@@ -1,0 +1,8 @@
+#include <error.h>
+
+namespace weif {
+
+error::error(const std::string& what): std::runtime_error(what) {}
+error::error(const char* what): std::runtime_error(what) {}
+
+} // weif
