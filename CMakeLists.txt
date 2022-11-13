@@ -1,0 +1,94 @@
+cmake_minimum_required (VERSION 3.5)
+project(libweif LANGUAGES C CXX VERSION 0.1.0)
+
+OPTION(BUILD_EXAMPLE "libweif example" ON)
+OPTION(BUILD_TEST    "libweif test"    ON)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_CXX_STANDARD 17)
+
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+
+# CheckIPOSupported module is available since 3.9
+# VERSION_GREATER_EQUAL is available since 3.7
+if(NOT (CMAKE_VERSION VERSION_LESS "3.9.0"))
+	# check_ipo_supported() returns an error when CMP0069 is OLD
+	cmake_policy(SET CMP0069 NEW)
+
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT HAS_LTO_SUPPORT)
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -O3 -ffast-math")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -O3 -ffast-math")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -Os -ffast-math")
+
+find_package(xtensor REQUIRED)
+
+include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
+
+file(GLOB_RECURSE SOURCES src/*.cpp)
+add_library(weif SHARED ${SOURCES})
+if(HAS_LTO_SUPPORT)
+	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif(HAS_LTO_SUPPORT)
+#
+# Here are a set of rules to help you update your library version information:
+#
+#    If the library source code has changed at all since the last update,
+#        then increment revision (‘c:r:a’ becomes ‘c:r+1:a’).
+#    If any interfaces have been added, removed, or changed since the last update,
+#        increment current, and set revision to 0.
+#    If any interfaces have been added since the last public release,
+#        then increment age.
+#    If any interfaces have been removed or changed since the last public release,
+#        then set age to 0.
+#
+# set_target_properties(weif PROPERTIES VERSION c.r.a SOVERSION c)
+#
+set_target_properties(weif PROPERTIES VERSION 1.0.0 SOVERSION 1)
+set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
+
+generate_export_header(weif)
+
+if(BUILD_TEST)
+enable_testing()
+file(GLOB_RECURSE TESTS test/*.cpp)
+foreach(test_source IN ITEMS ${TESTS})
+	string(REPLACE ${CMAKE_SOURCE_DIR}/ "" test_name ${test_source})
+	string(REPLACE / _ test_name ${test_name})
+	string(REPLACE .cpp "" test_name ${test_name})
+	add_executable(${test_name} ${test_source})
+	if(CPPUNIT_INCLUDE_DIRS)
+		target_include_directories(${test_name} ${CPPUNIT_INCLUDE_DIRS})
+	endif(CPPUNIT_INCLUDE_DIRS)
+	target_link_libraries(${test_name} ${CPPUNIT_LIBRARIES} weif)
+	add_test(${test_name} ${test_name})
+endforeach(test_source)
+endif()
+
+if(BUILD_EXAMPLE)
+file(GLOB_RECURSE EXAMPLES example/*.cpp)
+foreach(example_source IN ITEMS ${EXAMPLES})
+	string(REPLACE ${CMAKE_SOURCE_DIR}/ "" example_name ${example_source})
+	string(REPLACE / _ example_name ${example_name})
+	string(REPLACE .cpp "" example_name ${example_name})
+	add_executable(${example_name} ${example_source})
+	target_link_libraries(${example_name} weif)
+	if(HAS_LTO_SUPPORT)
+		set_property(TARGET ${example_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+	endif(HAS_LTO_SUPPORT)
+endforeach(example_source)
+endif()
+
+install(TARGETS weif
+	LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
+install(DIRECTORY include/
+	DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/weif
+	FILES_MATCHING PATTERN "*.h")
+configure_file("weif.pc.in" "weif.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/weif.pc"
+	DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig")
