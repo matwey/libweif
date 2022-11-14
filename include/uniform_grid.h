@@ -68,13 +68,38 @@ public:
 	uniform_grid(Iter begin, Iter end):
 		xt::xgenerator<detail::uniform_grid_fn<T>, T, std::array<std::size_t, 1>>{
 			detail::uniform_grid_fn<T>::make_from_iterable(begin, end),
-			{std::distance(begin, end)}} {}
+			{static_cast<std::size_t>(std::distance(begin, end))}} {}
 
 	const value_type& origin() const noexcept {
 		return this->functor().origin;
 	}
 	const value_type& delta() const noexcept {
 		return this->functor().delta;
+	}
+
+	bool match(const uniform_grid<T>& other) const noexcept {
+		using namespace std;
+
+		return this->delta() == other.delta()
+			&& fmod(this->origin(), this->delta()) == fmod(other.origin(), other.delta());
+	}
+
+	uniform_grid<T> intersect(const uniform_grid<T>& other) const {
+		if (other.origin() < origin())
+			return other.intersect(*this);
+
+		if (!match(other))
+			throw mismatched_grids{};
+
+		const auto new_size = (this->size() == 0 || other.size() == 0 || *this->crbegin() < other.origin() ?
+			static_cast<std::size_t>(0) :
+			static_cast<std::size_t>((std::min(*this->crbegin(), *other.crbegin()) - other.origin()) / other.delta()) + 1);
+
+		return {other.origin(), other.delta(), new_size};
+	}
+
+	std::size_t to_index(value_type v) const noexcept {
+		return static_cast<std::size_t>((v - origin()) / delta());
 	}
 };
 
