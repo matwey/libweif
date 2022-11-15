@@ -54,34 +54,54 @@ struct uniform_grid_fn {
 } // detail
 
 template<class T>
-class uniform_grid:
-	public xt::xgenerator<detail::uniform_grid_fn<T>, T, std::array<std::size_t, 1>> {
+class uniform_grid {
 public:
 	using value_type = T;
 
+private:
+	using generator_type =  xt::xgenerator<detail::uniform_grid_fn<T>, T, std::array<std::size_t, 1>>;
+
+	generator_type generator_;
+
+	const detail::uniform_grid_fn<T>& functor() const noexcept {
+		return generator_.functor();
+	}
+public:
+
 	uniform_grid(value_type origin, value_type delta, std::size_t size) noexcept:
-		xt::xgenerator<detail::uniform_grid_fn<T>, T, std::array<std::size_t, 1>>{
-			detail::uniform_grid_fn<T>{origin, delta},
-			{size}} {}
+		generator_{detail::uniform_grid_fn<T>{origin, delta}, {size}} {}
 
 	template<class Iter>
 	uniform_grid(Iter begin, Iter end):
-		xt::xgenerator<detail::uniform_grid_fn<T>, T, std::array<std::size_t, 1>>{
-			detail::uniform_grid_fn<T>::make_from_iterable(begin, end),
+		generator_{detail::uniform_grid_fn<T>::make_from_iterable(begin, end),
 			{static_cast<std::size_t>(std::distance(begin, end))}} {}
 
+	bool operator==(const uniform_grid<T>& other) const noexcept {
+		return generator_ == other.generator_;
+	}
+
+	bool operator!=(const uniform_grid<T>& other) const noexcept {
+		return !(*this == other);
+	}
+
 	const value_type& origin() const noexcept {
-		return this->functor().origin;
+		return functor().origin;
 	}
 	const value_type& delta() const noexcept {
-		return this->functor().delta;
+		return functor().delta;
+	}
+	const generator_type& values() const noexcept {
+		return generator_;
+	}
+	const std::size_t size() const noexcept {
+		return generator_.size();
 	}
 
 	bool match(const uniform_grid<T>& other) const noexcept {
 		using namespace std;
 
-		return this->delta() == other.delta()
-			&& fmod(this->origin(), this->delta()) == fmod(other.origin(), other.delta());
+		return delta() == other.delta()
+			&& fmod(origin(), delta()) == fmod(other.origin(), other.delta());
 	}
 
 	uniform_grid<T> intersect(const uniform_grid<T>& other) const {
@@ -91,9 +111,9 @@ public:
 		if (!match(other))
 			throw mismatched_grids{};
 
-		const auto new_size = (this->size() == 0 || other.size() == 0 || *this->crbegin() < other.origin() ?
+		const auto new_size = (size() == 0 || other.size() == 0 || *values().crbegin() < other.origin() ?
 			static_cast<std::size_t>(0) :
-			static_cast<std::size_t>((std::min(*this->crbegin(), *other.crbegin()) - other.origin()) / other.delta()) + 1);
+			static_cast<std::size_t>((std::min(*values().crbegin(), *other.values().crbegin()) - other.origin()) / other.delta()) + 1);
 
 		return {other.origin(), other.delta(), new_size};
 	}

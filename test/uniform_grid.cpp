@@ -15,6 +15,23 @@
 #include <uniform_grid.h>
 
 
+namespace CPPUNIT_NS {
+
+template<class T>
+struct assertion_traits<weif::uniform_grid<T>> {
+	static bool equal(const weif::uniform_grid<T>& x, const weif::uniform_grid<T>& y) {
+		return x == y;
+	}
+
+	static std::string toString(const weif::uniform_grid<T>& x) {
+		std::ostringstream oss;
+		oss << x.values();
+		return oss.str();
+	}
+};
+
+} // CPPUNIT_NS
+
 class test_uniform_grid_suite: public CppUnit::TestCase {
 CPPUNIT_TEST_SUITE(test_uniform_grid_suite);
 CPPUNIT_TEST(test_construct1);
@@ -30,7 +47,7 @@ void test_construct1() {
 	weif::uniform_grid ug{0.5f, 1.0f, 4};
 
 	const xt::xarray<float> expected = {0.5f, 1.5f, 2.5f, 3.5f};
-	const xt::xarray<float> actual = ug;
+	const xt::xarray<float> actual = ug.values();
 
 	CPPUNIT_ASSERT_EQUAL(expected, actual);
 };
@@ -38,7 +55,7 @@ void test_construct1() {
 void test_construct2() {
 	const xt::xarray<float> expected = {0.5f, 1.5f, 2.5f, 3.5f};
 	weif::uniform_grid ug(expected.cbegin(), expected.cend());
-	const xt::xarray<float> actual = ug;
+	const xt::xarray<float> actual = ug.values();
 
 	CPPUNIT_ASSERT_EQUAL(expected, actual);
 	CPPUNIT_ASSERT_EQUAL(0.5f, ug.origin());

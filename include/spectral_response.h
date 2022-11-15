@@ -20,7 +20,7 @@ public:
 	using value_type = T;
 private:
 	/* Consider using different type for uniform_grid, for instance, boost::cpp_dec_float */
-	uniform_grid<value_type>  grid_;
+	uniform_grid<value_type>   grid_;
 	xt::xtensor<value_type, 1> data_;
 public:
 	spectral_response(const uniform_grid<value_type>& grid, const xt::xtensor<value_type, 1>& data):
@@ -30,7 +30,7 @@ public:
 	const auto& grid() const { return grid_; }
 	const auto& data() const { return data_; }
 
-	void normalize();
+	void normalize() noexcept;
 	spectral_response<value_type> normalized() const;
 
 	void stack(const spectral_response<value_type>& other);

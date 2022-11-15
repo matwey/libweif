@@ -25,13 +25,19 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -O3 -ffast-math
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -O3 -ffast-math")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -Os -ffast-math")
 
+find_package(Boost COMPONENTS
+	program_options REQUIRED
+	system REQUIRED)
 find_package(xtensor REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(weif SHARED ${SOURCES})
+target_link_libraries(weif Boost::boost Boost::program_options Boost::system PkgConfig::FFTW3F)
 if(HAS_LTO_SUPPORT)
 	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif(HAS_LTO_SUPPORT)
@@ -53,8 +59,6 @@ set_target_properties(weif PROPERTIES VERSION 1.0.0 SOVERSION 1)
 set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 generate_export_header(weif)
-
-find_package(PkgConfig REQUIRED)
 
 if(BUILD_TEST)
 pkg_check_modules(CPPUNIT REQUIRED IMPORTED_TARGET cppunit)
