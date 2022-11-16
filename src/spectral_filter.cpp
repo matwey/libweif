@@ -10,6 +10,7 @@
 #include <xtensor/xmath.hpp>
 #include <xtensor/xpad.hpp>
 #include <xtensor/xtensor.hpp>
+#include <xtensor/xview.hpp>
 
 #include <spectral_filter.h>
 
@@ -48,8 +49,16 @@ spectral_filter<T>::spectral_filter(const spectral_response<value_type>& respons
 
 template<class T>
 typename spectral_filter<T>::value_type spectral_filter<T>::equiv_lambda() const noexcept {
-	// calc equiv lambda: integral in the notebook
-	return 0;
+	using namespace xt::placeholders;
+	using std::pow;
+
+	/* S(0) * 0**(-11/6) == 0 and S(inf) * inf**(-11/6) == 0 */
+	const auto vg = xt::view(grid_.values(), xt::range(1, _));
+	const auto vs = xt::view(data_, xt::range(1, _));
+	const auto i = grid_.delta() * xt::sum(vs * xt::pow(vg, -static_cast<value_type>(11.0/6.0)))();
+
+	/* 5.38 == 3.28 * 2**(5/7) */
+	return static_cast<value_type>(5.38) * pow(i, -static_cast<value_type>(6.0/7.0));
 }
 
 template<class T>

@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
 		auto sr = weif::spectral_response<float>::make_from_file(response_filename);
 		sr.normalize();
 		const weif::spectral_filter sf{sr, va["size"].as<std::size_t>()};
+		std::cerr << "Equivalent lambda: " << sf.equiv_lambda() << std::endl;
 
 		sf.dump(filter_filename);
 
