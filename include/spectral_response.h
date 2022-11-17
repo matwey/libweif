@@ -36,6 +36,8 @@ public:
 	void stack(const spectral_response<value_type>& other);
 	spectral_response<value_type> stacked(const spectral_response<value_type>& other) const;
 
+	value_type effective_lambda() const noexcept;
+
 	static spectral_response<value_type> make_from_file(const std::string& filename);
 };
 

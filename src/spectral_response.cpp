@@ -49,6 +49,11 @@ spectral_response<T> spectral_response<T>::stacked(const spectral_response<value
 }
 
 template<class T>
+typename spectral_response<T>::value_type spectral_response<T>::effective_lambda() const noexcept {
+	return grid_.origin() + grid_.delta() * xt::average(xt::arange(data_.size()), data_)();
+}
+
+template<class T>
 spectral_response<T> spectral_response<T>::make_from_file(const std::string& filename) {
 	rapidcsv::Document doc(filename,
 		rapidcsv::LabelParams(-1, -1),
