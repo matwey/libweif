@@ -1,8 +1,11 @@
 #ifndef _WEIF_SPECTRAL_FILTER_H
 #define _WEIF_SPECTRAL_FILTER_H
 
+#include <complex>
 #include <string>
 
+#include <xtensor/xcomplex.hpp>
+#include <xtensor/xmath.hpp>
 #include <xtensor/xtensor.hpp>
 
 #include <spectral_response.h>
@@ -22,16 +25,18 @@ public:
 	using value_type = T;
 private:
 	/* Consider using different type for uniform_grid, for instance, boost::cpp_dec_float */
-	uniform_grid<value_type>   grid_;
-	xt::xtensor<value_type, 1> data_;
+	uniform_grid<value_type> grid_;
+	xt::xtensor<std::complex<value_type>, 1> data_;
+	value_type carrier_;
 public:
 	spectral_filter(const spectral_response<value_type>& response, std::size_t size);
-	spectral_filter(const uniform_grid<value_type>& grid, const xt::xtensor<value_type, 1>& data):
-		grid_{grid},
-		data_{data} {}
 
-	const auto& grid() const { return grid_; }
-	const auto& data() const { return data_; }
+	const auto& grid() const noexcept { return grid_; }
+	const auto& data() const noexcept { return data_; }
+
+	auto values() const noexcept {
+		return xt::square(xt::cos(grid().values() * carrier_) * xt::imag(data()) - xt::sin(grid().values() * carrier_) * xt::real(data()));
+	}
 
 	value_type equiv_lambda() const noexcept;
 
