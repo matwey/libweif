@@ -35,7 +35,7 @@ public:
 	const auto& data() const noexcept { return data_; }
 
 	auto values() const noexcept {
-		return xt::square(xt::cos(grid().values() * carrier_) * xt::imag(data()) - xt::sin(grid().values() * carrier_) * xt::real(data()));
+		return xt::square(xt::cos(grid().values() * carrier_) * xt::imag(data()) + xt::sin(grid().values() * carrier_) * xt::real(data()));
 	}
 
 	value_type equiv_lambda() const noexcept;
