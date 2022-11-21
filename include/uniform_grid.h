@@ -121,6 +121,40 @@ public:
 	std::size_t to_index(value_type v) const noexcept {
 		return static_cast<std::size_t>((v - origin()) / delta());
 	}
+
+	template<class U>
+	auto operator+ (U x) const noexcept {
+		return uniform_grid<T>{origin() + x, delta(), size()};
+	}
+	template<class U>
+	auto operator- (U x) const noexcept {
+		return uniform_grid<T>{origin() - x, delta(), size()};
+	}
+	template<class U>
+	auto operator* (U x) const noexcept {
+		return uniform_grid<T>{origin() * x, delta() * x, size()};
+	}
+	template<class U>
+	auto operator/ (U x) const noexcept {
+		return uniform_grid<T>{origin() / x, delta() / x, size()};
+	}
+
+	template<class U>
+	auto operator+= (U x) noexcept {
+		return *this = *this + x;
+	}
+	template<class U>
+	auto operator-= (U x) noexcept {
+		return *this = *this - x;
+	}
+	template<class U>
+	auto operator*= (U x) noexcept {
+		return *this = *this * x;
+	}
+	template<class U>
+	auto operator/= (U x) noexcept {
+		return *this = *this / x;
+	}
 };
 
 template<class Iter>

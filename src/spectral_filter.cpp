@@ -47,12 +47,20 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 }
 
 template<class T>
+template<class E1, class E2>
+spectral_filter<T>::spectral_filter(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier):
+	grid_{grid},
+	real_{real.derived_cast(), typename cubic_spline<T>::first_order_boundary{0, 0}},
+	imag_{imag.derived_cast(), typename cubic_spline<T>::first_order_boundary{0, 0}},
+	carrier_{carrier} {}
+
+template<class T>
 template<class E>
 spectral_filter<T>::spectral_filter(value_type delta, const xt::xexpression<E>& e, T carrier):
-	grid_{static_cast<value_type>(0), delta, e.derived_cast().size()},
-	real_{xt::real(e.derived_cast()), typename cubic_spline<T>::first_order_boundary{0, 0}},
-	imag_{xt::imag(e.derived_cast()), typename cubic_spline<T>::first_order_boundary{0, 0}},
-	carrier_{carrier} {}
+	spectral_filter(uniform_grid{static_cast<value_type>(0), delta, e.derived_cast().size()},
+		xt::real(e.derived_cast()),
+		xt::imag(e.derived_cast()),
+		carrier) {}
 
 template<class T>
 spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size):
@@ -70,6 +78,25 @@ spectral_filter<T>::spectral_filter(const spectral_response<value_type>& respons
 template<class T>
 spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size):
 	spectral_filter(response, size, response.effective_lambda()) {}
+
+template<class T>
+void spectral_filter<T>::normalize() noexcept {
+	const auto lambda_0 = equiv_lambda();
+
+	grid_ *= lambda_0;
+	carrier_ /= lambda_0;
+	real_ *= lambda_0;
+	imag_ *= lambda_0;
+}
+
+template<class T>
+spectral_filter<T> spectral_filter<T>::normalized() const {
+	spectral_filter<T> ret{*this};
+
+	ret.normalize();
+
+	return ret;
+}
 
 template<class T>
 typename spectral_filter<T>::value_type spectral_filter<T>::equiv_lambda() const noexcept {

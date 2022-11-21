@@ -109,6 +109,66 @@ public:
 			return this->operator() (x);
 		}, std::forward<E>(e));
 	}
+
+	template<class U>
+	auto operator+ (U x) const noexcept {
+		const auto ret{*this};
+
+		ret += x;
+
+		return ret;
+	}
+	template<class U>
+	auto operator- (U x) const noexcept {
+		const auto ret{*this};
+
+		ret -= x;
+
+		return ret;
+	}
+	template<class U>
+	auto operator* (U x) const noexcept {
+		const auto ret{*this};
+
+		ret *= x;
+
+		return ret;
+	}
+	template<class U>
+	auto operator/ (U x) const noexcept {
+		const auto ret{*this};
+
+		ret /= x;
+
+		return ret;
+	}
+
+	template<class U>
+	cubic_spline<T>& operator+= (U x) noexcept {
+		values_ += x;
+
+		return *this;
+	}
+	template<class U>
+	cubic_spline<T>& operator-= (U x) noexcept {
+		values_ -= x;
+
+		return *this;
+	}
+	template<class U>
+	cubic_spline<T>& operator*= (U x) noexcept {
+		values_ *= x;
+		d2_ *= x;
+
+		return *this;
+	}
+	template<class U>
+	cubic_spline<T>& operator/= (U x) noexcept {
+		values_ /= x;
+		d2_ /= x;
+
+		return *this;
+	}
 };
 
 template<class E>

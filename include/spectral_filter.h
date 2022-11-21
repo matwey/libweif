@@ -34,6 +34,8 @@ private:
 	template<class E>
 	xt::xtensor<std::complex<value_type>, 1> make_fft(const xt::xexpression<E>& e);
 
+	template<class E1, class E2>
+	spectral_filter(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier);
 	template<class E>
 	spectral_filter(value_type delta, const xt::xexpression<E>& e, value_type carrier);
 	spectral_filter(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size);
@@ -64,6 +66,9 @@ public:
 	auto values() const noexcept {
 		return operator() (grid().values());
 	}
+
+	void normalize() noexcept;
+	spectral_filter<value_type> normalized() const;
 
 	value_type equiv_lambda() const noexcept;
 
