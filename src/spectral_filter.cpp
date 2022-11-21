@@ -18,33 +18,58 @@
 namespace weif {
 
 template<class T>
-spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size):
-	grid_(static_cast<value_type>(0),
-		static_cast<value_type>(1) / response.grid().delta() / std::max(size, response.grid().size()),
-		std::max(size, response.grid().size()) / 2 + 1),
-	data_(std::array{grid_.size()}) {
+template<class E>
+xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_filter<T>::make_fft(const xt::xexpression<E>& e) {
+	const auto size = e.derived_cast().size();
 
-	const std::size_t carrier_idx = response.grid().to_index(response.effective_lambda());
-	carrier_ = static_cast<value_type>(2) * xt::numeric_constants<value_type>::PI * response.grid().values()[carrier_idx];
+	xt::xtensor<std::complex<value_type>, 1> ret{std::array{size / 2 + 1}};
+	auto in_adapter = xt::adapt(reinterpret_cast<value_type*>(ret.data()), size, xt::no_ownership(), std::array{size});
+	in_adapter.assign(e);
 
-	const std::size_t in_size = std::max(size, response.grid().size());
-	auto in_storage = xt::adapt(reinterpret_cast<value_type*>(data_.data()), in_size, xt::no_ownership(), std::array{in_size});
+	if constexpr (std::is_same<value_type, float>::value) {
+		fftwf_plan p = fftwf_plan_dft_r2c_1d(size,
+			in_adapter.data(),
+			reinterpret_cast<fftwf_complex*>(ret.data()),
+			FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
 
-	const std::vector<std::size_t> pad{{0, in_storage.size() - response.data().size()}};
-	in_storage.assign(xt::view(xt::tile(xt::pad(response.data() / response.grid().values(), pad), {2}), xt::range(carrier_idx, carrier_idx + in_size)));
+		assert(p != nullptr);
 
-	fftwf_plan p = fftwf_plan_dft_r2c_1d(size,
-		in_storage.data(),
-		reinterpret_cast<fftwf_complex*>(data_.data()),
-		FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
+		fftwf_execute(p);
+		fftwf_destroy_plan(p);
+	} else {
+		static_assert(true, "value_type is not supported");
+	}
 
-	assert(p != nullptr);
+	/* Boundary condition at +inf */
+	ret(ret.size()-1) = std::complex<value_type>{0, 0};
 
-	fftwf_execute(p);
-	fftwf_destroy_plan(p);
-
-	assert(data_.size() == grid_.size());
+	return ret;
 }
+
+template<class T>
+template<class E>
+spectral_filter<T>::spectral_filter(value_type delta, const xt::xexpression<E>& e, T carrier):
+	grid_{static_cast<value_type>(0), delta, e.derived_cast().size()},
+	real_{xt::real(e.derived_cast()), typename cubic_spline<T>::first_order_boundary{0, 0}},
+	imag_{xt::imag(e.derived_cast()), typename cubic_spline<T>::first_order_boundary{0, 0}},
+	carrier_{carrier} {}
+
+template<class T>
+spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size):
+	spectral_filter(static_cast<value_type>(1) / response.grid().delta() / padded_size,
+		make_fft(xt::view(
+			xt::tile(xt::pad(response.data() / response.grid().values(),
+				std::vector<std::size_t>{{0, (padded_size > response.grid().size() ? padded_size - response.grid().size() : 0)}}), {2}),
+			xt::range(carrier_idx, carrier_idx + padded_size))),
+		response.grid().values()[carrier_idx]) {}
+
+template<class T>
+spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size, value_type carrier):
+	spectral_filter(response, size, response.grid().to_index(carrier), std::max(response.grid().size(), size)) {}
+
+template<class T>
+spectral_filter<T>::spectral_filter(const spectral_response<value_type>& response, std::size_t size):
+	spectral_filter(response, size, response.effective_lambda()) {}
 
 template<class T>
 typename spectral_filter<T>::value_type spectral_filter<T>::equiv_lambda() const noexcept {

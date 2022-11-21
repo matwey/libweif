@@ -30,9 +30,9 @@ private:
 	xt::xtensor<T, 1> values_;
 
 	template<class E>
-	cubic_spline(E&& e, value_type first, value_type last, value_type d0, value_type dn):
-		d2_{std::array{e.size()}},
-		values_{std::forward<E>(e)} {
+	cubic_spline(const xt::xexpression<E>& e, value_type first, value_type last, value_type d0, value_type dn):
+		d2_{std::array{e.derived_cast().size()}},
+		values_{e.derived_cast()} {
 
 		assert(values_.size() > 1);
 
@@ -66,30 +66,30 @@ private:
 
 public:
 	template<class E>
-	cubic_spline(E&& e):
-		cubic_spline(std::forward<E>(e),
+	cubic_spline(const xt::xexpression<E>& e):
+		cubic_spline(e,
 			static_cast<value_type>(0),
 			static_cast<value_type>(0),
 			static_cast<value_type>(0),
 			static_cast<value_type>(0)) {}
 
 	template<class E>
-	cubic_spline(E&& e, first_order_boundary boundary):
-		cubic_spline(std::forward<E>(e),
+	cubic_spline(const xt::xexpression<E>& e, first_order_boundary boundary):
+		cubic_spline(e,
 			static_cast<value_type>(1),
 			static_cast<value_type>(1),
-			(e(1) - e(0) - boundary.left) * 6,
-			(boundary.right - (e(e.size() - 1) - e(e.size() - 2))) * 6) {}
+			(e.derived_cast()(1) - e.derived_cast()(0) - boundary.left) * 6,
+			(boundary.right - (e.derived_cast()(e.derived_cast().size() - 1) - e.derived_cast()(e.derived_cast().size() - 2))) * 6) {}
 
 	template<class E>
-	cubic_spline(E&& e, second_order_boundary boundary):
-		cubic_spline(std::forward<E>(e),
+	cubic_spline(const xt::xexpression<E>& e, second_order_boundary boundary):
+		cubic_spline(e,
 			static_cast<value_type>(0),
 			static_cast<value_type>(0),
 			boundary.left * 2,
 			boundary.right * 2) {}
 
-	value_type operator() (const value_type x) const {
+	value_type operator() (const value_type x) const noexcept {
 		const auto idx = static_cast<std::size_t>(x);
 		const auto delta0 = x - static_cast<value_type>(idx);
 		const auto delta1 = static_cast<value_type>(1) - delta0;
@@ -104,7 +104,7 @@ public:
 	}
 
 	template<class E, typename = std::enable_if_t<xt::is_xexpression<E>::value>>
-	auto operator() (E&& e) const {
+	auto operator() (E&& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (auto x) {
 			return this->operator() (x);
 		}, std::forward<E>(e));
