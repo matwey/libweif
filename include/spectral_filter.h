@@ -20,8 +20,7 @@ namespace weif {
 template<class T>
 class WEIF_EXPORT spectral_filter {
 public:
-//	static_assert(std::is_floating_point<T>::value, "type T is not supported");
-	static_assert(std::is_same_v<T, float>, "type T is not supported");
+	static_assert(std::is_floating_point<T>::value, "type T is not supported");
 
 	using value_type = T;
 private:

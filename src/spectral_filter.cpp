@@ -36,6 +36,16 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 
 		fftwf_execute(p);
 		fftwf_destroy_plan(p);
+	} else if (std::is_same<value_type, double>::value) {
+		fftw_plan p = fftw_plan_dft_r2c_1d(size,
+			in_adapter.data(),
+			reinterpret_cast<fftw_complex*>(ret.data()),
+			FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
+
+		assert(p != nullptr);
+
+		fftw_execute(p);
+		fftw_destroy_plan(p);
 	} else {
 		static_assert(true, "value_type is not supported");
 	}
@@ -125,5 +135,6 @@ void spectral_filter<T>::dump(const std::string& filename) const {
 }
 
 template class spectral_filter<float>;
+template class spectral_filter<double>;
 
 } // weif

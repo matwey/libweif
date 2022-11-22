@@ -31,13 +31,14 @@ find_package(Boost COMPONENTS
 find_package(xtensor REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
+pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(weif SHARED ${SOURCES})
-target_link_libraries(weif Boost::boost Boost::program_options Boost::system PkgConfig::FFTW3F)
+target_link_libraries(weif Boost::boost Boost::program_options Boost::system PkgConfig::FFTW3F PkgConfig::FFTW3)
 if(HAS_LTO_SUPPORT)
 	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif(HAS_LTO_SUPPORT)
