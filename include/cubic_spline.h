@@ -62,6 +62,8 @@ private:
 		for (; i > 0; --i) {
 			d2_(i-1) = d2_(i-1) - cprime(i-1) * d2_(i);
 		}
+
+		assert(values_.size() == d2_.size());
 	}
 
 public:
@@ -88,6 +90,8 @@ public:
 			static_cast<value_type>(0),
 			boundary.left * 2,
 			boundary.right * 2) {}
+
+	auto size() const noexcept { return values_.size(); }
 
 	value_type operator() (const value_type x) const noexcept {
 		const auto idx = static_cast<std::size_t>(x);
