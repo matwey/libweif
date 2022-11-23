@@ -55,11 +55,11 @@ public:
 		return std::pow(std::cos(cx) * imag()(dx) + std::sin(cx) * real()(dx), 2);
 	}
 
-	template<class E, typename = std::enable_if_t<xt::is_xexpression<E>::value>>
-	auto operator() (E&& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (auto x) {
-			return this->operator() (x);
-		}, std::forward<E>(e));
+	template<class E>
+	auto operator() (const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) {
+			return this->operator()(x);
+		}, e.derived_cast());
 	}
 
 	auto values() const noexcept {
