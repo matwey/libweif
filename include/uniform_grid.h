@@ -93,9 +93,7 @@ public:
 	const generator_type& values() const noexcept {
 		return generator_;
 	}
-	const std::size_t size() const noexcept {
-		return generator_.size();
-	}
+	auto size() const noexcept { return generator_.size(); }
 
 	bool match(const uniform_grid<T>& other) const noexcept {
 		using namespace std;
@@ -123,36 +121,36 @@ public:
 	}
 
 	template<class U>
-	auto operator+ (U x) const noexcept {
+	auto operator+ (const U x) const noexcept {
 		return uniform_grid<T>{origin() + x, delta(), size()};
 	}
 	template<class U>
-	auto operator- (U x) const noexcept {
+	auto operator- (const U x) const noexcept {
 		return uniform_grid<T>{origin() - x, delta(), size()};
 	}
 	template<class U>
-	auto operator* (U x) const noexcept {
+	auto operator* (const U x) const noexcept {
 		return uniform_grid<T>{origin() * x, delta() * x, size()};
 	}
 	template<class U>
-	auto operator/ (U x) const noexcept {
+	auto operator/ (const U x) const noexcept {
 		return uniform_grid<T>{origin() / x, delta() / x, size()};
 	}
 
 	template<class U>
-	auto operator+= (U x) noexcept {
+	auto operator+= (const U x) noexcept {
 		return *this = *this + x;
 	}
 	template<class U>
-	auto operator-= (U x) noexcept {
+	auto operator-= (const U x) noexcept {
 		return *this = *this - x;
 	}
 	template<class U>
-	auto operator*= (U x) noexcept {
+	auto operator*= (const U x) noexcept {
 		return *this = *this * x;
 	}
 	template<class U>
-	auto operator/= (U x) noexcept {
+	auto operator/= (const U x) noexcept {
 		return *this = *this / x;
 	}
 };
