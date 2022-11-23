@@ -107,15 +107,15 @@ public:
 		return d20 * delta13 + d21 * delta03 + (y0 - d20) * delta1 + (y1 - d21) * delta0;
 	}
 
-	template<class E, typename = std::enable_if_t<xt::is_xexpression<E>::value>>
-	auto operator() (E&& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (auto x) {
-			return this->operator() (x);
-		}, std::forward<E>(e));
+	template<class E>
+	auto operator() (const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) {
+			return this->operator()(x);
+		}, e.derived_cast());
 	}
 
 	template<class U>
-	auto operator+ (U x) const noexcept {
+	auto operator+ (const U x) const noexcept {
 		const auto ret{*this};
 
 		ret += x;
@@ -123,7 +123,7 @@ public:
 		return ret;
 	}
 	template<class U>
-	auto operator- (U x) const noexcept {
+	auto operator- (const U x) const noexcept {
 		const auto ret{*this};
 
 		ret -= x;
@@ -131,7 +131,7 @@ public:
 		return ret;
 	}
 	template<class U>
-	auto operator* (U x) const noexcept {
+	auto operator* (const U x) const noexcept {
 		const auto ret{*this};
 
 		ret *= x;
@@ -139,7 +139,7 @@ public:
 		return ret;
 	}
 	template<class U>
-	auto operator/ (U x) const noexcept {
+	auto operator/ (const U x) const noexcept {
 		const auto ret{*this};
 
 		ret /= x;
@@ -148,26 +148,26 @@ public:
 	}
 
 	template<class U>
-	cubic_spline<T>& operator+= (U x) noexcept {
+	cubic_spline<T>& operator+= (const U x) noexcept {
 		values_ += x;
 
 		return *this;
 	}
 	template<class U>
-	cubic_spline<T>& operator-= (U x) noexcept {
+	cubic_spline<T>& operator-= (const U x) noexcept {
 		values_ -= x;
 
 		return *this;
 	}
 	template<class U>
-	cubic_spline<T>& operator*= (U x) noexcept {
+	cubic_spline<T>& operator*= (const U x) noexcept {
 		values_ *= x;
 		d2_ *= x;
 
 		return *this;
 	}
 	template<class U>
-	cubic_spline<T>& operator/= (U x) noexcept {
+	cubic_spline<T>& operator/= (const U x) noexcept {
 		values_ /= x;
 		d2_ /= x;
 
