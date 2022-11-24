@@ -48,11 +48,18 @@ public:
 	const auto& carrier() const noexcept { return carrier_; }
 
 	value_type operator() (const value_type x) const noexcept {
-		const auto c = static_cast<value_type>(2) * xt::numeric_constants<value_type>::PI * carrier();
-		const auto cx = x * c;
-		const auto dx = (x - grid().origin()) / grid().delta();
+		using namespace std;
 
-		return std::pow(std::cos(cx) * imag()(dx) + std::sin(cx) * real()(dx), 2);
+		const auto ax = abs(x);
+
+		if (grid() <= ax)
+			return static_cast<value_type>(0);
+
+		const auto c = static_cast<value_type>(2) * xt::numeric_constants<value_type>::PI * carrier();
+		const auto cx = ax * c;
+		const auto dx = (ax - grid().origin()) / grid().delta();
+
+		return pow(cos(cx) * imag()(dx) + sin(cx) * real()(dx), 2);
 	}
 
 	template<class E>

@@ -155,6 +155,26 @@ public:
 	}
 };
 
+template<class T>
+inline bool operator< (const uniform_grid<T>& lhs, const T& rhs) {
+	return *lhs.values().crbegin() < rhs;
+}
+
+template<class T>
+inline bool operator> (const uniform_grid<T>& lhs, const T& rhs) {
+	return lhs.origin() > rhs;
+}
+
+template<class T>
+inline bool operator<=(const uniform_grid<T>& lhs, const T& rhs) {
+	return *lhs.values().crbegin() <= rhs;
+}
+
+template<class T>
+inline bool operator>=(const uniform_grid<T>& lhs, const T& rhs) {
+	return lhs.origin() >= rhs;
+}
+
 template<class Iter>
 uniform_grid(Iter begin, Iter end) -> uniform_grid<typename std::iterator_traits<Iter>::value_type>;
 
