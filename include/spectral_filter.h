@@ -29,6 +29,9 @@ private:
 	cubic_spline<value_type> real_;
 	cubic_spline<value_type> imag_;
 	value_type carrier_;
+	value_type equiv_lambda_;
+
+	value_type eval_equiv_lambda() const;
 
 	template<class E>
 	xt::xtensor<std::complex<value_type>, 1> make_fft(const xt::xexpression<E>& e);
@@ -46,8 +49,10 @@ public:
 	const auto& real() const noexcept { return real_; }
 	const auto& imag() const noexcept { return imag_; }
 	const auto& carrier() const noexcept { return carrier_; }
+	const auto& equiv_lambda() const noexcept { return equiv_lambda_; }
 
 	value_type operator() (const value_type x) const noexcept {
+		// x = u^2 / lambda = z f^2
 		using namespace std;
 
 		const auto ax = abs(x);
@@ -55,9 +60,9 @@ public:
 		if (grid() <= ax)
 			return static_cast<value_type>(0);
 
-		const auto c = static_cast<value_type>(2) * xt::numeric_constants<value_type>::PI * carrier();
+		const auto c = xt::numeric_constants<value_type>::PI * carrier();
 		const auto cx = ax * c;
-		const auto dx = (ax - grid().origin()) / grid().delta();
+		const auto dx = (ax / static_cast<value_type>(2) - grid().origin()) / grid().delta();
 
 		return pow(cos(cx) * imag()(dx) + sin(cx) * real()(dx), 2);
 	}
@@ -69,16 +74,8 @@ public:
 		}, e.derived_cast());
 	}
 
-	auto values() const noexcept {
-		return operator() (grid().values());
-	}
-
 	void normalize() noexcept;
 	spectral_filter<value_type> normalized() const;
-
-	value_type equiv_lambda() const noexcept;
-
-	void dump(const std::string& filename) const;
 };
 
 template<class T>

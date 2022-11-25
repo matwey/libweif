@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <gsl/gsl_errno.h>
+
 #include <weif_export.h>
 
 namespace weif {
@@ -31,6 +33,12 @@ struct WEIF_EXPORT mismatched_grids:
 	public error {
 
 	mismatched_grids() noexcept;
+};
+
+struct WEIF_EXPORT gsl_error:
+	public error {
+
+	gsl_error(const int gsl_errno) noexcept;
 };
 
 } // weif

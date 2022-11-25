@@ -1,7 +1,13 @@
+#include <fstream>
 #include <iostream>
+#include <string>
 
-#include <xtensor/xio.hpp>
 #include <boost/program_options.hpp>
+
+#include <xtensor/xarray.hpp>
+#include <xtensor/xbuilder.hpp>
+#include <xtensor/xcsv.hpp>
+#include <xtensor/xmanipulation.hpp>
 
 #include <spectral_filter.h>
 
@@ -29,18 +35,22 @@ int main(int argc, char** argv) {
 
 		const auto response_filename = va["response_filename"].as<std::string>();
 		const auto filter_filename   = va["filter_filename"].as<std::string>();
+		const auto size = va["size"].as<std::size_t>();
 
 		auto sr = weif::spectral_response<float>::make_from_file(response_filename);
 		sr.normalize();
 		std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
-		weif::spectral_filter sf{sr, va["size"].as<std::size_t>()};
+		weif::spectral_filter sf{sr, size};
 		std::cerr << "Equivalent lambda: " << sf.equiv_lambda() << std::endl;
 		if (va.count("normalize")) {
 			sf.normalize();
 			std::cerr << "Equivalent lambda: " << sf.equiv_lambda() << std::endl;
 		}
 
-		sf.dump(filter_filename);
+		xt::xarray<float> grid = xt::linspace(static_cast<float>(0), static_cast<float>(5), size);
+
+		std::ofstream stm(filter_filename);
+		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, sf(xt::square(grid))))));
 
 	} catch (const po::error& e) {
 		std::cerr << e.what() << std::endl;

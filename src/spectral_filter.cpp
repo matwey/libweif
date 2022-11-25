@@ -1,10 +1,12 @@
 #include <array>
 #include <cassert>
 #include <complex>
-#include <fstream>
-#include <iomanip>
+#include <memory>
+#include <limits>
 
 #include <fftw3.h>
+
+#include <gsl/gsl_integration.h>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xmath.hpp>
@@ -62,7 +64,8 @@ spectral_filter<T>::spectral_filter(const uniform_grid<value_type>& grid, const 
 	grid_{grid},
 	real_{real.derived_cast(), typename cubic_spline<T>::first_order_boundary{0, 0}},
 	imag_{imag.derived_cast(), typename cubic_spline<T>::first_order_boundary{0, 0}},
-	carrier_{carrier} {}
+	carrier_{carrier},
+	equiv_lambda_{eval_equiv_lambda()} {}
 
 template<class T>
 template<class E>
@@ -95,6 +98,7 @@ void spectral_filter<T>::normalize() noexcept {
 
 	grid_ *= lambda_0;
 	carrier_ /= lambda_0;
+	equiv_lambda_ /= lambda_0;
 	real_ *= lambda_0;
 	imag_ *= lambda_0;
 }
@@ -109,29 +113,36 @@ spectral_filter<T> spectral_filter<T>::normalized() const {
 }
 
 template<class T>
-typename spectral_filter<T>::value_type spectral_filter<T>::equiv_lambda() const noexcept {
-	using namespace xt::placeholders;
-	using std::pow;
+typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() const {
+	constexpr std::size_t intervals = 1024;
 
-	/* S(0) * 0**(-11/6) == 0 and S(inf) * inf**(-11/6) == 0 */
-	const auto vg = xt::view(grid_.values(), xt::range(1, _));
-	const auto vs = xt::view(values(), xt::range(1, _));
-	const auto i = grid_.delta() * xt::sum(vs * xt::pow(vg, -static_cast<value_type>(11.0/6.0)))();
-
-	/* 5.38 == 3.28 * 2**(5/7) */
-	return static_cast<value_type>(5.38) * pow(i, -static_cast<value_type>(6.0/7.0));
-}
-
-template<class T>
-void spectral_filter<T>::dump(const std::string& filename) const {
-	std::ofstream fstm{filename};
-	fstm << "# 1/nm   value" << std::endl;
-	fstm << std::setprecision(7);
-
-	const auto v_expr = values();
-	for (std::size_t i = 0; i < grid_.size(); ++i) {
-		fstm << grid_.values()[i] << " " << v_expr[i] << std::endl;
+	auto workspace_ptr = gsl_integration_workspace_alloc(intervals);
+	if (workspace_ptr == nullptr) {
+		throw std::bad_alloc();
 	}
+
+	std::unique_ptr<gsl_integration_workspace, void (*)(gsl_integration_workspace*)> workspace{workspace_ptr, &gsl_integration_workspace_free};
+
+	gsl_function f;
+	f.function = [] (double x, void* params) -> double {
+		const auto that = reinterpret_cast<const spectral_filter<T>*>(params);
+
+		if (x == 0.0)
+			return 0.0;
+
+		return std::pow(x, -11.0/6.0) * that->operator()(x);
+	};
+	f.params = const_cast<void*>(reinterpret_cast<const void*>(this));
+
+	double result;
+	double abserr;
+
+	int status = gsl_integration_qagiu(&f, 0.0, std::numeric_limits<value_type>::epsilon(), std::numeric_limits<value_type>::epsilon(), intervals, workspace.get(), &result, &abserr);
+	if (status) {
+		throw gsl_error(status);
+	}
+
+	return static_cast<value_type>(3.28) * std::pow(static_cast<value_type>(result), -static_cast<value_type>(6.0/7.0));
 }
 
 template class spectral_filter<float>;
