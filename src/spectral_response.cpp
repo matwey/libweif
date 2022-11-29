@@ -10,7 +10,7 @@ namespace weif {
 template<class T>
 void spectral_response<T>::normalize() noexcept {
 	/* Response in full bandwidth is 1 */
-	const auto norm = xt::trapz(data_, grid().delta());
+	const auto norm = xt::sum(data_)();
 
 	data_ /= norm;
 }
