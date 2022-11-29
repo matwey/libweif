@@ -49,7 +49,7 @@ spectral_response<T> spectral_response<T>::stacked(const spectral_response<value
 
 template<class T>
 typename spectral_response<T>::value_type spectral_response<T>::effective_lambda() const noexcept {
-	return grid_.origin() + grid_.delta() * xt::average(xt::arange(data_.size()), data_)();
+	return grid_.origin() + grid_.delta() * xt::average(xt::arange(data_.size()), data_ / grid_.values())();
 }
 
 template<class T>
