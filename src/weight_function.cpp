@@ -12,7 +12,8 @@ namespace weif {
 
 template<class T>
 auto weight_function<T>::make_int(function_type&& fun, std::size_t size) {
-	constexpr std::size_t intervals = 1024;
+	constexpr std::size_t intervals = 8192;
+	constexpr const value_type aerr = 1.99910328743904797244566463608276268L * std::numeric_limits<value_type>::epsilon();
 
 	auto workspace_ptr = gsl_integration_workspace_alloc(intervals);
 	if (workspace_ptr == nullptr) {
@@ -41,7 +42,7 @@ auto weight_function<T>::make_int(function_type&& fun, std::size_t size) {
 		double result;
 		double abserr;
 
-		int status = gsl_integration_qagiu(&f, 0.0, std::numeric_limits<value_type>::epsilon(), std::numeric_limits<value_type>::epsilon(), intervals, workspace.get(), &result, &abserr);
+		int status = gsl_integration_qagiu(&f, 0.0, 2*aerr, std::numeric_limits<value_type>::epsilon(), intervals, workspace.get(), &result, &abserr);
 		if (status) {
 			throw gsl_error(status);
 		}

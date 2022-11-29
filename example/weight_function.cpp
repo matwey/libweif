@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <boost/program_options.hpp>
 
@@ -23,29 +24,51 @@ int main(int argc, char** argv) {
 
 	opts.add_options()
 		("size", po::value<std::size_t>()->default_value(1024), "Output grid size")
-		("response_filename", po::value<std::string>(), "Spectral response input filename");
-
-	pos_opts.add("response_filename", 1);
+		("aperture_scale", po::value<float>()->default_value(20.574), "Aperture scale, mm.")
+		("central_obscuration", po::value<float>()->default_value(0.0), "Central obscuration")
+		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
+		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename");
 
 	try {
 		auto parsed = po::command_line_parser(argc, argv).options(opts).positional(pos_opts).run();
 		po::store(std::move(parsed), va);
+
+		if (va.count("help")) {
+			std::cerr << opts << std::endl;
+
+			return 1;
+		}
+
 		po::notify(va);
 
-		const auto response_filename = va["response_filename"].as<std::string>();
 		const auto size = va["size"].as<std::size_t>();
+		const auto aperture_scale = va["aperture_scale"].as<float>();
+		const auto central_obscuration = va["central_obscuration"].as<float>();
+		const auto output_filename = va["output_filename"].as<std::string>();
+		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
 
-		auto sr = weif::spectral_response<float>::make_from_file(response_filename);
+		auto response_it = response_filename.cbegin();
+		auto sr = weif::spectral_response<float>::make_from_file(*response_it++);
+		for (; response_it != response_filename.cend(); ++response_it) {
+			auto sr2 = weif::spectral_response<float>::make_from_file(*response_it);
+			sr.stack(sr2);
+		}
+
+		std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 		sr.normalize();
+
 		weif::spectral_filter sf{sr, 4096};
 		const auto lambda = sf.equiv_lambda();
+		std::cerr << "Equivalent lambda: " << lambda << std::endl;
 		sf.normalize();
 
-		weif::weight_function<float> wf{sf, lambda, weif::circular_aperture<float>{}, 11, 1025};
+		const xt::xarray<float> grid = xt::linspace(static_cast<float>(0), static_cast<float>(30), size);
 
-		xt::xarray<float> grid = xt::linspace(static_cast<float>(0), static_cast<float>(30), size);
+		const auto wf = (central_obscuration != 0 ?
+			weif::weight_function<float>{sf, lambda, weif::annular_aperture<float>{central_obscuration}, aperture_scale, 1025} :
+			weif::weight_function<float>{sf, lambda, weif::circular_aperture<float>{}, aperture_scale, 1025});
 
-		std::ofstream stm("wf.dat");
+		std::ofstream stm(output_filename);
 		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, wf(grid)))));
 
 	} catch (const po::error& e) {
