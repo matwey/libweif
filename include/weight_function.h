@@ -21,7 +21,7 @@ public:
 	using value_type = T;
 
 private:
-	using function_type = std::function<double(double, double)>;
+	using function_type = std::function<value_type(value_type, value_type)>;
 
 private:
 	value_type lambda_;
@@ -40,13 +40,15 @@ public:
 	template<class SF, class AF>
 	weight_function(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, std::size_t size):
 		weight_function(lambda, aperture_scale,
-			[spectral_filter = std::forward<SF>(spectral_filter), aperture_filter = std::forward<AF>(aperture_filter)] (double u, double x) -> double {
-			using namespace std;
+			[spectral_filter = std::forward<SF>(spectral_filter), aperture_filter = std::forward<AF>(aperture_filter)] (value_type u, value_type x) -> value_type {
+			if (u == static_cast<value_type>(0) || u == std::numeric_limits<value_type>::infinity())
+				return static_cast<value_type>(0);
 
-			if (u == 0.0)
-				return 0.0;
+			if (u < static_cast<value_type>(1)) {
+				return std::pow(u, static_cast<value_type>(4.0/3.0)) * spectral_filter.regular(u * u) * aperture_filter(x * u);
+			}
 
-			return pow(u, -8.0/3.0) * spectral_filter(u * u) * aperture_filter(x * u);
+			return std::pow(u, -static_cast<value_type>(8.0/3.0)) * spectral_filter(u * u) * aperture_filter(x * u);
 		}, size) {}
 
 	const auto& lambda() const noexcept { return lambda_; /* nm */ }

@@ -1,6 +1,6 @@
 #include <limits>
 
-#include <gsl/gsl_integration.h>
+#include <boost/math/quadrature/exp_sinh.hpp>
 
 #include <xtensor/xio.hpp>
 
@@ -12,42 +12,17 @@ namespace weif {
 
 template<class T>
 auto weight_function<T>::make_int(function_type&& fun, std::size_t size) {
-	constexpr std::size_t intervals = 8192;
-	constexpr const value_type aerr = 1.99910328743904797244566463608276268L * std::numeric_limits<value_type>::epsilon();
+	auto integrator = std::make_unique<boost::math::quadrature::exp_sinh<value_type>>();
 
-	auto workspace_ptr = gsl_integration_workspace_alloc(intervals);
-	if (workspace_ptr == nullptr) {
-		throw std::bad_alloc();
-	}
-
-	std::unique_ptr<gsl_integration_workspace, void (*)(gsl_integration_workspace*)> workspace{workspace_ptr, &gsl_integration_workspace_free};
-
-	return xt::make_lambda_xfunction([workspace = std::move(workspace), fun = std::move(fun)] (const auto& z) {
+	return xt::make_lambda_xfunction([integrator = std::move(integrator), fun = std::forward<function_type>(fun)] (value_type z) -> value_type {
 		using namespace std::placeholders;
 
 		if (z == static_cast<value_type>(0))
 			return static_cast<value_type>(0);
 
 		const auto x = (static_cast<value_type>(1) - z) / z;
-		auto binder = std::bind(std::cref(fun), _1, static_cast<double>(x));
 
-		gsl_function f;
-		f.function = [] (double u, void* params) -> double {
-			const auto fn = reinterpret_cast<decltype(binder)*>(params);
-
-			return (*fn)(u);
-		};
-		f.params = &binder;
-
-		double result;
-		double abserr;
-
-		int status = gsl_integration_qagiu(&f, 0.0, 2*aerr, std::numeric_limits<value_type>::epsilon(), intervals, workspace.get(), &result, &abserr);
-		if (status) {
-			throw gsl_error(status);
-		}
-
-		return static_cast<value_type>(result);
+		return integrator->integrate(std::bind(std::cref(fun), _1, x));
 	}, xt::linspace(static_cast<value_type>(0), static_cast<value_type>(1), size));
 }
 
