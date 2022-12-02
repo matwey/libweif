@@ -4,9 +4,9 @@
 #include <memory>
 #include <limits>
 
-#include <fftw3.h>
+#include <boost/math/quadrature/exp_sinh.hpp>
 
-#include <gsl/gsl_integration.h>
+#include <fftw3.h>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xmath.hpp>
@@ -114,35 +114,20 @@ spectral_filter<T> spectral_filter<T>::normalized() const {
 
 template<class T>
 typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() const {
-	constexpr std::size_t intervals = 1024;
+	boost::math::quadrature::exp_sinh<value_type> integrator;
 
-	auto workspace_ptr = gsl_integration_workspace_alloc(intervals);
-	if (workspace_ptr == nullptr) {
-		throw std::bad_alloc();
-	}
+	const auto i = integrator.integrate([this] (value_type x) {
+		if (x == static_cast<value_type>(0.0) || x == std::numeric_limits<value_type>::infinity())
+			return static_cast<value_type>(0.0);
 
-	std::unique_ptr<gsl_integration_workspace, void (*)(gsl_integration_workspace*)> workspace{workspace_ptr, &gsl_integration_workspace_free};
+		if (x < static_cast<value_type>(1)) {
+			return std::pow(x, static_cast<value_type>(1.0/6.0)) * this->regular(x);
+		}
 
-	gsl_function f;
-	f.function = [] (double x, void* params) -> double {
-		const auto that = reinterpret_cast<const spectral_filter<T>*>(params);
+		return std::pow(x, -static_cast<value_type>(11.0/6.0)) * this->operator()(x);
+	});
 
-		if (x == 0.0)
-			return 0.0;
-
-		return std::pow(x, -11.0/6.0) * that->operator()(x);
-	};
-	f.params = const_cast<void*>(reinterpret_cast<const void*>(this));
-
-	double result;
-	double abserr;
-
-	int status = gsl_integration_qagiu(&f, 0.0, std::numeric_limits<value_type>::epsilon(), std::numeric_limits<value_type>::epsilon(), intervals, workspace.get(), &result, &abserr);
-	if (status) {
-		throw gsl_error(status);
-	}
-
-	return static_cast<value_type>(3.28) * std::pow(static_cast<value_type>(result), -static_cast<value_type>(6.0/7.0));
+	return static_cast<value_type>(3.28) * std::pow(i, -static_cast<value_type>(6.0/7.0));
 }
 
 template class spectral_filter<float>;
