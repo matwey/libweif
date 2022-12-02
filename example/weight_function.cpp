@@ -1,5 +1,6 @@
-#include <iostream>
+#include <chrono>
 #include <fstream>
+#include <iostream>
 #include <vector>
 
 #include <boost/program_options.hpp>
@@ -57,6 +58,8 @@ int main(int argc, char** argv) {
 		std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 		sr.normalize();
 
+		const auto t1 = std::chrono::high_resolution_clock::now();
+
 		weif::spectral_filter sf{sr, 4096};
 		const auto lambda = sf.equiv_lambda();
 		std::cerr << "Equivalent lambda: " << lambda << std::endl;
@@ -68,8 +71,12 @@ int main(int argc, char** argv) {
 			weif::weight_function<float>{sf, lambda, weif::annular_aperture<float>{central_obscuration}, aperture_scale, 1025} :
 			weif::weight_function<float>{sf, lambda, weif::circular_aperture<float>{}, aperture_scale, 1025});
 
+		const auto t2 = std::chrono::high_resolution_clock::now();
+
 		std::ofstream stm(output_filename);
 		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, wf(grid)))));
+
+		std::cerr << "Consumed time: " << std::chrono::duration_cast<std::chrono::duration<float>>(t2-t1).count() << " sec" << std::endl;
 
 	} catch (const po::error& e) {
 		std::cerr << e.what() << std::endl;
