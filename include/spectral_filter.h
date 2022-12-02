@@ -4,6 +4,8 @@
 #include <complex>
 #include <string>
 
+#include <boost/math/special_functions/sinc.hpp>
+
 #include <xtensor/xcomplex.hpp>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xtensor.hpp>
@@ -60,17 +62,46 @@ public:
 		if (grid() <= ax)
 			return static_cast<value_type>(0);
 
-		const auto c = xt::numeric_constants<value_type>::PI * carrier();
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+		const auto c = PI * carrier();
 		const auto cx = ax * c;
 		const auto dx = (ax / static_cast<value_type>(2) - grid().origin()) / grid().delta();
 
 		return pow(cos(cx) * imag()(dx) + sin(cx) * real()(dx), 2);
 	}
 
+	value_type regular(const value_type x) const noexcept {
+		// x = u^2 / lambda = z f^2
+		using namespace std;
+		using boost::math::sinc_pi;
+
+		const auto ax = abs(x);
+
+		if (grid() <= ax)
+			return static_cast<value_type>(0);
+
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+		const auto c = PI * carrier();
+		const auto cx = ax * c;
+		const auto dx = (ax / static_cast<value_type>(2) - grid().origin()) / grid().delta();
+		const auto im = (dx < static_cast<value_type>(1) ?
+			(imag().values()(1) + imag().double_primes()(1) * (dx * dx - static_cast<value_type>(1)) / static_cast<value_type>(6)) / (grid().delta() * static_cast<value_type>(2)) :
+			imag()(dx) / ax);
+
+		return pow(cos(cx) * im + c * sinc_pi(cx) * real()(dx), 2);
+	}
+
 	template<class E>
 	auto operator() (const xt::xexpression<E>& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (const auto& x) {
 			return this->operator()(x);
+		}, e.derived_cast());
+	}
+
+	template<class E>
+	auto regular(const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) {
+			return this->regular(x);
 		}, e.derived_cast());
 	}
 

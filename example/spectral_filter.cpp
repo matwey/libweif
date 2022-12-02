@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 		xt::xarray<float> grid = xt::linspace(static_cast<float>(0), static_cast<float>(5), size);
 
 		std::ofstream stm(filter_filename);
-		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, sf(xt::square(grid))))));
+		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, sf(xt::square(grid)), sf.regular(xt::square(grid))))));
 
 	} catch (const po::error& e) {
 		std::cerr << e.what() << std::endl;

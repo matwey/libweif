@@ -91,6 +91,9 @@ public:
 			boundary.left * 2,
 			boundary.right * 2) {}
 
+	const auto& values() const noexcept { return values_; }
+	const auto& double_primes() const noexcept { return d2_; }
+
 	auto size() const noexcept { return values_.size(); }
 
 	value_type operator() (const value_type x) const noexcept {
