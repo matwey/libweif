@@ -14,6 +14,7 @@
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
 
+#include <fftw3_wrap.h>
 #include <spectral_filter.h>
 
 
@@ -28,29 +29,8 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 	auto in_adapter = xt::adapt(reinterpret_cast<value_type*>(ret.data()), size, xt::no_ownership(), std::array{size});
 	in_adapter.assign(e);
 
-	if constexpr (std::is_same<value_type, float>::value) {
-		fftwf_plan p = fftwf_plan_dft_r2c_1d(size,
-			in_adapter.data(),
-			reinterpret_cast<fftwf_complex*>(ret.data()),
-			FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
-
-		assert(p != nullptr);
-
-		fftwf_execute(p);
-		fftwf_destroy_plan(p);
-	} else if (std::is_same<value_type, double>::value) {
-		fftw_plan p = fftw_plan_dft_r2c_1d(size,
-			in_adapter.data(),
-			reinterpret_cast<fftw_complex*>(ret.data()),
-			FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
-
-		assert(p != nullptr);
-
-		fftw_execute(p);
-		fftw_destroy_plan(p);
-	} else {
-		static_assert(true, "value_type is not supported");
-	}
+	fft_plan_r2c plan{std::array{static_cast<int>(size)}, in_adapter.data(), ret.data(), FFTW_ESTIMATE | FFTW_DESTROY_INPUT};
+	plan(in_adapter.data(), ret.data());
 
 	/* Boundary condition at +inf */
 	ret(ret.size()-1) = std::complex<value_type>{0, 0};
@@ -132,5 +112,6 @@ typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() 
 
 template class spectral_filter<float>;
 template class spectral_filter<double>;
+template class spectral_filter<long double>;
 
 } // weif
