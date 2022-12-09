@@ -20,6 +20,51 @@
 namespace weif {
 
 template<class T>
+class WEIF_EXPORT mono_spectral_filter {
+public:
+	static_assert(std::is_floating_point<T>::value, "type T is not supported");
+
+	using value_type = T;
+
+	value_type operator() (const value_type x) const noexcept {
+		// x = u^2 / lambda = z f^2
+		using namespace std;
+
+		const auto ax = abs(x);
+
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+		return pow(sin(PI * ax), 2);
+	}
+
+	value_type regular(const value_type x) const noexcept {
+		// x = u^2 / lambda = z f^2
+		using namespace std;
+		using boost::math::sinc_pi;
+
+		const auto ax = abs(x);
+
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+		return pow(PI * sinc_pi(PI * ax), 2);
+	}
+
+	template<class E>
+	auto operator() (const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) {
+			return this->operator()(x);
+		}, e.derived_cast());
+	}
+
+	template<class E>
+	auto regular(const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) {
+			return this->regular(x);
+		}, e.derived_cast());
+	}
+};
+
+template<class T>
 class WEIF_EXPORT spectral_filter {
 public:
 	static_assert(std::is_floating_point<T>::value, "type T is not supported");

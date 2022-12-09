@@ -20,9 +20,10 @@ auto weight_function<T>::make_int(function_type&& fun, std::size_t size) {
 		if (z == static_cast<value_type>(0))
 			return static_cast<value_type>(0);
 
+		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
 		const auto x = (static_cast<value_type>(1) - z) / z;
 
-		return integrator->integrate(std::bind(std::cref(fun), _1, x));
+		return integrator->integrate(std::bind(std::cref(fun), _1, x), tol);
 	}, xt::linspace(static_cast<value_type>(0), static_cast<value_type>(1), size));
 }
 
@@ -41,6 +42,7 @@ weight_function<T>::weight_function(typename weight_function<T>::value_type lamb
 
 template class weight_function<float>;
 template class weight_function<double>;
+template class weight_function<long double>;
 
 } // weif
 
