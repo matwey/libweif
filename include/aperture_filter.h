@@ -28,6 +28,24 @@ inline T airy_tmp(const T x) noexcept {
 
 } // detail
 
+template<class T>
+struct point_aperture {
+	using value_type = T;
+
+	value_type operator() (value_type u) const noexcept {
+		return static_cast<value_type>(1);
+	}
+
+	template<class E>
+	auto operator() (const xt::xexpression<E>& e) const noexcept {
+		return xt::ones_like(e);
+	}
+
+	template<class E1, class E2>
+	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E1>& e2) const noexcept {
+		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
+	}
+};
 
 template<class T>
 struct circular_aperture {

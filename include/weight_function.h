@@ -61,6 +61,9 @@ public:
 		/* 1e13 = pow(1e3, 5.0/6.0) * pow(1e9, 7.0/6.0) */
 		constexpr const value_type c = 9.69e-3 * 32 * PI * PI * PI * 1e13;
 
+		if (altitude == static_cast<value_type>(0))
+			return static_cast<value_type>(0);
+
 		const value_type fresnel_radius = sqrt(lambda() * altitude);
 		const value_type z = (fresnel_radius / (fresnel_radius + aperture_scale()) - grid_.origin()) / grid_.delta();
 

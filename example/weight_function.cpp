@@ -19,8 +19,12 @@
 
 using value_type = float;
 
-std::variant<weif::annular_aperture<value_type>, weif::circular_aperture<value_type>>
-make_aperture_filter(value_type central_obscuration) {
+std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>>
+make_aperture_filter(value_type aperture_scale, value_type central_obscuration) {
+	if (aperture_scale == 0) {
+		return weif::point_aperture<value_type>{};
+	}
+
 	if (central_obscuration != 0) {
 		return weif::annular_aperture<value_type>{central_obscuration};
 	}
@@ -87,7 +91,7 @@ int main(int argc, char** argv) {
 		const bool mono = va.count("mono");
 
 		const auto [lambda, spectral_filter] = make_spectral_filter(response_filename, mono);
-		const auto aperture_filter = make_aperture_filter(central_obscuration);
+		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration);
 
 		const xt::xarray<value_type> grid = xt::linspace(static_cast<value_type>(0), static_cast<value_type>(30), size);
 
