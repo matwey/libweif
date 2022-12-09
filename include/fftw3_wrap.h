@@ -26,6 +26,9 @@ struct fftw_traits<float> {
 
 	constexpr static auto plan_dft_r2c = &fftwf_plan_dft_r2c;
 	constexpr static auto execute_dft_r2c = &fftwf_execute_dft_r2c;
+
+	constexpr static auto plan_r2r = &fftwf_plan_r2r;
+	constexpr static auto execute_r2r = &fftwf_execute_r2r;
 };
 
 template<>
@@ -37,6 +40,9 @@ struct fftw_traits<double> {
 
 	constexpr static auto plan_dft_r2c = &fftw_plan_dft_r2c;
 	constexpr static auto execute_dft_r2c = &fftw_execute_dft_r2c;
+
+	constexpr static auto plan_r2r = &fftw_plan_r2r;
+	constexpr static auto execute_r2r = &fftw_execute_r2r;
 };
 
 template<>
@@ -48,6 +54,9 @@ struct fftw_traits<long double> {
 
 	constexpr static auto plan_dft_r2c = &fftwl_plan_dft_r2c;
 	constexpr static auto execute_dft_r2c = &fftwl_execute_dft_r2c;
+
+	constexpr static auto plan_r2r = &fftwl_plan_r2r;
+	constexpr static auto execute_r2r = &fftwl_execute_r2r;
 };
 
 template<class T>
@@ -101,8 +110,26 @@ struct fft_plan_r2c:
 	}
 };
 
+template<class T>
+struct fft_plan_r2r:
+	public detail::fft_plan<T> {
+	using traits_type = detail::fftw_traits<T>;
+	using value_type = T;
+
+	template<std::size_t Rank>
+	fft_plan_r2r(const std::array<int, Rank>& n, value_type* in, value_type* out, const std::array<fftw_r2r_kind, Rank>& kind, unsigned flags) noexcept:
+		detail::fft_plan<T>(traits_type::plan_r2r(n.size(), n.data(), in, out, kind.data(), flags)) {}
+
+	void operator() (value_type* in, value_type* out) const noexcept {
+		traits_type::execute_r2r(*this, in, out);
+	}
+};
+
 template<class T, std::size_t Rank>
 fft_plan_r2c(const std::array<int, Rank>& n, T* in, std::complex<T>* out, unsigned flags) -> fft_plan_r2c<T>;
+
+template<class T, std::size_t Rank>
+fft_plan_r2r(const std::array<int, Rank>& n, T* in, T* out, const std::array<fftw_r2r_kind, Rank>& kind, unsigned flags) -> fft_plan_r2r<T>;
 
 } // weif
 

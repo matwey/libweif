@@ -1,7 +1,10 @@
 #ifndef _WEIF_WEIGHT_FUNCTION_H
 #define _WEIF_WEIGHT_FUNCTION_H
 
+#include <cmath>
 #include <functional>
+#include <limits>
+#include <utility>
 
 #include <xtensor/xmath.hpp>
 
@@ -34,13 +37,13 @@ private:
 
 	template<class E>
 	weight_function(value_type lambda, value_type aperture_scale, const xt::xexpression<E>& values);
-
 	weight_function(value_type lambda, value_type aperture_scale, function_type&& fun, std::size_t size);
+
 public:
 	template<class SF, class AF>
 	weight_function(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, std::size_t size):
 		weight_function(lambda, aperture_scale,
-			[spectral_filter = std::forward<SF>(spectral_filter), aperture_filter = std::forward<AF>(aperture_filter)] (value_type u, value_type x) -> value_type {
+			[spectral_filter = std::forward<SF>(spectral_filter), aperture_filter = std::forward<AF>(aperture_filter)] (value_type u, value_type x) noexcept -> value_type {
 			if (u == static_cast<value_type>(0) || u == std::numeric_limits<value_type>::infinity())
 				return static_cast<value_type>(0);
 

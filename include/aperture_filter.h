@@ -36,6 +36,10 @@ struct point_aperture {
 		return static_cast<value_type>(1);
 	}
 
+	value_type operator() (value_type ux, value_type uy) const noexcept {
+		return static_cast<value_type>(1);
+	}
+
 	template<class E>
 	auto operator() (const xt::xexpression<E>& e) const noexcept {
 		return xt::ones_like(e);
@@ -53,6 +57,10 @@ struct circular_aperture {
 
 	value_type operator() (value_type u) const noexcept {
 		return std::pow(detail::airy_tmp(xt::numeric_constants<value_type>::PI * u), 2);
+	}
+
+	value_type operator() (value_type ux, value_type uy) const noexcept {
+		return this->operator()(std::hypot(ux, uy));
 	}
 
 	template<class E>
@@ -88,6 +96,10 @@ public:
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
 		return std::pow(detail::airy_tmp(piu) - eps2 * detail::airy_tmp(obscuration() * piu), 2) / norm;
+	}
+
+	value_type operator() (value_type ux, value_type uy) const noexcept {
+		return this->operator()(std::hypot(ux, uy));
 	}
 
 	template<class E>

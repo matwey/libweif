@@ -45,4 +45,3 @@ template class weight_function<double>;
 template class weight_function<long double>;
 
 } // weif
-
