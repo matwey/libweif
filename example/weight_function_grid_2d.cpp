@@ -65,9 +65,10 @@ int main(int argc, char** argv) {
 	po::variables_map va;
 
 	opts.add_options()
-		("aperture_scale", po::value<value_type>()->default_value(1.1), "Aperture scale, mm.")
+		("aperture_scale", po::value<value_type>()->default_value(11), "Aperture scale, mm.")
 		("central_obscuration", po::value<value_type>()->default_value(0.0), "Central obscuration")
-		("grid_step", po::value<value_type>()->default_value(1.1), "Grid step, mm.")
+		("grid_step", po::value<value_type>()->default_value(11), "Grid step, mm.")
+		("grid_size", po::value<std::size_t>()->default_value(121), "Grid size")
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
 		("mono", "Use monochromatic spectral filter instead of polychromatic one");
@@ -87,6 +88,7 @@ int main(int argc, char** argv) {
 		const auto aperture_scale = va["aperture_scale"].as<value_type>();
 		const auto central_obscuration = va["central_obscuration"].as<value_type>();
 		const auto grid_step = va["grid_step"].as<value_type>();
+		const auto grid_size = va["grid_size"].as<std::size_t>();
 		const auto output_filename = va["output_filename"].as<std::string>();
 		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
 		const bool mono = va.count("mono");
@@ -100,7 +102,7 @@ int main(int argc, char** argv) {
 
 		const auto wf = std::visit([&] (const auto& af) {
 			return std::visit([&] (const auto& sf) {
-				return weif::weight_function_grid_2d<value_type>{sf, lambda, af, aperture_scale, grid_step, std::array{static_cast<std::size_t>(401), static_cast<std::size_t>(401)}};
+				return weif::weight_function_grid_2d<value_type>{sf, lambda, af, aperture_scale, grid_step, std::array{static_cast<std::size_t>(grid_size), static_cast<std::size_t>(grid_size)}};
 			}, spectral_filter);
 		}, aperture_filter);
 
