@@ -19,10 +19,14 @@
 
 using value_type = float;
 
-std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>>
-make_aperture_filter(value_type aperture_scale, value_type central_obscuration) {
+std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>, weif::angle_averaged<weif::square_aperture<value_type>>>
+make_aperture_filter(value_type aperture_scale, value_type central_obscuration, bool square) {
 	if (aperture_scale == 0) {
 		return weif::point_aperture<value_type>{};
+	}
+
+	if (square) {
+		return weif::angle_averaged<weif::square_aperture<value_type>>{};
 	}
 
 	if (central_obscuration != 0) {
@@ -69,6 +73,7 @@ int main(int argc, char** argv) {
 		("central_obscuration", po::value<value_type>()->default_value(0.0), "Central obscuration")
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
+		("square", "Use square aperture filter")
 		("mono", "Use monochromatic spectral filter instead of polychromatic one");
 
 	try {
@@ -88,10 +93,11 @@ int main(int argc, char** argv) {
 		const auto central_obscuration = va["central_obscuration"].as<value_type>();
 		const auto output_filename = va["output_filename"].as<std::string>();
 		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
+		const bool square = va.count("square");
 		const bool mono = va.count("mono");
 
 		const auto [lambda, spectral_filter] = make_spectral_filter(response_filename, mono);
-		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration);
+		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration, square);
 
 		const xt::xarray<value_type> grid = xt::linspace(static_cast<value_type>(0), static_cast<value_type>(30), size);
 

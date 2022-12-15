@@ -4,6 +4,8 @@
 #include <cmath>
 #include <type_traits>
 
+#include <boost/math/quadrature/tanh_sinh.hpp>
+#include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
 #include <xtensor/xmath.hpp>
@@ -110,6 +112,75 @@ public:
 		auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
 
 		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - eps2 * airy_vec((xt::numeric_constants<value_type>::PI * obscuration()) * e.derived_cast())) / norm;
+	}
+
+	template<class E1, class E2>
+	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E1>& e2) const noexcept {
+		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
+	}
+};
+
+template<class T>
+struct square_aperture {
+	using value_type = T;
+
+	value_type operator() (value_type ux, value_type uy) const noexcept {
+		using namespace std;
+		using boost::math::sinc_pi;
+
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+		return pow(sinc_pi(ux * PI) * sinc_pi(uy * PI), 2);
+	}
+
+	template<class E1, class E2>
+	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E1>& e2) const noexcept {
+		using boost::math::sinc_pi;
+
+		auto sinc_pi_vec = xt::vectorize(&sinc_pi<value_type>);
+
+		return xt::square(sinc_pi_vec(xt::numeric_constants<value_type>::PI * e1.derived_cast()) * sinc_pi_vec(xt::numeric_constants<value_type>::PI * xt::expand_dims(e2.derived_cast(), 1)));
+	}
+};
+
+template<class AF>
+class angle_averaged:
+	private AF {
+public:
+	using value_type = typename AF::value_type;
+
+private:
+	mutable boost::math::quadrature::tanh_sinh<value_type> integrator_;
+
+public:
+	template<class... Args>
+	angle_averaged(Args&&... args):
+		AF(std::forward<Args&&>(args)...),
+		integrator_{} {}
+
+	value_type operator() (value_type u) const noexcept {
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
+
+		return integrator_.integrate([this, u] (value_type t) noexcept {
+			using namespace std;
+
+			const auto f = PI * (t + static_cast<value_type>(1));
+			const auto ux = u * cos(f);
+			const auto uy = u * sin(f);
+
+			return static_cast<const AF&>(*this)(ux, uy);
+		}, tol) / 2;
+	}
+
+	value_type operator() (value_type ux, value_type uy) const noexcept {
+		return this->operator()(std::hypot(ux, uy));
+	}
+
+	template<class E>
+	auto operator() (const xt::xexpression<E>& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (const auto& x) { return this->operator()(x); }, e.derived_cast());
 	}
 
 	template<class E1, class E2>
