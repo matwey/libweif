@@ -95,7 +95,7 @@ public:
 	weight_function_grid_2d(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, shape_type shape, const allocator_type& alloc = allocator_type()):
 		weight_function_grid_2d(std::forward<SF>(spectral_filter), lambda, std::forward<AF>(aperture_filter), aperture_scale, aperture_scale, shape, alloc) {}
 
-	const auto& get_allocator() const noexcept { return *this; }
+	const allocator_type& get_allocator() const noexcept { return *this; }
 
 	inline result_type operator() (value_type altitude) const {
 		using namespace std;
