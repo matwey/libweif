@@ -19,14 +19,14 @@
 
 using value_type = float;
 
-std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>, weif::angle_averaged<weif::square_aperture<value_type>>>
+std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>, weif::angle_averaged<value_type>>
 make_aperture_filter(value_type aperture_scale, value_type central_obscuration, bool square) {
 	if (aperture_scale == 0) {
 		return weif::point_aperture<value_type>{};
 	}
 
 	if (square) {
-		return weif::angle_averaged<weif::square_aperture<value_type>>{};
+		return weif::angle_averaged<value_type>{weif::square_aperture<value_type>{}, 1024};
 	}
 
 	if (central_obscuration != 0) {

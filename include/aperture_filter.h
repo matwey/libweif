@@ -2,6 +2,7 @@
 #define _WEIF_APERTURE_FILTER_H
 
 #include <cmath>
+#include <memory>
 #include <type_traits>
 
 #include <boost/math/quadrature/tanh_sinh.hpp>
@@ -11,6 +12,8 @@
 #include <xtensor/xmath.hpp>
 #include <xtensor/xvectorize.hpp>
 
+#include <cubic_spline.h>
+#include <uniform_grid.h>
 
 namespace weif {
 
@@ -143,35 +146,56 @@ struct square_aperture {
 	}
 };
 
-template<class AF>
-class angle_averaged:
-	private AF {
+template<class T>
+class angle_averaged {
 public:
-	using value_type = typename AF::value_type;
+	using value_type = T;
 
 private:
-	mutable boost::math::quadrature::tanh_sinh<value_type> integrator_;
+	uniform_grid<value_type> grid_;
+	cubic_spline<value_type> af_;
 
-public:
-	template<class... Args>
-	angle_averaged(Args&&... args):
-		AF(std::forward<Args&&>(args)...),
-		integrator_{} {}
+	template<class AF>
+	static auto integrate_aperture_function(AF&& aperture_filter, std::size_t size) {
+		using boost::math::quadrature::tanh_sinh;
 
-	value_type operator() (value_type u) const noexcept {
+		auto integrator = std::make_unique<tanh_sinh<value_type>>();
+
 		constexpr auto PI = xt::numeric_constants<value_type>::PI;
 
-		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
+		return xt::make_lambda_xfunction([integrator = std::move(integrator), aperture_filter = std::forward<AF>(aperture_filter)] (value_type z) -> value_type {
+			if (z == static_cast<value_type>(0))
+				return static_cast<value_type>(0);
 
-		return integrator_.integrate([this, u] (value_type t) noexcept {
-			using namespace std;
+			const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
+			const auto u = (static_cast<value_type>(1) - z) / z;
 
-			const auto f = PI * (t + static_cast<value_type>(1));
-			const auto ux = u * cos(f);
-			const auto uy = u * sin(f);
+			return integrator->integrate([u, &aperture_filter] (value_type t) noexcept {
+				using namespace std;
 
-			return static_cast<const AF&>(*this)(ux, uy);
-		}, tol) / 2;
+				const auto f = PI * (t + static_cast<value_type>(1));
+				const auto ux = u * cos(f);
+				const auto uy = u * sin(f);
+
+				return aperture_filter(ux, uy);
+			}, tol) / 2;
+		}, xt::linspace(static_cast<value_type>(0), static_cast<value_type>(1), size));
+	}
+
+	template<class E>
+	explicit angle_averaged(const xt::xexpression<E>& values):
+		grid_{static_cast<value_type>(0), static_cast<value_type>(1) / (values.derived_cast().size() - 1), values.derived_cast().size()},
+		af_{values, typename cubic_spline<T>::first_order_boundary{0, 0}} {}
+
+public:
+	template<class AF>
+	angle_averaged(AF&& aperture_filter, std::size_t size):
+		angle_averaged(integrate_aperture_function(std::forward<AF>(aperture_filter), size)) {}
+
+	value_type operator() (value_type u) const noexcept {
+		const value_type z = (static_cast<value_type>(1) / (static_cast<value_type>(1) + u) - grid_.origin()) / grid_.delta();
+
+		return af_(z);
 	}
 
 	value_type operator() (value_type ux, value_type uy) const noexcept {

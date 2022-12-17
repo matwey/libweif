@@ -10,7 +10,9 @@ namespace weif {
 
 template<class T>
 auto weight_function_2d<T>::integrate_weight_function(function_type&& fun, std::size_t size) {
-	auto integrator = std::make_unique<boost::math::quadrature::exp_sinh<value_type>>();
+	using boost::math::quadrature::exp_sinh;
+
+	auto integrator = std::make_unique<exp_sinh<value_type>>();
 
 	return xt::make_lambda_xfunction([integrator = std::move(integrator), fun = std::forward<function_type>(fun)] (value_type z) -> value_type {
 		using namespace std::placeholders;
