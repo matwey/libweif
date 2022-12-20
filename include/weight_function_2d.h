@@ -1,7 +1,11 @@
 #ifndef _WEIF_WEIGHT_FUNCTION_2D_H
 #define _WEIF_WEIGHT_FUNCTION_2D_H
 
+#include <cmath>
+#include <limits>
 #include <type_traits>
+
+#include <boost/math/quadrature/exp_sinh.hpp>
 
 #include <xtensor/xexpression.hpp>
 #include <xtensor/xmath.hpp>
@@ -25,7 +29,8 @@ private:
 private:
 	static auto integrate_weight_function(function_type&& fun, std::size_t size);
 
-	weight_function_2d(value_type lambda, value_type aperture_scale, function_type&& fun, std::size_t size);
+	weight_function_2d(value_type lambda, value_type aperture_scale, function_type&& fun, std::size_t size):
+		detail::weight_function_base<T>(lambda, aperture_scale, integrate_weight_function(std::forward<function_type>(fun), size)) {}
 
 public:
 	template<class SF, class AF>
@@ -64,6 +69,32 @@ public:
 		}, e.derived_cast());
 	}
 };
+
+template<class T>
+auto weight_function_2d<T>::integrate_weight_function(function_type&& fun, std::size_t size) {
+	using boost::math::quadrature::exp_sinh;
+
+	auto integrator = std::make_unique<exp_sinh<value_type>>();
+
+	return xt::make_lambda_xfunction([integrator = std::move(integrator), fun = std::forward<function_type>(fun)] (value_type z) -> value_type {
+		using namespace std::placeholders;
+
+		if (z == static_cast<value_type>(0))
+			return static_cast<value_type>(0);
+
+		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
+		const auto x = (static_cast<value_type>(1) - z) / z;
+
+		return integrator->integrate([&integrator, &fun, &x, &tol] (value_type ux) noexcept {
+			return integrator->integrate(std::bind(std::cref(fun), ux, _1, x), tol);
+		}, tol) * 4;
+	}, xt::linspace(static_cast<value_type>(0), static_cast<value_type>(1), size));
+}
+
+
+extern template class weight_function_2d<float>;
+extern template class weight_function_2d<double>;
+extern template class weight_function_2d<long double>;
 
 } // weif
 
