@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
 		const auto t1 = std::chrono::high_resolution_clock::now();
 
-		const weif::square_aperture<value_type> square_af{};
+		const weif::af::square<value_type> square_af{};
 		const weif::digital_filter_2d<value_type> df{[&square_af](value_type ux, value_type uy) noexcept {
 			using namespace std;
 
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 
 			return pow(u2 * 4, static_cast<value_type>(5.0/6.0)) / square_af(ux, uy);
 		}, std::array{impulse_size, impulse_size}};
-		const weif::angle_averaged<value_type> af{[&square_af, &df](value_type ux, value_type uy) noexcept {
+		const weif::af::angle_averaged<value_type> af{[&square_af, &df](value_type ux, value_type uy) noexcept {
 			return square_af(ux, uy) * df(ux, uy);
 		}, 1024};
 		constexpr auto wf_grid_size = 1024 + 1;

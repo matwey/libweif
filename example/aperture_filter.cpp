@@ -35,8 +35,8 @@ int main(int argc, char** argv) {
 		po::store(std::move(parsed), va);
 		po::notify(va);
 
-		dump_aperture_filter("circular_aperture.csv", weif::circular_aperture<float>{}, va["size"].as<std::size_t>());
-		dump_aperture_filter("annular_aperture.csv", weif::annular_aperture<float>{0.25}, va["size"].as<std::size_t>());
+		dump_aperture_filter("circular_aperture.csv", weif::af::circular<float>{}, va["size"].as<std::size_t>());
+		dump_aperture_filter("annular_aperture.csv", weif::af::annular<float>{0.25}, va["size"].as<std::size_t>());
 
 	} catch (const po::error& e) {
 		std::cerr << e.what() << std::endl;

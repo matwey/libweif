@@ -16,7 +16,7 @@
 #include <uniform_grid.h>
 
 namespace weif {
-
+namespace af {
 namespace detail {
 
 template<class T>
@@ -34,7 +34,7 @@ inline T airy_tmp(const T x) noexcept {
 } // detail
 
 template<class T>
-struct point_aperture {
+struct point {
 	using value_type = T;
 
 	value_type operator() (value_type u) const noexcept {
@@ -57,7 +57,7 @@ struct point_aperture {
 };
 
 template<class T>
-struct circular_aperture {
+struct circular {
 	using value_type = T;
 
 	value_type operator() (value_type u) const noexcept {
@@ -70,7 +70,7 @@ struct circular_aperture {
 
 	template<class E>
 	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
+		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
 
 		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()));
 	}
@@ -82,7 +82,7 @@ struct circular_aperture {
 };
 
 template<class T>
-class annular_aperture {
+class annular {
 public:
 	using value_type = T;
 
@@ -90,7 +90,7 @@ private:
 	value_type obscuration_;
 
 public:
-	explicit annular_aperture(value_type obscuration) noexcept:
+	explicit annular(value_type obscuration) noexcept:
 		obscuration_{obscuration} {}
 
 	const auto& obscuration() const noexcept { return obscuration_; }
@@ -111,8 +111,7 @@ public:
 	auto operator() (const xt::xexpression<E>& e) const noexcept {
 		const auto eps2 = std::pow(obscuration(), 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
-
-		auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
+		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
 
 		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - eps2 * airy_vec((xt::numeric_constants<value_type>::PI * obscuration()) * e.derived_cast())) / norm;
 	}
@@ -124,7 +123,7 @@ public:
 };
 
 template<class T>
-struct square_aperture {
+struct square {
 	using value_type = T;
 
 	value_type operator() (value_type ux, value_type uy) const noexcept {
@@ -140,7 +139,7 @@ struct square_aperture {
 	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E1>& e2) const noexcept {
 		using boost::math::sinc_pi;
 
-		auto sinc_pi_vec = xt::vectorize(&sinc_pi<value_type>);
+		const auto sinc_pi_vec = xt::vectorize(&sinc_pi<value_type>);
 
 		return xt::square(sinc_pi_vec(xt::numeric_constants<value_type>::PI * e1.derived_cast()) * sinc_pi_vec(xt::numeric_constants<value_type>::PI * xt::expand_dims(e2.derived_cast(), 1)));
 	}
@@ -213,6 +212,7 @@ public:
 	}
 };
 
+} // af
 } // weif
 
 #endif // _WEIF_APERTURE_FILTER_H

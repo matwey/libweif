@@ -19,21 +19,21 @@
 
 using value_type = float;
 
-std::variant<weif::point_aperture<value_type>, weif::annular_aperture<value_type>, weif::circular_aperture<value_type>, weif::angle_averaged<value_type>>
+std::variant<weif::af::point<value_type>, weif::af::annular<value_type>, weif::af::circular<value_type>, weif::af::angle_averaged<value_type>>
 make_aperture_filter(value_type aperture_scale, value_type central_obscuration, bool square) {
 	if (aperture_scale == 0) {
-		return weif::point_aperture<value_type>{};
+		return weif::af::point<value_type>{};
 	}
 
 	if (square) {
-		return weif::angle_averaged<value_type>{weif::square_aperture<value_type>{}, 1024};
+		return weif::af::angle_averaged<value_type>{weif::af::square<value_type>{}, 1024};
 	}
 
 	if (central_obscuration != 0) {
-		return weif::annular_aperture<value_type>{central_obscuration};
+		return weif::af::annular<value_type>{central_obscuration};
 	}
 
-	return weif::circular_aperture<value_type>{};
+	return weif::af::circular<value_type>{};
 }
 
 std::pair<value_type, std::variant<weif::mono_spectral_filter<value_type>, weif::spectral_filter<value_type>>>
