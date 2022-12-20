@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <memory_resource>
 
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xmath.hpp>
@@ -19,8 +20,6 @@ template<class T, class Allocator = std::allocator<T>>
 class WEIF_EXPORT digital_filter_2d:
 	private Allocator {
 public:
-	static_assert(std::is_floating_point<T>::value, "type T is not supported");
-
 	using value_type = T;
 	using allocator_type = Allocator;
 	using shape_type = std::array<std::size_t, 2>;
@@ -115,6 +114,22 @@ digital_filter_2d<T, Allocator>::make_impulse(function_type&& fun, shape_type sh
 
 	return ret;
 }
+
+
+extern template class digital_filter_2d<float>;
+extern template class digital_filter_2d<double>;
+extern template class digital_filter_2d<long double>;
+
+namespace pmr {
+
+template<class T>
+using digital_filter_2d = weif::digital_filter_2d<T, std::pmr::polymorphic_allocator<T>>;
+
+} // pmr
+
+extern template class digital_filter_2d<float, std::pmr::polymorphic_allocator<float>>;
+extern template class digital_filter_2d<double, std::pmr::polymorphic_allocator<double>>;
+extern template class digital_filter_2d<long double, std::pmr::polymorphic_allocator<long double>>;
 
 } // weif
 
