@@ -6,6 +6,7 @@
 #include <functional>
 #include <limits>
 #include <memory>
+#include <memory_resource>
 #include <utility>
 
 #include <xtensor/xbuilder.hpp>
@@ -18,12 +19,11 @@
 
 
 namespace weif {
+namespace detail {
 
 template<class T>
 class WEIF_EXPORT weight_function_grid_2d_base {
 public:
-	static_assert(std::is_floating_point<T>::value, "type T is not supported");
-
 	using value_type = T;
 	using shape_type = std::array<std::size_t, 2>;
 
@@ -41,11 +41,20 @@ private:
 protected:
 	function_type fun_;
 
-	void apply_inplace_dct(value_type* data) const noexcept;
+	void apply_inplace_dct(value_type* data) const noexcept { plan_(data, data); }
 	const auto& fft_norm() const noexcept { return fft_norm_; }
 
 public:
-	weight_function_grid_2d_base(value_type lambda, value_type aperture_scale, value_type grid_step, shape_type shape, function_type&& fun);
+	weight_function_grid_2d_base(value_type lambda, value_type aperture_scale, value_type grid_step, shape_type shape, function_type&& fun):
+		lambda_{lambda},
+		aperture_scale_{aperture_scale},
+		grid_step_{grid_step},
+		shape_{shape},
+		fft_norm_{static_cast<value_type>(1) /
+			static_cast<value_type>(4 * (std::get<0>(shape_) - 1) * (std::get<1>(shape_) - 1) * grid_step_ * grid_step_)},
+		plan_{std::array{static_cast<int>(std::get<0>(shape)), static_cast<int>(std::get<1>(shape))},
+			nullptr, nullptr, std::array{FFTW_REDFT00, FFTW_REDFT00}, FFTW_ESTIMATE},
+		fun_{std::forward<function_type>(fun)} {}
 
 	const auto& lambda() const noexcept { return lambda_; /* nm */ }
 	const auto& aperture_scale() const noexcept { return aperture_scale_; /* mm */ }
@@ -53,22 +62,22 @@ public:
 	const auto& shape() const noexcept { return shape_; }
 };
 
+} // detail
+
 template<class T, class Allocator = std::allocator<T>>
 class WEIF_EXPORT weight_function_grid_2d:
-	public weight_function_grid_2d_base<T>,
+	public detail::weight_function_grid_2d_base<T>,
 	private Allocator {
 public:
-	static_assert(std::is_floating_point<T>::value, "type T is not supported");
-
-	using typename weight_function_grid_2d_base<T>::value_type;
-	using typename weight_function_grid_2d_base<T>::shape_type;
+	using typename detail::weight_function_grid_2d_base<T>::value_type;
+	using typename detail::weight_function_grid_2d_base<T>::shape_type;
 	using allocator_type = Allocator;
 	using result_type = xt::xtensor<value_type, 2, XTENSOR_DEFAULT_LAYOUT, allocator_type>;
-	using typename weight_function_grid_2d_base<T>::function_type;
+	using typename detail::weight_function_grid_2d_base<T>::function_type;
 
 private:
 	weight_function_grid_2d(value_type lambda, value_type aperture_scale, value_type grid_step, shape_type shape, function_type&& fun, const allocator_type& alloc):
-		weight_function_grid_2d_base<T>(lambda, aperture_scale, grid_step, shape, std::forward<function_type>(fun)),
+		detail::weight_function_grid_2d_base<T>(lambda, aperture_scale, grid_step, shape, std::forward<function_type>(fun)),
 		allocator_type(alloc) {}
 
 public:
@@ -116,7 +125,7 @@ public:
 		const auto uy = xt::linspace(static_cast<value_type>(0), nyquist, std::get<1>(this->shape()));
 
 		result_type res{xt::make_lambda_xfunction(
-			std::bind(std::cref(weight_function_grid_2d_base<T>::fun_), _1, _2, this->aperture_scale() / fresnel_radius),
+			std::bind(std::cref(detail::weight_function_grid_2d_base<T>::fun_), _1, _2, this->aperture_scale() / fresnel_radius),
 			ux, xt::expand_dims(uy, 1))};
 
 		this->apply_inplace_dct(res.data());
@@ -126,6 +135,22 @@ public:
 		return res;
 	}
 };
+
+
+extern template class weight_function_grid_2d<float>;
+extern template class weight_function_grid_2d<double>;
+extern template class weight_function_grid_2d<long double>;
+
+namespace pmr {
+
+template<class T>
+using weight_function_grid_2d = weif::weight_function_grid_2d<T, std::pmr::polymorphic_allocator<T>>;
+
+} // pmr
+
+extern template class weight_function_grid_2d<float, std::pmr::polymorphic_allocator<float>>;
+extern template class weight_function_grid_2d<double, std::pmr::polymorphic_allocator<double>>;
+extern template class weight_function_grid_2d<long double, std::pmr::polymorphic_allocator<long double>>;
 
 } // weif
 
