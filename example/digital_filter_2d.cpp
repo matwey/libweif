@@ -14,6 +14,7 @@
 #include <digital_filter_2d.h>
 #include <spectral_filter.h>
 #include <weight_function.h>
+#include <weight_function_grid_2d.h>
 
 
 using value_type = float;
@@ -52,6 +53,8 @@ int main(int argc, char** argv) {
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename");
 
+	constexpr bool sum_then_integrate = true;
+
 	try {
 		auto parsed = po::command_line_parser(argc, argv).options(opts).positional(pos_opts).run();
 		po::store(std::move(parsed), va);
@@ -67,8 +70,6 @@ int main(int argc, char** argv) {
 
 		const xt::xarray<value_type> grid = xt::linspace(static_cast<value_type>(0), static_cast<value_type>(30), size);
 
-		const auto t1 = std::chrono::high_resolution_clock::now();
-
 		const weif::af::square<value_type> square_af{};
 		const weif::digital_filter_2d<value_type> df{[&square_af](value_type ux, value_type uy) noexcept {
 			using namespace std;
@@ -77,18 +78,43 @@ int main(int argc, char** argv) {
 
 			return pow(u2 * 4, static_cast<value_type>(5.0/6.0)) / square_af(ux, uy);
 		}, std::array{impulse_size, impulse_size}};
-		const weif::af::angle_averaged<value_type> af{[&square_af, &df](value_type ux, value_type uy) noexcept {
-			return square_af(ux, uy) * df(ux, uy);
-		}, 1024};
-		constexpr auto wf_grid_size = 1024 + 1;
-		const weif::weight_function<value_type> wf{sf, lambda, af, aperture_scale, wf_grid_size};
 
-		const auto t2 = std::chrono::high_resolution_clock::now();
+		if constexpr (sum_then_integrate) {
+			const auto t1 = std::chrono::high_resolution_clock::now();
 
-		std::ofstream stm(output_filename);
-		xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, wf(grid)))));
+			const weif::af::angle_averaged<value_type> af{[&square_af, &df](value_type ux, value_type uy) noexcept {
+				return square_af(ux, uy) * df(ux, uy);
+			}, 1024};
+			constexpr auto wf_grid_size = 1024 + 1;
+			const weif::weight_function<value_type> wf{sf, lambda, af, aperture_scale, wf_grid_size};
 
-		std::cerr << "Consumed time: " << std::chrono::duration_cast<std::chrono::duration<value_type>>(t2-t1).count() << " sec" << std::endl;
+			std::ofstream stm(output_filename);
+			xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, wf(grid)))));
+
+			const auto t2 = std::chrono::high_resolution_clock::now();
+
+			std::cerr << "Consumed time: " << std::chrono::duration_cast<std::chrono::duration<value_type>>(t2-t1).count() << " sec" << std::endl;
+		} else {
+			const auto t1 = std::chrono::high_resolution_clock::now();
+
+			const weif::weight_function_grid_2d<value_type> wf{sf, lambda, square_af, aperture_scale, aperture_scale,
+				std::array{impulse_size, impulse_size}};
+
+			const std::vector<std::vector<std::size_t>> pad_width{{0, impulse_size - 1}, {0, impulse_size - 1}};
+
+			xt::xarray<value_type> res{grid.shape()};
+
+			for (std::size_t i = 0; i < grid.size(); ++i) {
+				res(i) = xt::sum(xt::pad(wf(grid(i)) * df.impulse(), pad_width, xt::pad_mode::symmetric))();
+			}
+
+			std::ofstream stm(output_filename);
+			xt::dump_csv(stm, xt::transpose(xt::vstack(xt::xtuple(grid, res))));
+
+			const auto t2 = std::chrono::high_resolution_clock::now();
+
+			std::cerr << "Consumed time: " << std::chrono::duration_cast<std::chrono::duration<value_type>>(t2-t1).count() << " sec" << std::endl;
+		}
 
 	} catch (const po::error& e) {
 		std::cerr << e.what() << std::endl;
