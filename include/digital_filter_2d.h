@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <memory>
-#include <memory_resource>
 
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xmath.hpp>
@@ -12,6 +11,10 @@
 #include <fftw3_wrap.h>
 
 #include <weif_export.h>
+
+#if __cpp_lib_memory_resource >= 201603
+#include <memory_resource>
+#endif
 
 
 namespace weif {
@@ -120,6 +123,8 @@ extern template class digital_filter_2d<float>;
 extern template class digital_filter_2d<double>;
 extern template class digital_filter_2d<long double>;
 
+#if __cpp_lib_memory_resource >= 201603
+
 namespace pmr {
 
 template<class T>
@@ -130,6 +135,8 @@ using digital_filter_2d = weif::digital_filter_2d<T, std::pmr::polymorphic_alloc
 extern template class digital_filter_2d<float, std::pmr::polymorphic_allocator<float>>;
 extern template class digital_filter_2d<double, std::pmr::polymorphic_allocator<double>>;
 extern template class digital_filter_2d<long double, std::pmr::polymorphic_allocator<long double>>;
+
+#endif
 
 } // weif
 

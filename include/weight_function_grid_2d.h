@@ -6,7 +6,6 @@
 #include <functional>
 #include <limits>
 #include <memory>
-#include <memory_resource>
 #include <utility>
 
 #include <xtensor/xbuilder.hpp>
@@ -16,6 +15,10 @@
 #include <fftw3_wrap.h>
 
 #include <weif_export.h>
+
+#if __cpp_lib_memory_resource >= 201603
+#include <memory_resource>
+#endif
 
 
 namespace weif {
@@ -141,6 +144,8 @@ extern template class weight_function_grid_2d<float>;
 extern template class weight_function_grid_2d<double>;
 extern template class weight_function_grid_2d<long double>;
 
+#if __cpp_lib_memory_resource >= 201603
+
 namespace pmr {
 
 template<class T>
@@ -151,6 +156,8 @@ using weight_function_grid_2d = weif::weight_function_grid_2d<T, std::pmr::polym
 extern template class weight_function_grid_2d<float, std::pmr::polymorphic_allocator<float>>;
 extern template class weight_function_grid_2d<double, std::pmr::polymorphic_allocator<double>>;
 extern template class weight_function_grid_2d<long double, std::pmr::polymorphic_allocator<long double>>;
+
+#endif
 
 } // weif
 
