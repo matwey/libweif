@@ -21,13 +21,7 @@ using value_type = float;
 
 std::pair<value_type, weif::spectral_filter<value_type>>
 make_spectral_filter(const std::vector<std::string>& response_filename) {
-	auto response_it = response_filename.cbegin();
-	auto sr = weif::spectral_response<value_type>::make_from_file(*response_it++);
-	for (; response_it != response_filename.cend(); ++response_it) {
-		auto sr2 = weif::spectral_response<value_type>::make_from_file(*response_it);
-		sr.stack(sr2);
-	}
-
+	auto sr = weif::spectral_response<value_type>::stack_from_files(response_filename.cbegin(), response_filename.cend());
 	std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 	sr.normalize();
 

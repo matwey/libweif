@@ -1,7 +1,9 @@
 #ifndef _WEIF_SPECTRAL_RESPONSE_H
 #define _WEIF_SPECTRAL_RESPONSE_H
 
+#include <algorithm>
 #include <string>
+#include <optional>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xtensor.hpp>
@@ -45,6 +47,9 @@ public:
 	}
 
 	static spectral_response<value_type> make_from_file(const std::string& filename);
+
+	template<class Iterator>
+	static spectral_response<value_type> stack_from_files(Iterator begin, Iterator end);
 };
 
 template<class T>
@@ -100,6 +105,22 @@ spectral_response<T> spectral_response<T>::make_from_file(const std::string& fil
 	const auto data_adapt  = xt::adapt(data_column, {data_column.size()});
 
 	return {uniform_grid{grid_column.cbegin(), grid_column.cend()}, data_adapt};
+}
+
+template<class T>
+template<class Iterator>
+spectral_response<T> spectral_response<T>::stack_from_files(Iterator begin, Iterator end) {
+	using optional_type = std::optional<spectral_response<T>>;
+
+	return std::accumulate(begin, end, optional_type{}, [] (const optional_type& acc, const auto& filename) {
+		auto c = spectral_response<T>::make_from_file(filename);
+
+		if (acc) {
+			c.stack(*acc);
+		}
+
+		return c;
+	}).value();
 }
 
 template<class T>
