@@ -243,7 +243,9 @@ typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() 
 
 
 template<class T>
-spectral_filter(const spectral_response<T>& response) -> spectral_filter<T>;
+spectral_filter(const spectral_response<T>& response, std::size_t size, T carrier) -> spectral_filter<T>;
+template<class T>
+spectral_filter(const spectral_response<T>& response, std::size_t size) -> spectral_filter<T>;
 template<class T>
 spectral_filter(const uniform_grid<T>& grid, const xt::xtensor<T, 1>& data) -> spectral_filter<T>;
 
