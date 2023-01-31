@@ -181,7 +181,7 @@ public:
 		}, e.derived_cast());
 	}
 
-	void normalize() noexcept;
+	spectral_filter<value_type>& normalize() noexcept;
 	spectral_filter<value_type> normalized() const;
 };
 
@@ -204,7 +204,7 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 }
 
 template<class T>
-void spectral_filter<T>::normalize() noexcept {
+spectral_filter<T>& spectral_filter<T>::normalize() noexcept {
 	const auto lambda_0 = equiv_lambda();
 
 	grid_ *= lambda_0;
@@ -212,6 +212,8 @@ void spectral_filter<T>::normalize() noexcept {
 	equiv_lambda_ /= lambda_0;
 	real_ *= lambda_0;
 	imag_ *= lambda_0;
+
+	return *this;
 }
 
 template<class T>

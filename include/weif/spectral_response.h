@@ -43,7 +43,7 @@ public:
 	const auto& grid() const { return grid_; }
 	const auto& data() const { return data_; }
 
-	void normalize() noexcept;
+	spectral_response<value_type>& normalize() noexcept;
 	spectral_response<value_type> normalized() const;
 
 	void stack(const spectral_response<value_type>& other);
@@ -60,11 +60,13 @@ public:
 };
 
 template<class T>
-void spectral_response<T>::normalize() noexcept {
+spectral_response<T>& spectral_response<T>::normalize() noexcept {
 	/* Response in full bandwidth is 1 */
 	const auto norm = xt::sum(data_)();
 
 	data_ /= norm;
+
+	return *this;
 }
 
 template<class T>
