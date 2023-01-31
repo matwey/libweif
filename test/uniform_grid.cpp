@@ -4,15 +4,17 @@
  * Copyright (C) 2017-2022  Matwey V. Kornilov <matwey.kornilov@gmail.com>
  */
 
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TestAssert.h>
+#include <cppunit/TestCase.h>
+#include <cppunit/Portability.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/ui/text/TestRunner.h>
 
 #include <xtensor/xio.hpp>
-#include <xtensor/xarray.hpp>
+#include <xtensor/xarray.hpp> // IWYU pragma: keep
 
-#include <uniform_grid.h>
+#include <weif/uniform_grid.h>
 
 
 namespace CPPUNIT_NS {

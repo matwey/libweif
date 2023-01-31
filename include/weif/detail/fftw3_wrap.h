@@ -1,17 +1,23 @@
-#ifndef _FFTW3_WRAP_H
-#define _FFTW3_WRAP_H
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
+#ifndef _WEIF_DETAIL_FFTW3_WRAP_H
+#define _WEIF_DETAIL_FFTW3_WRAP_H
 
 #include <array>
 #include <cassert>
 #include <complex>
+#include <cstdlib>
 #include <memory>
 #include <type_traits>
 
-#include <fftw3.h>
+#include <fftw3.h> // IWYU pragma: export
 
 
 namespace weif {
-
 namespace detail {
 
 template<class T>
@@ -91,8 +97,6 @@ private:
 	std::unique_ptr<std::remove_pointer_t<plan_type>, deleter> plan_;
 };
 
-} // detail;
-
 template<class T>
 struct fft_plan_r2c:
 	public detail::fft_plan<T> {
@@ -131,6 +135,7 @@ fft_plan_r2c(const std::array<int, Rank>& n, T* in, std::complex<T>* out, unsign
 template<class T, std::size_t Rank>
 fft_plan_r2r(const std::array<int, Rank>& n, T* in, T* out, const std::array<fftw_r2r_kind, Rank>& kind, unsigned flags) -> fft_plan_r2r<T>;
 
+} // detail;
 } // weif
 
-#endif // _FFTW3_WRAP_H
+#endif // _WEIF_DETAIL_FFTW3_WRAP_H

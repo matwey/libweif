@@ -1,20 +1,27 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-#include <boost/program_options.hpp>
+#include <boost/program_options.hpp> // IWYU pragma: keep
 
-#include <xtensor/xarray.hpp>
+#include <xtensor/xarray.hpp> // IWYU pragma: keep
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xcsv.hpp>
 #include <xtensor/xmanipulation.hpp>
 
-#include <aperture_filter.h>
-#include <digital_filter_2d.h>
-#include <spectral_filter.h>
-#include <weight_function.h>
-#include <weight_function_grid_2d.h>
+#include <weif/af/angle_averaged.h>
+#include <weif/af/square.h>
+#include <weif/digital_filter_2d.h>
+#include <weif/spectral_filter.h>
+#include <weif/weight_function.h>
+#include <weif/weight_function_grid_2d.h>
 
 
 using value_type = float;

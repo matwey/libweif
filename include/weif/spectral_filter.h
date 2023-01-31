@@ -1,12 +1,18 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #ifndef _WEIF_SPECTRAL_FILTER_H
 #define _WEIF_SPECTRAL_FILTER_H
 
-#include <array>
-#include <cassert>
+#include <algorithm>
+#include <array> // IWYU pragma: keep
+#include <cmath>
 #include <complex>
 #include <limits>
-#include <memory>
-#include <string>
+#include <vector>
 
 #include <boost/math/quadrature/exp_sinh.hpp>
 #include <boost/math/special_functions/sinc.hpp>
@@ -18,11 +24,10 @@
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
 
-#include <cubic_spline.h>
-#include <fftw3_wrap.h>
-#include <spectral_response.h>
-#include <uniform_grid.h>
-
+#include <weif/detail/cubic_spline.h>
+#include <weif/detail/fftw3_wrap.h> // IWYU pragma: keep
+#include <weif/uniform_grid.h>
+#include <weif/spectral_response.h>
 #include <weif_export.h>
 
 
@@ -79,8 +84,8 @@ public:
 private:
 	/* Consider using different type for uniform_grid, for instance, boost::cpp_dec_float */
 	uniform_grid<value_type> grid_;
-	cubic_spline<value_type> real_;
-	cubic_spline<value_type> imag_;
+	detail::cubic_spline<value_type> real_;
+	detail::cubic_spline<value_type> imag_;
 	value_type carrier_;
 	value_type equiv_lambda_;
 
@@ -92,14 +97,14 @@ private:
 	template<class E1, class E2>
 	spectral_filter(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier):
 		grid_{grid},
-		real_{real.derived_cast(), typename cubic_spline<T>::first_order_boundary{0, 0}},
-		imag_{imag.derived_cast(), typename cubic_spline<T>::second_order_boundary{0, 0}},
+		real_{real.derived_cast(), typename detail::cubic_spline<T>::first_order_boundary{0, 0}},
+		imag_{imag.derived_cast(), typename detail::cubic_spline<T>::second_order_boundary{0, 0}},
 		carrier_{carrier},
 		equiv_lambda_{eval_equiv_lambda()} {}
 
 	template<class E>
 	spectral_filter(value_type delta, const xt::xexpression<E>& e, value_type carrier):
-		spectral_filter(uniform_grid{static_cast<value_type>(0), delta, e.derived_cast().size()},
+		spectral_filter({static_cast<value_type>(0), delta, e.derived_cast().size()},
 			xt::real(e.derived_cast()),
 			xt::imag(e.derived_cast()),
 			carrier) {}
@@ -189,7 +194,7 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 	auto in_adapter = xt::adapt(reinterpret_cast<value_type*>(ret.data()), size, xt::no_ownership(), std::array{size});
 	in_adapter.assign(e);
 
-	fft_plan_r2c plan{std::array{static_cast<int>(size)}, in_adapter.data(), ret.data(), FFTW_ESTIMATE | FFTW_DESTROY_INPUT};
+	detail::fft_plan_r2c plan{std::array{static_cast<int>(size)}, in_adapter.data(), ret.data(), FFTW_ESTIMATE | FFTW_DESTROY_INPUT};
 	plan(in_adapter.data(), ret.data());
 
 	/* Boundary condition at +inf */

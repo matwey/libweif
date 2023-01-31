@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #ifndef _WEIF_ERROR_H
 #define _WEIF_ERROR_H
 

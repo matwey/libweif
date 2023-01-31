@@ -1,15 +1,21 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #include <iostream>
 #include <fstream>
 #include <string>
 
-#include <boost/program_options.hpp>
+#include <boost/program_options.hpp> // IWYU pragma: keep
 
-#include <xtensor/xarray.hpp>
+#include <xtensor/xarray.hpp> // IWYU pragma: keep
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xcsv.hpp>
 #include <xtensor/xmanipulation.hpp>
 
-#include <aperture_filter.h>
+#include <weif/af/circular.h>
 
 template<class AF>
 void dump_aperture_filter(const std::string& filename, const AF& af, std::size_t size) {

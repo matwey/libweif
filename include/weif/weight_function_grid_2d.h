@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #ifndef _WEIF_WEIGHT_FUNCTION_GRID_2D_H
 #define _WEIF_WEIGHT_FUNCTION_GRID_2D_H
 
@@ -5,15 +11,13 @@
 #include <cmath>
 #include <functional>
 #include <limits>
-#include <memory>
 #include <utility>
 
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xmath.hpp>
-#include <xtensor/xtensor.hpp>
+#include <xtensor/xtensor.hpp> // IWYU pragma: keep
 
-#include <fftw3_wrap.h>
-
+#include <weif/detail/fftw3_wrap.h> // IWYU pragma: keep
 #include <weif_export.h>
 
 #if __cpp_lib_memory_resource >= 201603

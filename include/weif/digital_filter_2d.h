@@ -1,15 +1,23 @@
-#ifndef _DIGITAL_FILTER_2D_H
-#define _DIGITAL_FILTER_2D_H
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
 
+#ifndef _WEIF_DIGITAL_FILTER_2D_H
+#define _WEIF_DIGITAL_FILTER_2D_H
+
+#include <array>
+#include <cmath>
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xmath.hpp>
-#include <xtensor/xtensor.hpp>
+#include <xtensor/xtensor.hpp> // IWYU pragma: keep
 
-#include <fftw3_wrap.h>
-
+#include <weif/detail/fftw3_wrap.h>
 #include <weif_export.h>
 
 #if __cpp_lib_memory_resource >= 201603
@@ -108,7 +116,7 @@ digital_filter_2d<T, Allocator>::make_impulse(function_type&& fun, shape_type sh
 
 	impulse_type ret{xt::make_lambda_xfunction(std::forward<function_type>(fun), ux, xt::expand_dims(uy, 1))};
 
-	fft_plan_r2r<T> plan{std::array{static_cast<int>(std::get<0>(shape)), static_cast<int>(std::get<1>(shape))},
+	detail::fft_plan_r2r<T> plan{std::array{static_cast<int>(std::get<0>(shape)), static_cast<int>(std::get<1>(shape))},
 		ret.data(), ret.data(), std::array{FFTW_REDFT00, FFTW_REDFT00}, FFTW_ESTIMATE};
 
 	plan(ret.data(), ret.data());
@@ -140,4 +148,4 @@ extern template class digital_filter_2d<long double, std::pmr::polymorphic_alloc
 
 } // weif
 
-#endif // _DIGITAL_FILTER_2D_H
+#endif // _WEIF_DIGITAL_FILTER_2D_H

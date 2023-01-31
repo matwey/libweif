@@ -1,7 +1,14 @@
-#ifndef _WEIF_CUBIC_SPLINE_H
-#define _WEIF_CUBIC_SPLINE_H
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
+#ifndef _WEIF_DETAIL_CUBIC_SPLINE_H
+#define _WEIF_DETAIL_CUBIC_SPLINE_H
 
 #include <cmath>
+#include <cstdlib>
 #include <type_traits>
 
 #include <xtensor/xmath.hpp>
@@ -10,6 +17,7 @@
 
 
 namespace weif {
+namespace detail {
 
 template<class T> class cubic_spline {
 public:
@@ -185,6 +193,7 @@ cubic_spline(E&& e, typename cubic_spline<typename std::decay_t<E>::value_type>:
 template<class E>
 cubic_spline(E&& e, typename cubic_spline<typename std::decay_t<E>::value_type>::second_order_boundary boundary) -> cubic_spline<typename std::decay_t<E>::value_type>;
 
+} // detail
 } // weif
 
-#endif // _WEIF_CUBIC_SPLINE_H
+#endif // _WEIF_DETAIL_CUBIC_SPLINE_H

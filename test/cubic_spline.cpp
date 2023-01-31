@@ -4,17 +4,20 @@
  * Copyright (C) 2017-2022  Matwey V. Kornilov <matwey.kornilov@gmail.com>
  */
 
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TestAssert.h>
+#include <cppunit/TestCase.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/ui/text/TestRunner.h>
 
+#include <xtensor/xarray.hpp> // IWYU pragma: keep
 #include <xtensor/xbuilder.hpp>
-#include <xtensor/xio.hpp>
-#include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp> // IWYU pragma: keep
 
-#include <cubic_spline.h>
+#include <weif/detail/cubic_spline.h>
 
+
+using weif::detail::cubic_spline;
 
 class test_cubic_spline_suite: public CppUnit::TestCase {
 CPPUNIT_TEST_SUITE(test_cubic_spline_suite);
@@ -33,7 +36,7 @@ CPPUNIT_TEST_SUITE_END();
 
 void test_spline1() {
 	const xt::xarray<float> expected = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{expected};
+	cubic_spline s{expected};
 	const xt::xarray<float> actual = s(xt::arange(0.0f, 4.0f, 1.0f));
 
 	CPPUNIT_ASSERT_EQUAL(expected, actual);
@@ -41,7 +44,7 @@ void test_spline1() {
 
 void test_spline2() {
 	const xt::xarray<float> expected = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{expected};
+	cubic_spline s{expected};
 	xt::xarray<float> actual = {0.0f, 0.0f, 0.0f, 0.0f};
 
 	for (std::size_t i = 0; i < 4; ++i) {
@@ -53,7 +56,7 @@ void test_spline2() {
 
 void test_spline3() {
 	const xt::xarray<float> y = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{y, weif::cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
+	cubic_spline s{y, cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
 	const xt::xarray<float> expected = {1.5f, 2.5f, 3.5f};
 	const xt::xarray<float> actual = s(xt::arange(0.5f, 3.0f, 1.0f));
 
@@ -62,7 +65,7 @@ void test_spline3() {
 
 void test_spline4() {
 	const xt::xarray<float> y = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{y, weif::cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
+	cubic_spline s{y, cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
 	const xt::xarray<float> expected = {1.25f, 2.25f, 3.25f};
 	const xt::xarray<float> actual = s(xt::arange(0.25f, 3.0f, 1.0f));
 
@@ -71,7 +74,7 @@ void test_spline4() {
 
 void test_spline5() {
 	const xt::xarray<float> y = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{y};
+	cubic_spline s{y};
 	const xt::xarray<float> expected = {1.5f, 2.5f, 3.5f};
 	const xt::xarray<float> actual = s(xt::arange(0.5f, 3.0f, 1.0f));
 
@@ -80,7 +83,7 @@ void test_spline5() {
 
 void test_spline6() {
 	const xt::xarray<float> y = {1.0f, 2.0f, 3.0f, 4.0f};
-	weif::cubic_spline s{y};
+	cubic_spline s{y};
 	const xt::xarray<float> expected = {1.25f, 2.25f, 3.25f};
 	const xt::xarray<float> actual = s(xt::arange(0.25f, 3.0f, 1.0f));
 
@@ -89,7 +92,7 @@ void test_spline6() {
 
 void test_spline7() {
 	const xt::xarray<float> y = {0.0f, 1.0f};
-	weif::cubic_spline s{y};
+	cubic_spline s{y};
 	const xt::xarray<float> expected = {0.0f, 0.25f, 0.5f, 0.75f};
 	const xt::xarray<float> actual = s(xt::arange(0.0f, 1.0f, 0.25f));
 
@@ -98,7 +101,7 @@ void test_spline7() {
 
 void test_spline8() {
 	const xt::xarray<float> y = {0.0f, 1.0f};
-	weif::cubic_spline s{y, weif::cubic_spline<float>::first_order_boundary{0.0f, 0.0f}};
+	cubic_spline s{y, cubic_spline<float>::first_order_boundary{0.0f, 0.0f}};
 	const xt::xarray<float> expected = {0.0f, 0.15625f, 0.5f, 0.84375f};
 	const xt::xarray<float> actual = s(xt::arange(0.0f, 1.0f, 0.25f));
 
@@ -107,7 +110,7 @@ void test_spline8() {
 
 void test_spline9() {
 	const xt::xarray<float> y = {0.0f, 1.0f};
-	weif::cubic_spline s{y, weif::cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
+	cubic_spline s{y, cubic_spline<float>::first_order_boundary{1.0f, 1.0f}};
 	const xt::xarray<float> expected = {0.0f, 0.25f, 0.5f, 0.75f};
 	const xt::xarray<float> actual = s(xt::arange(0.0f, 1.0f, 0.25f));
 
@@ -116,7 +119,7 @@ void test_spline9() {
 
 void test_spline10() {
 	const xt::xarray<float> expected = {0.0f, 1.0f, 4.0f, 9.0f};
-	weif::cubic_spline s{expected, weif::cubic_spline<float>::second_order_boundary{2.0f, 2.0f}};
+	cubic_spline s{expected, cubic_spline<float>::second_order_boundary{2.0f, 2.0f}};
 	const xt::xarray<float> actual = s(xt::arange(0.0f, 4.0f, 1.0f));
 
 	CPPUNIT_ASSERT_EQUAL(expected, actual);
@@ -124,7 +127,7 @@ void test_spline10() {
 
 void test_spline11() {
 	const xt::xarray<double> y = {0.0f, 1.0f, 4.0f, 9.0f};
-	weif::cubic_spline s{y, weif::cubic_spline<double>::second_order_boundary{2.0f, 2.0f}};
+	cubic_spline s{y, cubic_spline<double>::second_order_boundary{2.0f, 2.0f}};
 	const xt::xarray<double> expected = {0.25f, 2.25f, 6.25f};
 	const xt::xarray<double> actual = s(xt::arange(0.5f, 3.0f, 1.0f));
 

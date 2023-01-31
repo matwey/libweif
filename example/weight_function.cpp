@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -11,10 +17,13 @@
 #include <xtensor/xcsv.hpp>
 #include <xtensor/xmanipulation.hpp>
 
-#include <aperture_filter.h>
-#include <spectral_filter.h>
-#include <spectral_response.h>
-#include <weight_function.h>
+#include <weif/af/angle_averaged.h>
+#include <weif/af/circular.h>
+#include <weif/af/square.h>
+#include <weif/af/point.h>
+#include <weif/spectral_filter.h>
+#include <weif/spectral_response.h>
+#include <weif/weight_function.h>
 
 
 using value_type = float;

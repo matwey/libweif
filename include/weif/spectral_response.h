@@ -1,9 +1,17 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #ifndef _WEIF_SPECTRAL_RESPONSE_H
 #define _WEIF_SPECTRAL_RESPONSE_H
 
 #include <algorithm>
-#include <string>
+#include <cassert>
+#include <numeric>
 #include <optional>
+#include <string>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xtensor.hpp>
@@ -11,8 +19,7 @@
 
 #include <rapidcsv.h>
 
-#include <uniform_grid.h>
-
+#include <weif/uniform_grid.h>
 #include <weif_export.h>
 
 

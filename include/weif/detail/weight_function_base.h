@@ -1,5 +1,11 @@
-#ifndef _WEIF_WEIGHT_FUNCTION_BASE_H
-#define _WEIF_WEIGHT_FUNCTION_BASE_H
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
+#ifndef _WEIF_DETAIL_WEIGHT_FUNCTION_BASE_H
+#define _WEIF_DETAIL_WEIGHT_FUNCTION_BASE_H
 
 #include <cmath>
 #include <functional>
@@ -7,9 +13,8 @@
 #include <xtensor/xexpression.hpp>
 #include <xtensor/xmath.hpp>
 
-#include <cubic_spline.h>
-#include <uniform_grid.h>
-
+#include <weif/detail/cubic_spline.h>
+#include <weif/uniform_grid.h>
 #include <weif_export.h>
 
 
@@ -61,4 +66,4 @@ public:
 } // detail
 } // weif
 
-#endif // _WEIF_WEIGHT_FUNCTION_BASE_H
+#endif // _WEIF_DETAIL_WEIGHT_FUNCTION_BASE_H

@@ -1,17 +1,23 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
+ */
+
 #ifndef _WEIF_WEIGHT_FUNCTION_H
 #define _WEIF_WEIGHT_FUNCTION_H
 
 #include <cmath>
 #include <limits>
-#include <type_traits>
+#include <memory>
+#include <utility>
 
 #include <boost/math/quadrature/exp_sinh.hpp>
 
-#include <xtensor/xexpression.hpp>
+#include <xtensor/xexpression.hpp> // IWYU pragma: keep
 #include <xtensor/xmath.hpp>
 
-#include <weight_function_base.h>
-
+#include <weif/detail/weight_function_base.h>
 #include <weif_export.h>
 
 
