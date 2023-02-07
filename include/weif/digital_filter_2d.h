@@ -63,21 +63,24 @@ public:
 		using std::cos;
 		using std::sin;
 
-		constexpr const auto PI = xt::numeric_constants<value_type>::PI;
-		const auto cx = cos(2*PI*ux);
-		const auto sx = sin(2*PI*ux);
-		const auto cy = cos(2*PI*uy);
-		const auto sy = sin(2*PI*uy);
+		const auto& nx = std::get<0>(shape());
+		const auto& ny = std::get<1>(shape());
 
+		constexpr auto two_pi = xt::numeric_constants<value_type>::PI * 2;
+		const auto cx = cos(two_pi * ux);
+		const auto sx = sin(two_pi * ux);
+		const auto cy = cos(two_pi * uy);
+		const auto sy = sin(two_pi * uy);
+
+		value_type ret = 0;
 		value_type six = 0;
 		value_type cix = 1;
-		value_type ret = 0;
-		for (std::size_t i = 0; i < std::get<0>(shape()); ++i) {
+		for (std::size_t i = 0; i < nx; ++i) {
 			const auto i_norm = (i > 0 ? static_cast<value_type>(2) : static_cast<value_type>(1));
 			value_type sjy = 0;
 			value_type cjy = 1;
 
-			for (std::size_t j = 0; j < std::get<1>(shape()); ++j) {
+			for (std::size_t j = 0; j < ny; ++j) {
 				const auto j_norm = (j > 0 ? static_cast<value_type>(2) : static_cast<value_type>(1));
 
 				ret += impulse_(i, j) * i_norm * j_norm * (cix * cjy - six * sjy);
@@ -116,7 +119,7 @@ digital_filter_2d<T, Allocator>::make_impulse(function_type&& fun, shape_type sh
 
 	impulse_type ret{xt::make_lambda_xfunction(std::forward<function_type>(fun), ux, xt::expand_dims(uy, 1))};
 
-	detail::fft_plan_r2r<T> plan{std::array{static_cast<int>(std::get<0>(shape)), static_cast<int>(std::get<1>(shape))},
+	detail::fft_plan_r2r<T> plan{std::array{static_cast<int>(nx), static_cast<int>(ny)},
 		ret.data(), ret.data(), std::array{FFTW_REDFT00, FFTW_REDFT00}, FFTW_ESTIMATE};
 
 	plan(ret.data(), ret.data());
