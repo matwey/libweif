@@ -133,7 +133,7 @@ public:
 
 		result_type res{xt::make_lambda_xfunction(
 			std::bind(std::cref(detail::weight_function_grid_2d_base<T>::fun_), _1, _2, this->aperture_scale() / fresnel_radius),
-			ux, xt::expand_dims(uy, 1))};
+			xt::expand_dims(ux, 1), uy)};
 
 		this->apply_inplace_dct(res.data());
 
