@@ -46,10 +46,19 @@ private:
 	static impulse_type make_impulse(function_type&& fun, shape_type shape, const allocator_type& alloc);
 
 	digital_filter_2d(function_type&& fun, shape_type shape, const allocator_type& alloc):
-		allocator_type(alloc),
-		impulse_{make_impulse(std::forward<function_type>(fun), shape, get_allocator())} {}
+		digital_filter_2d(make_impulse(std::forward<function_type>(fun), shape, get_allocator()), alloc) {}
 
 public:
+	template<class E>
+	digital_filter_2d(const xt::xexpression<E>& impulse, const allocator_type& alloc = allocator_type()):
+		allocator_type(alloc),
+		impulse_{impulse.derived_cast()} {}
+
+	template<class E>
+	digital_filter_2d(xt::xexpression<E>&& impulse, const allocator_type& alloc = allocator_type()):
+		allocator_type(alloc),
+		impulse_{impulse.derived_cast()} {}
+
 	template<class DF>
 	digital_filter_2d(DF&& digital_filter_fun, shape_type shape, const allocator_type& alloc = allocator_type()):
 		digital_filter_2d(std::function(std::forward<DF>(digital_filter_fun)), shape, alloc) {}
