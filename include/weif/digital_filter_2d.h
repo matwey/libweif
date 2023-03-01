@@ -102,7 +102,7 @@ public:
 	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
 		return xt::make_lambda_xfunction([this] (const value_type& ux, const value_type& uy) {
 			return this->operator()(ux, uy);
-		}, e1.derived_cast(), xt::expand_dims(e2.derived_cast(), 1));
+		}, xt::expand_dims(e1.derived_cast(), 1), e2.derived_cast());
 	}
 };
 
@@ -117,7 +117,7 @@ digital_filter_2d<T, Allocator>::make_impulse(function_type&& fun, shape_type sh
 	const auto fft_norm = static_cast<value_type>(1) /
 		static_cast<value_type>(4 * (nx - 1) * (ny - 1));
 
-	impulse_type ret{xt::make_lambda_xfunction(std::forward<function_type>(fun), ux, xt::expand_dims(uy, 1))};
+	impulse_type ret{xt::make_lambda_xfunction(std::forward<function_type>(fun), xt::expand_dims(ux, 1), uy)};
 
 	detail::fft_plan_r2r<T> plan{std::array{static_cast<int>(nx), static_cast<int>(ny)},
 		ret.data(), ret.data(), std::array{FFTW_REDFT00, FFTW_REDFT00}, FFTW_ESTIMATE};
