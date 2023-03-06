@@ -68,6 +68,32 @@ public:
 	const auto& impulse() const noexcept { return impulse_; }
 	const auto& shape()   const noexcept { return impulse_.shape(); }
 
+	digital_filter_2d<T, Allocator>& mix() noexcept {
+		const auto& nx = std::get<0>(shape());
+		const auto& ny = std::get<1>(shape());
+
+		const auto amplitude = impulse_(0,0);
+
+		for (std::size_t i = 0; i < nx; ++i) {
+			bool sign = i % 2;
+			for (std::size_t j = 0; j < ny; ++j, sign = !sign) {
+				impulse_(i, j) += (sign ? amplitude : -amplitude);
+			}
+		}
+
+		impulse_(0,0) = 0;
+
+		return *this;
+	};
+
+	digital_filter_2d<T, Allocator> mixed() const {
+		digital_filter_2d<T, Allocator> ret{*this};
+
+		ret.mix();
+
+		return ret;
+	}
+
 	value_type operator() (value_type ux, value_type uy) const noexcept {
 		using std::cos;
 		using std::sin;
