@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
 		("grid_size", po::value<std::size_t>()->default_value(121), "Grid size")
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
+		("altitude", po::value<value_type>()->default_value(2), "Altitude, km.")
 		("mono", po::value<value_type>(), "Use monochromatic spectral filter with given labmda");
 
 	try {
@@ -93,6 +94,7 @@ int main(int argc, char** argv) {
 		const auto grid_size = va["grid_size"].as<std::size_t>();
 		const auto output_filename = va["output_filename"].as<std::string>();
 		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
+		const auto altitude = va["altitude"].as<value_type>();
 
 		const auto [lambda, spectral_filter] = make_spectral_filter(
 			response_filename,
@@ -112,7 +114,7 @@ int main(int argc, char** argv) {
 		const auto t2 = std::chrono::high_resolution_clock::now();
 
 		std::ofstream stm(output_filename);
-		xt::dump_csv(stm, wf(2.0));
+		xt::dump_csv(stm, wf(altitude));
 
 		std::cerr << "Consumed time: " << std::chrono::duration_cast<std::chrono::duration<value_type>>(t2-t1).count() << " sec" << std::endl;
 
