@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(GNUInstallDirs)
 include(GenerateExportHeader)
+include(CheckIncludeFileCXX)
 
 # CheckIPOSupported module is available since 3.9
 # VERSION_GREATER_EQUAL is available since 3.7
@@ -33,6 +34,10 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 pkg_check_modules(FFTW3L REQUIRED IMPORTED_TARGET fftw3l)
+CHECK_INCLUDE_FILE_CXX("rapidcsv.h" RAPIDCSV_FOUND)
+if(NOT RAPIDCSV_FOUND)
+	message(FATAL_ERROR "rapidcsv.h not found")
+endif()
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
