@@ -55,7 +55,7 @@ endif(HAS_LTO_SUPPORT)
 #    If any interfaces have been removed or changed since the last public release,
 #        then set age to 0.
 #
-# set_target_properties(weif PROPERTIES VERSION c.r.a SOVERSION c)
+# set_target_properties(weif PROPERTIES VERSION c-a.a.r SOVERSION c-a)
 #
 set_target_properties(weif PROPERTIES VERSION 1.0.0 SOVERSION 1)
 set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
