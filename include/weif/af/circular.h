@@ -76,7 +76,8 @@ public:
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
 		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
 
-		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - eps2 * airy_vec((xt::numeric_constants<value_type>::PI * obscuration()) * e.derived_cast())) / norm;
+		/* Use static_cast<> to capture by value */
+		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - static_cast<value_type>(eps2) * airy_vec((xt::numeric_constants<value_type>::PI * obscuration()) * e.derived_cast())) / static_cast<value_type>(norm);
 	}
 
 	template<class E1, class E2>
@@ -109,7 +110,8 @@ private:
 		const auto norm = static_cast<value_type>(1) - eps2;
 		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
 
-		return (airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - eps2 * airy_vec((xt::numeric_constants<value_type>::PI * obscuration) * e.derived_cast())) / norm;
+		/* Use static_cast<> to capture by value */
+		return (airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - static_cast<value_type>(eps2) * airy_vec((xt::numeric_constants<value_type>::PI * obscuration) * e.derived_cast())) / static_cast<value_type>(norm);
 	}
 
 public:
@@ -132,7 +134,8 @@ public:
 
 	template<class E>
 	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		auto e2 = xt::make_xshared(e.derived_cast() * ratio());
+		/* Use static_cast<> to capture by value */
+		auto e2 = xt::make_xshared(e.derived_cast() * static_cast<value_type>(ratio()));
 
 		return calc(e, obscuration_first()) * calc(e2, obscuration_second());
 	}
