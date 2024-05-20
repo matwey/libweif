@@ -34,7 +34,7 @@ struct WEIF_EXPORT square {
 	}
 
 	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E1>& e2) const noexcept {
+	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
 		using boost::math::sinc_pi;
 
 		const auto sinc_pi_vec = xt::vectorize(&sinc_pi<value_type>);
