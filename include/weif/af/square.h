@@ -9,11 +9,10 @@
 
 #include <cmath>
 
-#include <boost/math/special_functions/sinc.hpp>
-
 #include <xtensor/xmath.hpp>
 #include <xtensor/xvectorize.hpp>
 
+#include <weif/math.h>
 #include <weif_export.h>
 
 
@@ -33,13 +32,13 @@ struct WEIF_EXPORT square {
 		return pow(sinc_pi(ux * PI) * sinc_pi(uy * PI), 2);
 	}
 
-	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
-		using boost::math::sinc_pi;
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
+	auto operator() (E1&& e1, E2&& e2) const noexcept {
+		auto [xx, yy] = xt::meshgrid(
+			sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E1>(e1)),
+			sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E2>(e2)));
 
-		const auto sinc_pi_vec = xt::vectorize(&sinc_pi<value_type>);
-
-		return xt::square(sinc_pi_vec(xt::numeric_constants<value_type>::PI * e1.derived_cast()) * sinc_pi_vec(xt::numeric_constants<value_type>::PI * xt::expand_dims(e2.derived_cast(), 1)));
+		return xt::square(std::move(xx) * std::move(yy));
 	}
 };
 

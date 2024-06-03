@@ -12,7 +12,7 @@
 #include <xtensor/xmath.hpp>
 #include <xtensor/xvectorize.hpp>
 
-#include <weif/af/detail/impl.h>
+#include <weif/math.h>
 #include <weif_export.h>
 
 
@@ -24,23 +24,23 @@ struct WEIF_EXPORT circular {
 	using value_type = T;
 
 	value_type operator() (value_type u) const noexcept {
-		return std::pow(detail::airy_tmp(xt::numeric_constants<value_type>::PI * u), 2);
+		return std::pow(math::jinc_pi(xt::numeric_constants<value_type>::PI * u), 2);
 	}
 
 	value_type operator() (value_type ux, value_type uy) const noexcept {
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
-
-		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()));
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		return xt::square(math::jinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E>(e)));
 	}
 
-	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
-		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
+	auto operator() (E1&& e1, E2&& e2) const noexcept {
+		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
+
+		return this->operator()(xt::sqrt(xt::square(std::move(xx)) + xt::square(std::move(yy))));
 	}
 };
 
@@ -63,26 +63,31 @@ public:
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return std::pow(detail::airy_tmp(piu) - eps2 * detail::airy_tmp(obscuration() * piu), 2) / norm;
+		return std::pow(math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration() * piu), 2) / norm;
 	}
 
 	value_type operator() (value_type ux, value_type uy) const noexcept {
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
 		const auto eps2 = std::pow(obscuration(), 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
-		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
+
+		auto fnct = [=](auto u) -> decltype(u) {
+			return math::jinc_pi(xt::numeric_constants<value_type>::PI * u) - eps2 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration()) * u);
+		};
 
 		/* Use static_cast<> to capture by value */
-		return xt::square(airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - static_cast<value_type>(eps2) * airy_vec((xt::numeric_constants<value_type>::PI * obscuration()) * e.derived_cast())) / static_cast<value_type>(norm);
+		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / static_cast<value_type>(norm);
 	}
 
-	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
-		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
+	auto operator() (E1&& e1, E2&& e2) const noexcept {
+		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
+
+		return this->operator()(xt::sqrt(xt::square(std::move(xx)) + xt::square(std::move(yy))));
 	}
 };
 
@@ -101,17 +106,7 @@ private:
 		const auto norm = static_cast<value_type>(1) - eps2;
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return (detail::airy_tmp(piu) - eps2 * detail::airy_tmp(obscuration * piu)) / norm;
-	}
-
-	template<class E>
-	auto calc(const xt::xexpression<E>& e, value_type obscuration) const noexcept {
-		const auto eps2 = std::pow(obscuration, 2);
-		const auto norm = static_cast<value_type>(1) - eps2;
-		const auto airy_vec = xt::vectorize(&detail::airy_tmp<value_type>);
-
-		/* Use static_cast<> to capture by value */
-		return (airy_vec(xt::numeric_constants<value_type>::PI * e.derived_cast()) - static_cast<value_type>(eps2) * airy_vec((xt::numeric_constants<value_type>::PI * obscuration) * e.derived_cast())) / static_cast<value_type>(norm);
+		return (math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration * piu)) / norm;
 	}
 
 public:
@@ -132,17 +127,31 @@ public:
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		/* Use static_cast<> to capture by value */
-		auto e2 = xt::make_xshared(e.derived_cast() * static_cast<value_type>(ratio()));
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		const auto obscuration1 = obscuration_first();
+		const auto eps12 = std::pow(obscuration1, 2);
+		const auto norm1 = static_cast<value_type>(1) - eps12;
+		const auto obscuration2 = obscuration_second();
+		const auto eps22 = std::pow(obscuration2, 2);
+		const auto norm2 = static_cast<value_type>(1) - eps22;
+		const auto r = ratio();
 
-		return calc(e, obscuration_first()) * calc(e2, obscuration_second());
+		auto fnct = [=](auto u) -> decltype(u * u) {
+			const auto a1 = math::jinc_pi(xt::numeric_constants<value_type>::PI * u) - eps12 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration1) * u);
+			const auto a2 = math::jinc_pi((xt::numeric_constants<value_type>::PI * r) * u) - eps22 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration2 * r) * u);
+
+			return a1 * a2;
+		};
+
+		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / (norm1 * norm2);
 	}
 
-	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
-		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
+	auto operator() (E1&& e1, E2&& e2) const noexcept {
+		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
+
+		return this->operator()(xt::sqrt(xt::square(std::move(xx)) + xt::square(std::move(yy))));
 	}
 };
 
