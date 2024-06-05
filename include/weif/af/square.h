@@ -35,8 +35,8 @@ struct WEIF_EXPORT square {
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		auto [xx, yy] = xt::meshgrid(
-			sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E1>(e1)),
-			sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E2>(e2)));
+			math::sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E1>(e1)),
+			math::sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E2>(e2)));
 
 		return xt::square(std::move(xx) * std::move(yy));
 	}

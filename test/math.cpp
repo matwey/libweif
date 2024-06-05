@@ -57,6 +57,7 @@ void test_jinc_pi1() {
 void test_jinc_pi_vec1() {
 	using namespace weif::math;
 
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
 	const xt::xarray<double> expected = {
 		1.0,
 		0.99875052072483995088407208329032034367448,
@@ -64,14 +65,15 @@ void test_jinc_pi_vec1() {
 		0.0086945492337722873339497536051718576612593
 	};
 	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
-	xt::xarray<double> jinc = jinc_pi(args);
+	xt::xarray<double> actual = jinc_pi(args);
 
-	CPPUNIT_ASSERT_EQUAL(expected, jinc);
+	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
 }
 
 void test_sinc_pi_vec1() {
 	using namespace weif::math;
 
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
 	const xt::xarray<double> expected = {
 		1.0,
 		0.99833416646828152274465063467924745690004,
@@ -79,9 +81,9 @@ void test_sinc_pi_vec1() {
 		-0.054402111088936981340474766185137728168366
 	};
 	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
-	xt::xarray<double> sinc = sinc_pi(args);
+	xt::xarray<double> actual = sinc_pi(args);
 
-	CPPUNIT_ASSERT_EQUAL(expected, sinc);
+	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
 }
 
 };

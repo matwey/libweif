@@ -144,7 +144,7 @@ public:
 			return a1 * a2;
 		};
 
-		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / (norm1 * norm2);
+		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / (norm1 * norm2);
 	}
 
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
