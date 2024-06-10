@@ -61,18 +61,18 @@ public:
 		return pow(PI * sinc_pi(PI * ax), 2);
 	}
 
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->operator()(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 
-	template<class E>
-	auto regular(const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto regular(E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->regular(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 };
 
@@ -167,18 +167,18 @@ public:
 		return pow(cos(cx) * im + c * sinc_pi(cx) * real()(dx), 2);
 	}
 
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->operator()(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 
-	template<class E>
-	auto regular(const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto regular(E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->regular(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 
 	spectral_filter<value_type>& normalize() noexcept;
