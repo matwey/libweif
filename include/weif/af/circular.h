@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include <xtensor/xmath.hpp>
+#include <xtensor/xutils.hpp>
 #include <xtensor/xvectorize.hpp>
 
 #include <weif/math.h>
@@ -33,7 +34,11 @@ struct WEIF_EXPORT circular {
 
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
-		return xt::square(math::jinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E>(e)));
+		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
+
+		constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+		return xt::square(math::jinc_pi(static_cast<xvalue_type>(PI) * std::forward<E>(e)));
 	}
 
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
@@ -72,15 +77,19 @@ public:
 
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
+		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
+
 		const auto eps2 = std::pow(obscuration(), 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
 
 		auto fnct = [=](auto u) -> decltype(u) {
-			return math::jinc_pi(xt::numeric_constants<value_type>::PI * u) - eps2 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration()) * u);
+			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+			return math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps2) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration()) * u);
 		};
 
 		/* Use static_cast<> to capture by value */
-		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / static_cast<value_type>(norm);
+		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / static_cast<xvalue_type>(norm);
 	}
 
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
@@ -129,6 +138,8 @@ public:
 
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
+		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
+
 		const auto obscuration1 = obscuration_first();
 		const auto eps12 = std::pow(obscuration1, 2);
 		const auto norm1 = static_cast<value_type>(1) - eps12;
@@ -138,13 +149,15 @@ public:
 		const auto r = ratio();
 
 		auto fnct = [=](auto u) -> decltype(u * u) {
-			const auto a1 = math::jinc_pi(xt::numeric_constants<value_type>::PI * u) - eps12 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration1) * u);
-			const auto a2 = math::jinc_pi((xt::numeric_constants<value_type>::PI * r) * u) - eps22 * math::jinc_pi((xt::numeric_constants<value_type>::PI * obscuration2 * r) * u);
+			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+
+			const auto a1 = math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps12) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration1) * u);
+			const auto a2 = math::jinc_pi(static_cast<xvalue_type>(PI * r) * u) - static_cast<xvalue_type>(eps22) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration2 * r) * u);
 
 			return a1 * a2;
 		};
 
-		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / (norm1 * norm2);
+		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / static_cast<xvalue_type>(norm1 * norm2);
 	}
 
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>

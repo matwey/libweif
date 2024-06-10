@@ -8,6 +8,7 @@
 #define _WEIF_AF_SQUARE_H
 
 #include <cmath>
+#include <type_traits>
 
 #include <xtensor/xmath.hpp>
 #include <xtensor/xvectorize.hpp>
@@ -34,9 +35,11 @@ struct WEIF_EXPORT square {
 
 	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
+		using xvalue_type = std::common_type_t<xt::get_value_type_t<std::decay_t<E1>>, xt::get_value_type_t<std::decay_t<E2>>>;
+
 		auto [xx, yy] = xt::meshgrid(
-			math::sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E1>(e1)),
-			math::sinc_pi(xt::numeric_constants<value_type>::PI * std::forward<E2>(e2)));
+			math::sinc_pi(xt::numeric_constants<xvalue_type>::PI * std::forward<E1>(e1)),
+			math::sinc_pi(xt::numeric_constants<xvalue_type>::PI * std::forward<E2>(e2)));
 
 		return xt::square(std::move(xx) * std::move(yy));
 	}
