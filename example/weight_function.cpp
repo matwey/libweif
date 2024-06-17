@@ -21,6 +21,7 @@
 #include <weif/af/circular.h>
 #include <weif/af/square.h>
 #include <weif/af/point.h>
+#include <weif/sf/mono.h>
 #include <weif/spectral_filter.h>
 #include <weif/spectral_response.h>
 #include <weif/weight_function.h>
@@ -45,10 +46,10 @@ make_aperture_filter(value_type aperture_scale, value_type central_obscuration, 
 	return weif::af::circular<value_type>{};
 }
 
-std::pair<value_type, std::variant<weif::mono_spectral_filter<value_type>, weif::spectral_filter<value_type>>>
+std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::spectral_filter<value_type>>>
 make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<float> mono) {
 	if (mono) {
-		return {*mono, weif::mono_spectral_filter<value_type>{}};
+		return {*mono, weif::sf::mono<value_type>{}};
 	}
 
 	auto sr = weif::spectral_response<value_type>::stack_from_files(response_filename.cbegin(), response_filename.cend());

@@ -33,48 +33,6 @@
 
 namespace weif {
 
-template<class T>
-class WEIF_EXPORT mono_spectral_filter {
-public:
-	using value_type = T;
-
-	value_type operator() (const value_type x) const noexcept {
-		// x = u^2 / lambda = z f^2
-		using namespace std;
-
-		const auto ax = abs(x);
-
-		constexpr auto PI = xt::numeric_constants<value_type>::PI;
-
-		return pow(sin(PI * ax), 2);
-	}
-
-	value_type regular(const value_type x) const noexcept {
-		// x = u^2 / lambda = z f^2
-		using namespace std;
-		using boost::math::sinc_pi;
-
-		const auto ax = abs(x);
-
-		constexpr auto PI = xt::numeric_constants<value_type>::PI;
-
-		return pow(PI * sinc_pi(PI * ax), 2);
-	}
-
-	template<class E, xt::enable_xexpression<E, bool> = true>
-	auto operator() (E&& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
-			return this->operator()(x);
-		}, std::forward<E>(e));
-	}
-
-	template<class E, xt::enable_xexpression<E, bool> = true>
-	auto regular(E&& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
-			return this->regular(x);
-		}, std::forward<E>(e));
-	}
-};
 
 template<class T>
 class WEIF_EXPORT spectral_filter {
