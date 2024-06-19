@@ -21,7 +21,7 @@
 #include <weif/af/square.h>
 #include <weif/af/point.h>
 #include <weif/sf/mono.h>
-#include <weif/spectral_filter.h>
+#include <weif/sf/poly.h>
 #include <weif/spectral_response.h>
 #include <weif/weight_function_grid_2d.h>
 
@@ -41,7 +41,7 @@ make_aperture_filter(value_type aperture_scale, value_type central_obscuration) 
 	return weif::af::circular<value_type>{};
 }
 
-std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::spectral_filter<value_type>>>
+std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::sf::poly<value_type>>>
 make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<float> mono) {
 	if (mono) {
 		return {*mono, weif::sf::mono<value_type>{}};
@@ -51,7 +51,7 @@ make_spectral_filter(const std::vector<std::string>& response_filename, std::opt
 	std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 	sr.normalize();
 
-	weif::spectral_filter sf{sr, 4096};
+	weif::sf::poly sf{sr, 4096};
 	const auto lambda = sf.equiv_lambda();
 	std::cerr << "Equivalent lambda: " << lambda << std::endl;
 	sf.normalize();

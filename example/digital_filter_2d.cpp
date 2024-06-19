@@ -19,20 +19,20 @@
 #include <weif/af/angle_averaged.h>
 #include <weif/af/square.h>
 #include <weif/digital_filter_2d.h>
-#include <weif/spectral_filter.h>
+#include <weif/sf/poly.h>
 #include <weif/weight_function.h>
 #include <weif/weight_function_grid_2d.h>
 
 
 using value_type = float;
 
-std::pair<value_type, weif::spectral_filter<value_type>>
+std::pair<value_type, weif::sf::poly<value_type>>
 make_spectral_filter(const std::vector<std::string>& response_filename) {
 	auto sr = weif::spectral_response<value_type>::stack_from_files(response_filename.cbegin(), response_filename.cend());
 	std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 	sr.normalize();
 
-	weif::spectral_filter sf{sr, 4096};
+	weif::sf::poly sf{sr, 4096};
 	const auto lambda = sf.equiv_lambda();
 	std::cerr << "Equivalent lambda: " << lambda << std::endl;
 	sf.normalize();

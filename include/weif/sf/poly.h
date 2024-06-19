@@ -4,14 +4,11 @@
  * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
  */
 
-#ifndef _WEIF_SPECTRAL_FILTER_H
-#define _WEIF_SPECTRAL_FILTER_H
+#ifndef _WEIF_SF_POLY_H
+#define _WEIF_SF_POLY_H
 
-#include <algorithm>
-#include <array> // IWYU pragma: keep
 #include <cmath>
 #include <complex>
-#include <limits>
 #include <vector>
 
 #include <boost/math/quadrature/exp_sinh.hpp>
@@ -32,10 +29,10 @@
 
 
 namespace weif {
-
+namespace sf {
 
 template<class T>
-class WEIF_EXPORT spectral_filter {
+class WEIF_EXPORT poly {
 public:
 	using value_type = T;
 
@@ -53,7 +50,7 @@ private:
 	xt::xtensor<std::complex<value_type>, 1> make_fft(const xt::xexpression<E>& e);
 
 	template<class E1, class E2>
-	spectral_filter(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier):
+	poly(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier):
 		grid_{grid},
 		real_{real.derived_cast(), typename detail::cubic_spline<T>::first_order_boundary{0, 0}},
 		imag_{imag.derived_cast(), typename detail::cubic_spline<T>::second_order_boundary{0, 0}},
@@ -61,14 +58,14 @@ private:
 		equiv_lambda_{eval_equiv_lambda()} {}
 
 	template<class E>
-	spectral_filter(value_type delta, const xt::xexpression<E>& e, value_type carrier):
-		spectral_filter({static_cast<value_type>(0), delta, e.derived_cast().size()},
+	poly(value_type delta, const xt::xexpression<E>& e, value_type carrier):
+		poly({static_cast<value_type>(0), delta, e.derived_cast().size()},
 			xt::real(e.derived_cast()),
 			xt::imag(e.derived_cast()),
 			carrier) {}
 
-	spectral_filter(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size):
-		spectral_filter(static_cast<value_type>(1) / response.grid().delta() / padded_size,
+	poly(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size):
+		poly(static_cast<value_type>(1) / response.grid().delta() / padded_size,
 			make_fft(xt::view(
 				xt::tile(xt::pad(response.data() / response.grid().values(),
 					std::vector<std::size_t>{{0, (padded_size > response.grid().size() ? padded_size - response.grid().size() : 0)}}), {2}),
@@ -76,16 +73,10 @@ private:
 			response.grid().values()[carrier_idx]) {}
 
 public:
-	spectral_filter(const spectral_response<value_type>& response, std::size_t size, value_type carrier):
-		spectral_filter(response, size, response.grid().to_index(carrier), std::max(response.grid().size(), size)) {}
-	spectral_filter(const spectral_response<value_type>& response, std::size_t size):
-		spectral_filter(response, size, response.effective_lambda()) {}
-
-	const auto& grid() const noexcept { return grid_; }
-	const auto& real() const noexcept { return real_; }
-	const auto& imag() const noexcept { return imag_; }
-	const auto& carrier() const noexcept { return carrier_; }
-	const auto& equiv_lambda() const noexcept { return equiv_lambda_; }
+	poly(const spectral_response<value_type>& response, std::size_t size, value_type carrier):
+		poly(response, size, response.grid().to_index(carrier), std::max(response.grid().size(), size)) {}
+	poly(const spectral_response<value_type>& response, std::size_t size):
+		poly(response, size, response.effective_lambda()) {}
 
 	value_type operator() (const value_type x) const noexcept {
 		// x = u^2 / lambda = z f^2
@@ -139,13 +130,19 @@ public:
 		}, std::forward<E>(e));
 	}
 
-	spectral_filter<value_type>& normalize() noexcept;
-	spectral_filter<value_type> normalized() const;
+	const auto& grid() const noexcept { return grid_; }
+	const auto& real() const noexcept { return real_; }
+	const auto& imag() const noexcept { return imag_; }
+	const auto& carrier() const noexcept { return carrier_; }
+	const auto& equiv_lambda() const noexcept { return equiv_lambda_; }
+
+	poly<value_type>& normalize() noexcept;
+	poly<value_type> normalized() const;
 };
 
 template<class T>
 template<class E>
-xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_filter<T>::make_fft(const xt::xexpression<E>& e) {
+xt::xtensor<std::complex<typename poly<T>::value_type>, 1> poly<T>::make_fft(const xt::xexpression<E>& e) {
 	const auto size = e.derived_cast().size();
 
 	xt::xtensor<std::complex<value_type>, 1> ret{std::array{size / 2 + 1}};
@@ -162,7 +159,7 @@ xt::xtensor<std::complex<typename spectral_filter<T>::value_type>, 1> spectral_f
 }
 
 template<class T>
-spectral_filter<T>& spectral_filter<T>::normalize() noexcept {
+poly<T>& poly<T>::normalize() noexcept {
 	const auto lambda_0 = equiv_lambda();
 
 	grid_ *= lambda_0;
@@ -175,8 +172,8 @@ spectral_filter<T>& spectral_filter<T>::normalize() noexcept {
 }
 
 template<class T>
-spectral_filter<T> spectral_filter<T>::normalized() const {
-	spectral_filter<T> ret{*this};
+poly<T> poly<T>::normalized() const {
+	poly<T> ret{*this};
 
 	ret.normalize();
 
@@ -184,7 +181,9 @@ spectral_filter<T> spectral_filter<T>::normalized() const {
 }
 
 template<class T>
-typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() const {
+typename poly<T>::value_type poly<T>::eval_equiv_lambda() const {
+	using namespace std;
+
 	boost::math::quadrature::exp_sinh<value_type> integrator;
 
 	const auto i = integrator.integrate([this] (value_type x) {
@@ -192,28 +191,29 @@ typename spectral_filter<T>::value_type spectral_filter<T>::eval_equiv_lambda() 
 			return static_cast<value_type>(0.0);
 
 		if (x < static_cast<value_type>(1)) {
-			return std::pow(x, static_cast<value_type>(1.0/6.0)) * this->regular(x);
+			return pow(x, static_cast<value_type>(1.0/6.0)) * this->regular(x);
 		}
 
-		return std::pow(x, -static_cast<value_type>(11.0/6.0)) * this->operator()(x);
+		return pow(x, -static_cast<value_type>(11.0/6.0)) * this->operator()(x);
 	});
 
-	return static_cast<value_type>(3.28) * std::pow(i, -static_cast<value_type>(6.0/7.0));
+	return static_cast<value_type>(3.28) * pow(i, -static_cast<value_type>(6.0/7.0));
 }
 
 
 template<class T>
-spectral_filter(const spectral_response<T>& response, std::size_t size, T carrier) -> spectral_filter<T>;
+poly(const spectral_response<T>& response, std::size_t size, T carrier) -> poly<T>;
 template<class T>
-spectral_filter(const spectral_response<T>& response, std::size_t size) -> spectral_filter<T>;
-template<class T>
-spectral_filter(const uniform_grid<T>& grid, const xt::xtensor<T, 1>& data) -> spectral_filter<T>;
+poly(const spectral_response<T>& response, std::size_t size) -> poly<T>;
 
 
-extern template class spectral_filter<float>;
-extern template class spectral_filter<double>;
-extern template class spectral_filter<long double>;
+extern template class poly<float>;
+extern template class poly<double>;
+extern template class poly<long double>;
 
+} // sf
 } // weif
 
-#endif // _WEIF_SPECTRAL_FILTER_H
+#endif // _WEIF_SF_POLY_H
+
+

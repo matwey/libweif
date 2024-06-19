@@ -4,13 +4,15 @@
  * Copyright (C) 2022-2023  Matwey V. Kornilov <matwey.kornilov@gmail.com>
  */
 
-#include <weif/spectral_filter.h>
+#include <weif/sf/poly.h>
 
 
 namespace weif {
+namespace sf {
 
-template class spectral_filter<float>;
-template class spectral_filter<double>;
-template class spectral_filter<long double>;
+template class poly<float>;
+template class poly<double>;
+template class poly<long double>;
 
+} // sf
 } // weif

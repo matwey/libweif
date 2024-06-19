@@ -15,7 +15,7 @@
 #include <xtensor/xcsv.hpp>
 #include <xtensor/xmanipulation.hpp>
 
-#include <weif/spectral_filter.h>
+#include <weif/sf/poly.h>
 
 
 int main(int argc, char** argv) {
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 		auto sr = weif::spectral_response<float>::make_from_file(response_filename);
 		sr.normalize();
 		std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
-		weif::spectral_filter sf{sr, size};
+		weif::sf::poly sf{sr, size};
 		std::cerr << "Equivalent lambda: " << sf.equiv_lambda() << std::endl;
 		if (va.count("normalize")) {
 			sf.normalize();
