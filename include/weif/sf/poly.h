@@ -64,7 +64,7 @@ private:
 			xt::imag(e.derived_cast()),
 			carrier) {}
 
-	poly(const spectral_response<value_type>& response, std::size_t size, std::size_t carrier_idx, std::size_t padded_size):
+	poly(const spectral_response<value_type>& response, std::size_t carrier_idx, std::size_t padded_size):
 		poly(static_cast<value_type>(1) / response.grid().delta() / padded_size,
 			make_fft(xt::view(
 				xt::tile(xt::pad(response.data() / response.grid().values(),
@@ -74,7 +74,7 @@ private:
 
 public:
 	poly(const spectral_response<value_type>& response, std::size_t size, value_type carrier):
-		poly(response, size, response.grid().to_index(carrier), std::max(response.grid().size(), size)) {}
+		poly(response, response.grid().to_index(carrier), std::max(response.grid().size(), size)) {}
 	poly(const spectral_response<value_type>& response, std::size_t size):
 		poly(response, size, response.effective_lambda()) {}
 
