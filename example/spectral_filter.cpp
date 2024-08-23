@@ -28,10 +28,9 @@ int main(int argc, char** argv) {
 	opts.add_options()
 		("size", po::value<std::size_t>()->default_value(1024), "Output grid size")
 		("normalize", "Normalize the filter")
-		("response_filename", po::value<std::string>(), "Spectral response input filename")
+		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
 		("filter_filename", po::value<std::string>(), "Spectral filter output filename");
 
-	pos_opts.add("response_filename", 1);
 	pos_opts.add("filter_filename", 1);
 
 	try {
@@ -39,11 +38,11 @@ int main(int argc, char** argv) {
 		po::store(std::move(parsed), va);
 		po::notify(va);
 
-		const auto response_filename = va["response_filename"].as<std::string>();
+		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
 		const auto filter_filename   = va["filter_filename"].as<std::string>();
 		const auto size = va["size"].as<std::size_t>();
 
-		auto sr = weif::spectral_response<float>::make_from_file(response_filename);
+		auto sr = weif::spectral_response<float>::stack_from_files(response_filename.cbegin(), response_filename.cend());
 		sr.normalize();
 		std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 		weif::sf::poly sf{sr, size};
