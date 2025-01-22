@@ -61,7 +61,7 @@ public:
 
 	template<class DF>
 	digital_filter_2d(DF&& digital_filter_fun, shape_type shape, const allocator_type& alloc = allocator_type()):
-		digital_filter_2d(std::function(std::forward<DF>(digital_filter_fun)), shape, alloc) {}
+		digital_filter_2d(function_type(std::forward<DF>(digital_filter_fun)), shape, alloc) {}
 
 	const allocator_type& get_allocator() const noexcept { return *this; }
 
