@@ -92,7 +92,23 @@ public:
 		const auto cx = ax * c;
 		const auto dx = (ax / static_cast<value_type>(2) - grid().origin()) / grid().delta();
 
-		return pow(cos(cx) * imag()(dx) + sin(cx) * real()(dx), 2);
+		/*
+		 * Implementation note
+		 *
+		 * Tokovinin (2003), and Kornilov and Safonov (2019) noted that
+		 * the spectral filter is a squared imaginary and real parts of
+		 * Fourier transform for the spectral response. Because of
+		 * squaring, it does not matter which sign they used in the
+		 * definition of the Fourier transform.
+		 *
+		 * However, when the Fourier shift theorem is applied the sign
+		 * must be consistent with FFTW3 real-to-complex routines used
+		 * to perform actual Fourier transform. The FFTW3 uses a minus
+		 * sign for the forward Fourier transform. Note, that atmos
+		 * software uses the opposite sign.
+		 */
+
+		return pow(sin(cx) * real()(dx) - cos(cx) * imag()(dx), 2);
 	}
 
 	value_type regular(const value_type x) const noexcept {
@@ -113,7 +129,7 @@ public:
 			(imag().values()(1) + imag().double_primes()(1) * (dx * dx - static_cast<value_type>(1)) / static_cast<value_type>(6)) / (grid().delta() * static_cast<value_type>(2)) :
 			imag()(dx) / ax);
 
-		return pow(cos(cx) * im + c * sinc_pi(cx) * real()(dx), 2);
+		return pow(c * sinc_pi(cx) * real()(dx) - cos(cx) * im, 2);
 	}
 
 	template<class E, xt::enable_xexpression<E, bool> = true>

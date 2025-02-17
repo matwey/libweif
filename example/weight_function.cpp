@@ -47,7 +47,7 @@ make_aperture_filter(value_type aperture_scale, value_type central_obscuration, 
 }
 
 std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::sf::poly<value_type>>>
-make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<float> mono) {
+make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<value_type> mono, std::optional<value_type> carrier) {
 	if (mono) {
 		return {*mono, weif::sf::mono<value_type>{}};
 	}
@@ -56,7 +56,12 @@ make_spectral_filter(const std::vector<std::string>& response_filename, std::opt
 	std::cerr << "Effective lambda: " << sr.effective_lambda() << std::endl;
 	sr.normalize();
 
-	weif::sf::poly sf{sr, 4096};
+	auto sf = [&] () {
+		if (carrier)
+			return weif::sf::poly{sr, 4096, *carrier};
+
+		return weif::sf::poly{sr, 4096};
+	} ();
 	const auto lambda = sf.equiv_lambda();
 	std::cerr << "Equivalent lambda: " << lambda << std::endl;
 	sf.normalize();
@@ -78,6 +83,7 @@ int main(int argc, char** argv) {
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
 		("square", "Use square aperture filter")
+		("carrier", po::value<value_type>(), "Carrier wavelength")
 		("mono", po::value<value_type>(), "Use monochromatic spectral filter with given labmda");
 
 	try {
@@ -98,10 +104,12 @@ int main(int argc, char** argv) {
 		const auto output_filename = va["output_filename"].as<std::string>();
 		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
 		const bool square = va.count("square");
+		const std::optional<value_type> carrier{
+			va.count("carrier") ? std::optional(va["carrier"].as<value_type>()) : std::nullopt};
+		const std::optional<value_type> mono{
+			va.count("mono") ? std::optional(va["mono"].as<value_type>()) : std::nullopt};
 
-		const auto [lambda, spectral_filter] = make_spectral_filter(
-			response_filename,
-			(va.count("mono") ? std::optional{va["mono"].as<value_type>()} : std::nullopt));
+		const auto [lambda, spectral_filter] = make_spectral_filter(response_filename, mono, carrier);
 		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration, square);
 
 		const xt::xarray<value_type> grid = xt::linspace(static_cast<value_type>(0), static_cast<value_type>(30), size);
