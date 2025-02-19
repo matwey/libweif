@@ -49,10 +49,10 @@ public:
 				return static_cast<value_type>(0);
 
 			if (u < static_cast<value_type>(1)) {
-				return pow(u, static_cast<value_type>(4.0/3.0)) * spectral_filter.regular(u * u) * aperture_filter(x * u);
+				return pow(cbrt(u), 4) * spectral_filter.regular(u * u) * aperture_filter(x * u);
 			}
 
-			const auto t = pow(u, -static_cast<value_type>(8.0/3.0));
+			const auto t = pow(cbrt(u), -8);
 			if (t == static_cast<value_type>(0))
 				return static_cast<value_type>(0);
 
