@@ -31,6 +31,18 @@ T jinc_pi(const T x) noexcept {
 	}
 }
 
+template<class T, xt::disable_xexpression<T, bool> = true>
+T zinc_pi(const T x) noexcept {
+	using namespace std;
+
+	if (abs(x) >= 7.2 * boost::math::tools::forth_root_epsilon<T>()) {
+		return boost::math::cyl_bessel_j(2, x) / (x * x) * static_cast<T>(8);
+	} else {
+        	// |x| < (eps*384)^(1/4)
+		return static_cast<T>(1) - x * x / 12;
+	}
+}
+
 namespace detail {
 
 	struct jinc_pi_fun {
@@ -59,6 +71,18 @@ namespace detail {
 		}
 	};
 
+	struct zinc_pi_fun {
+		template <class T>
+		constexpr auto operator()(const T& arg) const {
+			return zinc_pi(arg);
+		}
+
+		template <class B>
+		constexpr auto simd_apply(const B& arg) const {
+			return zinc_pi(arg);
+		}
+	};
+
 } // detail
 
 template <class E, xt::enable_xexpression<E, bool> = true>
@@ -69,6 +93,11 @@ inline auto jinc_pi(E&& e) noexcept {
 template <class E, xt::enable_xexpression<E, bool> = true>
 inline auto sinc_pi(E&& e) noexcept {
 	return xt::xfunction<detail::sinc_pi_fun, E>{detail::sinc_pi_fun{}, std::forward<E>(e)};
+}
+
+template <class E, xt::enable_xexpression<E, bool> = true>
+inline auto zinc_pi(E&& e) noexcept {
+	return xt::xfunction<detail::zinc_pi_fun, E>{detail::zinc_pi_fun{}, std::forward<E>(e)};
 }
 
 } // math

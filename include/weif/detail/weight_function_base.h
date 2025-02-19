@@ -33,6 +33,14 @@ private:
 	cubic_spline<value_type> wf_;
 
 protected:
+	inline const auto& grid() const noexcept {
+		return grid_;
+	}
+
+	inline const auto& wf() const noexcept {
+		return wf_;
+	}
+
 	inline value_type operator() (value_type altitude) const noexcept {
 		using namespace std;
 
