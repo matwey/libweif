@@ -83,6 +83,7 @@ auto weight_function<T>::integrate_weight_function(function_type&& fun, std::siz
 	return xt::make_lambda_xfunction([integrator = std::move(integrator), fun = std::forward<function_type>(fun)] (value_type z) -> value_type {
 		using namespace std::placeholders;
 
+		// boost 1.86 has fix for BesselJ(+inf)
 		if (z == static_cast<value_type>(0))
 			return static_cast<value_type>(0);
 

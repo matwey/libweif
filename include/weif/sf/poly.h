@@ -52,8 +52,8 @@ private:
 	template<class E1, class E2>
 	poly(const uniform_grid<value_type>& grid, const xt::xexpression<E1>& real, const xt::xexpression<E2>& imag, value_type carrier):
 		grid_{grid},
-		real_{real.derived_cast(), typename detail::cubic_spline<T>::first_order_boundary{0, 0}},
-		imag_{imag.derived_cast(), typename detail::cubic_spline<T>::second_order_boundary{0, 0}},
+		real_{real.derived_cast(), typename detail::first_order_boundary<value_type>{0, 0}},
+		imag_{imag.derived_cast(), typename detail::second_order_boundary<value_type>{0, 0}},
 		carrier_{carrier},
 		equiv_lambda_{eval_equiv_lambda()} {}
 

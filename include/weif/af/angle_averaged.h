@@ -59,7 +59,7 @@ private:
 	template<class E>
 	explicit angle_averaged(const xt::xexpression<E>& values):
 		grid_{static_cast<value_type>(0), static_cast<value_type>(1) / (values.derived_cast().size() - 1), values.derived_cast().size()},
-		af_{values, typename detail::cubic_spline<T>::first_order_boundary{0, 0}} {}
+		af_{values, detail::first_order_boundary<value_type>{0, 0}} {}
 
 public:
 	template<class AF>

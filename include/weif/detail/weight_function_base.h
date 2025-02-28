@@ -57,7 +57,7 @@ public:
 		grid_{static_cast<value_type>(0),
 			static_cast<value_type>(1) / (values.derived_cast().size()-1),
 			values.derived_cast().size()},
-		wf_{values, typename cubic_spline<T>::first_order_boundary{0, 0}} {}
+		wf_{values, first_order_boundary<value_type>{0, 0}} {}
 
 	const auto& lambda() const noexcept { return lambda_; /* nm */ }
 	const auto& aperture_scale() const noexcept { return aperture_scale_; /* mm */ }
