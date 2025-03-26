@@ -18,6 +18,8 @@
 
 #include <weif/math.h>
 
+#include "xexpression.h"
+
 
 class test_math_suite: public CppUnit::TestCase {
 CPPUNIT_TEST_SUITE(test_math_suite);
@@ -67,7 +69,7 @@ void test_jinc_pi_vec1() {
 	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
 	xt::xarray<double> actual = jinc_pi(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_sinc_pi_vec1() {
@@ -83,7 +85,7 @@ void test_sinc_pi_vec1() {
 	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
 	xt::xarray<double> actual = sinc_pi(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 };

@@ -19,6 +19,8 @@
 #include <weif/sf/mono.h>
 #include <weif/sf/gauss.h>
 
+#include "xexpression.h"
+
 
 class test_sf_suite: public CppUnit::TestCase {
 CPPUNIT_TEST_SUITE(test_sf_suite);
@@ -108,7 +110,7 @@ void test_mono_vec1() {
 	const mono<double> sf{};
 	xt::xarray<double> actual = sf(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_mono_vec2() {
@@ -125,7 +127,7 @@ void test_mono_vec2() {
 	const mono<double> sf{};
 	xt::xarray<double> actual = sf.regular(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_gauss1() {
@@ -257,7 +259,7 @@ void test_gauss_vec1() {
 	const gauss<double> sf{0.0};
 	xt::xarray<double> actual = sf(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_gauss_vec2() {
@@ -274,7 +276,7 @@ void test_gauss_vec2() {
 	const gauss<double> sf{0.0};
 	xt::xarray<double> actual = sf.regular(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_gauss_vec3() {
@@ -291,7 +293,7 @@ void test_gauss_vec3() {
 	const gauss<double> sf{0.1};
 	xt::xarray<double> actual = sf(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_gauss_vec4() {
@@ -308,7 +310,7 @@ void test_gauss_vec4() {
 	const gauss<double> sf{0.1};
 	xt::xarray<double> actual = sf.regular(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 };

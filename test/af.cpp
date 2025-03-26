@@ -20,6 +20,8 @@
 #include <weif/af/point.h>
 #include <weif/af/square.h>
 
+#include "xexpression.h"
+
 
 class test_af_suite: public CppUnit::TestCase {
 CPPUNIT_TEST_SUITE(test_af_suite);
@@ -81,7 +83,7 @@ void test_circular_vec1() {
 	const circular<double> af{};
 	xt::xarray<double> actual = af(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_annular1() {
@@ -127,7 +129,7 @@ void test_annular_vec1() {
 	const annular<double> af{0.5};
 	xt::xarray<double> actual = af(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_cross_annular1() {
@@ -202,7 +204,7 @@ void test_cross_annular_vec1() {
 	const cross_annular<double> af{2.0, 0.5, 0.25};
 	xt::xarray<double> actual = af(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_cross_annular_vec2() {
@@ -219,7 +221,7 @@ void test_cross_annular_vec2() {
 	const cross_annular<double> af{1.0, 0.0, 0.0};
 	xt::xarray<double> actual = af(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_point1() {
@@ -259,7 +261,7 @@ void test_point_vec1() {
 	const point<double> af{};
 	xt::xarray<double> actual = af(args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 void test_square1() {
@@ -310,7 +312,7 @@ void test_square_vec1() {
 	const square<double> af{};
 	xt::xarray<double> actual = af(args, args);
 
-	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
 };
