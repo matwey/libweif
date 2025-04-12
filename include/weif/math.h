@@ -8,6 +8,7 @@
 #define _WEIF_MATH_H
 
 #include <cmath>
+#include <type_traits>
 
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/sinc.hpp>
@@ -61,12 +62,12 @@ namespace detail {
 
 } // detail
 
-template <class E, xt::enable_xexpression<E, bool> = true>
+template <class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
 inline auto jinc_pi(E&& e) noexcept {
 	return xt::xfunction<detail::jinc_pi_fun, E>{detail::jinc_pi_fun{}, std::forward<E>(e)};
 }
 
-template <class E, xt::enable_xexpression<E, bool> = true>
+template <class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
 inline auto sinc_pi(E&& e) noexcept {
 	return xt::xfunction<detail::sinc_pi_fun, E>{detail::sinc_pi_fun{}, std::forward<E>(e)};
 }

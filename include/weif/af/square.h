@@ -33,7 +33,7 @@ struct WEIF_EXPORT square {
 		return pow(sinc_pi(ux * PI) * sinc_pi(uy * PI), 2);
 	}
 
-	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
+	template<class E1, class E2, xt::enable_xexpression<std::decay_t<E1>, bool> = true, xt::enable_xexpression<std::decay_t<E2>, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		using xvalue_type = std::common_type_t<xt::get_value_type_t<std::decay_t<E1>>, xt::get_value_type_t<std::decay_t<E2>>>;
 
