@@ -9,7 +9,6 @@
 
 #include <cmath>
 #include <complex>
-#include <type_traits>
 #include <vector>
 
 #include <boost/math/quadrature/exp_sinh.hpp>
@@ -133,14 +132,14 @@ public:
 		return pow(c * sinc_pi(cx) * real()(dx) - cos(cx) * im, 2);
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->operator()(x);
 		}, std::forward<E>(e));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto regular(E&& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
 			return this->regular(x);

@@ -7,8 +7,6 @@
 #ifndef _WEIF_AF_POINT_H
 #define _WEIF_AF_POINT_H
 
-#include <type_traits>
-
 #include <weif_export.h>
 
 
@@ -27,12 +25,12 @@ struct WEIF_EXPORT point {
 		return static_cast<value_type>(1);
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		return xt::ones_like(std::forward<E>(e));
 	}
 
-	template<class E1, class E2, xt::enable_xexpression<std::decay_t<E1>, bool> = true, xt::enable_xexpression<std::decay_t<E2>, bool> = true>
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
 

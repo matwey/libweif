@@ -43,7 +43,7 @@ public:
 		return pow(PI * sinc_pi(PI * x), 2);
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
@@ -52,7 +52,7 @@ public:
 		return xt::square(xt::sin(static_cast<xvalue_type>(PI) * std::forward<E>(e)));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto regular(E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 

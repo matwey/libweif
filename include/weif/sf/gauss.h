@@ -8,7 +8,6 @@
 #define _WEIF_SF_GAUSS_H
 
 #include <cmath>
-#include <type_traits>
 
 #include <xtensor/xmath.hpp>
 #include <xtensor/xutils.hpp>
@@ -56,7 +55,7 @@ public:
 		return pow(PI * sinc_pi(PI * x), 2) * exp(-C * pow(fwhm() * x, 2));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		const auto fwhm_ = fwhm();
 
@@ -72,7 +71,7 @@ public:
 		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto regular(E&& e) const noexcept {
 		const auto fwhm_ = fwhm();
 

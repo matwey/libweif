@@ -33,7 +33,7 @@ struct WEIF_EXPORT circular {
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
@@ -42,7 +42,7 @@ struct WEIF_EXPORT circular {
 		return xt::square(math::jinc_pi(static_cast<xvalue_type>(PI) * std::forward<E>(e)));
 	}
 
-	template<class E1, class E2, xt::enable_xexpression<std::decay_t<E1>, bool> = true, xt::enable_xexpression<std::decay_t<E2>, bool> = true>
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
 
@@ -76,7 +76,7 @@ public:
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
@@ -93,7 +93,7 @@ public:
 		return xt::square(xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e))) / static_cast<xvalue_type>(norm);
 	}
 
-	template<class E1, class E2, xt::enable_xexpression<std::decay_t<E1>, bool> = true, xt::enable_xexpression<std::decay_t<E2>, bool> = true>
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
 
@@ -137,7 +137,7 @@ public:
 		return this->operator()(std::hypot(ux, uy));
 	}
 
-	template<class E, xt::enable_xexpression<std::decay_t<E>, bool> = true>
+	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
@@ -161,7 +161,7 @@ public:
 		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / static_cast<xvalue_type>(norm1 * norm2);
 	}
 
-	template<class E1, class E2, xt::enable_xexpression<std::decay_t<E1>, bool> = true, xt::enable_xexpression<std::decay_t<E2>, bool> = true>
+	template<class E1, class E2, xt::enable_xexpression<E1, bool> = true, xt::enable_xexpression<E2, bool> = true>
 	auto operator() (E1&& e1, E2&& e2) const noexcept {
 		auto [xx, yy] = xt::meshgrid(std::forward<E1>(e1), std::forward<E2>(e2));
 
