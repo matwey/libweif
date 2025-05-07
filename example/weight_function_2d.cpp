@@ -47,7 +47,7 @@ make_aperture_filter(value_type aperture_scale, value_type central_obscuration, 
 }
 
 std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::sf::poly<value_type>>>
-make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<float> mono) {
+make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<value_type> mono) {
 	if (mono) {
 		return {*mono, weif::sf::mono<value_type>{}};
 	}

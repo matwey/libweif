@@ -35,7 +35,7 @@
 #include <weif/spectral_response.h>
 
 
-using value_type = float;
+using value_type = long double;
 
 namespace sf {
 
@@ -362,7 +362,7 @@ auto weight_function<T>::integrate_weight_function(function_type&& fun, std::siz
 }
 
 std::pair<value_type, std::variant<sf::mono<value_type>, sf::gauss<value_type>, sf::poly<value_type>>>
-make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<float> mono) {
+make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<value_type> mono) {
 	if (mono) {
 		return {*mono, sf::mono<value_type>{}};
 	}
@@ -425,7 +425,7 @@ int main(int argc, char** argv) {
 
 		constexpr auto wf_grid_size = 1024 + 1;
 		const auto af = ztilt<value_type>{};
-		const auto cf = transversal<value_type>{};
+		const auto cf = longitudinal<value_type>{};
 		const auto wf = std::visit([&] (const auto& sf) {
 			return weight_function<value_type>{sf, lambda, af, aperture_scale, cf, base_length, wf_grid_size};
 		}, spectral_filter);
