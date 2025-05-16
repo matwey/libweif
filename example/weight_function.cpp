@@ -27,23 +27,72 @@
 #include <weif/weight_function.h>
 
 
+
+template<class AF>
+class dimm_aperture_function {
+public:
+	using inner_aperture_function = AF;
+	using value_type = typename inner_aperture_function::value_type;
+
+private:
+	inner_aperture_function aperture_function_;
+	value_type base_ratio_;
+
+public:
+	dimm_aperture_function(AF&& aperture_function, value_type base_ratio):
+		aperture_function_(std::move(aperture_function)),
+		base_ratio_(base_ratio) {}
+
+	value_type operator() (value_type u) const noexcept {
+		using boost::math::cyl_bessel_j;
+
+		constexpr auto TWO_PI = xt::numeric_constants<value_type>::PI * 2;
+
+		return aperture_function_(u) * cyl_bessel_j(0, TWO_PI * u * base_ratio_);
+	}
+};
+
+template<class AF>
+dimm_aperture_function(AF&&, typename AF::value_type) -> dimm_aperture_function<AF>;
+
+
 using value_type = float;
 
-std::variant<weif::af::point<value_type>, weif::af::annular<value_type>, weif::af::circular<value_type>, weif::af::angle_averaged<value_type>>
-make_aperture_filter(value_type aperture_scale, value_type central_obscuration, bool square) {
-	if (aperture_scale == 0) {
-		return weif::af::point<value_type>{};
-	}
+std::variant<
+	weif::af::point<value_type>,
+	weif::af::annular<value_type>,
+	weif::af::circular<value_type>,
+	weif::af::angle_averaged<value_type>,
+	dimm_aperture_function<weif::af::point<value_type>>,
+	dimm_aperture_function<weif::af::annular<value_type>>,
+	dimm_aperture_function<weif::af::circular<value_type>>
+> make_aperture_filter(value_type aperture_scale, value_type central_obscuration, bool square, const std::optional<value_type>& base_ratio) {
 
-	if (square) {
-		return weif::af::angle_averaged<value_type>{weif::af::square<value_type>{}, 1024};
-	}
+	if (!base_ratio) {
+		if (aperture_scale == 0) {
+			return weif::af::point<value_type>{};
+		}
 
-	if (central_obscuration != 0) {
-		return weif::af::annular<value_type>{central_obscuration};
-	}
+		if (square) {
+			return weif::af::angle_averaged<value_type>{weif::af::square<value_type>{}, 1024};
+		}
 
-	return weif::af::circular<value_type>{};
+		if (central_obscuration != 0) {
+			return weif::af::annular<value_type>{central_obscuration};
+		}
+
+		return weif::af::circular<value_type>{};
+	} else {
+		if (aperture_scale == 0) {
+			return dimm_aperture_function{weif::af::point<value_type>{}, *base_ratio};
+		}
+
+		if (central_obscuration != 0) {
+			return dimm_aperture_function{weif::af::annular<value_type>{central_obscuration}, *base_ratio};
+		}
+
+		return dimm_aperture_function{weif::af::circular<value_type>{}, *base_ratio};
+	}
 }
 
 std::pair<value_type, std::variant<weif::sf::mono<value_type>, weif::sf::poly<value_type>>>
@@ -79,6 +128,7 @@ int main(int argc, char** argv) {
 	opts.add_options()
 		("size", po::value<std::size_t>()->default_value(1024), "Output grid size")
 		("aperture_scale", po::value<value_type>()->default_value(20.574), "Aperture scale, mm.")
+		("base_ratio", po::value<value_type>(), "Base to aperture scale ratio")
 		("central_obscuration", po::value<value_type>()->default_value(0.0), "Central obscuration")
 		("output_filename", po::value<std::string>()->default_value("wf.dat"), "Output filename")
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
@@ -100,6 +150,8 @@ int main(int argc, char** argv) {
 
 		const auto size = va["size"].as<std::size_t>();
 		const auto aperture_scale = va["aperture_scale"].as<value_type>();
+		const std::optional<value_type> base_ratio{
+			va.count("base_ratio") ? std::optional(va["base_ratio"].as<value_type>()) : std::nullopt};
 		const auto central_obscuration = va["central_obscuration"].as<value_type>();
 		const auto output_filename = va["output_filename"].as<std::string>();
 		const auto response_filename = va["response_filename"].as<std::vector<std::string>>();
@@ -110,7 +162,7 @@ int main(int argc, char** argv) {
 			va.count("mono") ? std::optional(va["mono"].as<value_type>()) : std::nullopt};
 
 		const auto [lambda, spectral_filter] = make_spectral_filter(response_filename, mono, carrier);
-		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration, square);
+		const auto aperture_filter = make_aperture_filter(aperture_scale, central_obscuration, square, base_ratio);
 
 		const xt::xarray<value_type> grid = xt::linspace(static_cast<value_type>(0), static_cast<value_type>(30), size);
 
