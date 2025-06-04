@@ -19,6 +19,11 @@
 namespace weif {
 namespace math {
 
+
+template<class T>
+constexpr T Kolmogorov_Cn2_scale = T(0.0096931507043123421456817216188956817L); // $\frac{\Gamma(8/3) \sin \frac{\pi}{3}}{(2\pi)^{8/3}}$
+
+
 template<class T, xt::disable_xexpression<T, bool> = true>
 T jinc_pi(const T x) noexcept {
 	using namespace std;
@@ -30,6 +35,7 @@ T jinc_pi(const T x) noexcept {
 		return static_cast<T>(1) - x * x / 8;
 	}
 }
+
 
 namespace detail {
 

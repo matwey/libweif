@@ -7,9 +7,10 @@ OPTION(BUILD_TEST    "libweif test"    ON)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 
+include(CheckCXXSourceRuns)
+include(CheckIncludeFileCXX)
 include(GNUInstallDirs)
 include(GenerateExportHeader)
-include(CheckIncludeFileCXX)
 
 # CheckIPOSupported module is available since 3.9
 # VERSION_GREATER_EQUAL is available since 3.7
@@ -21,10 +22,9 @@ if(NOT (CMAKE_VERSION VERSION_LESS "3.9.0"))
 	check_ipo_supported(RESULT HAS_LTO_SUPPORT)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -O3 -ffast-math -fno-finite-math-only")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -O3 -ffast-math -fno-finite-math-only")
-set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -Os -ffast-math -fno-finite-math-only")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ffast-math -fno-finite-math-only")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 
 find_package(Boost COMPONENTS
 	program_options REQUIRED
@@ -37,6 +37,21 @@ pkg_check_modules(FFTW3L REQUIRED IMPORTED_TARGET fftw3l)
 CHECK_INCLUDE_FILE_CXX("rapidcsv.h" RAPIDCSV_FOUND)
 if(NOT RAPIDCSV_FOUND)
 	message(FATAL_ERROR "rapidcsv.h not found")
+endif()
+
+check_cxx_source_runs("
+#include <limits>
+#include <boost/math/special_functions/bessel.hpp>
+
+int main() {
+	using namespace boost::math;
+	constexpr auto inf = std::numeric_limits<double>::infinity();
+	return !(cyl_bessel_j(1, inf) == 0.0 && sinc_pi(inf) == 0.0);
+}
+" HAVE_CORRECT_SPECIAL_FUNCTIONS)
+
+if(NOT HAVE_CORRECT_SPECIAL_FUNCTIONS)
+	message(FATAL_ERROR "boost::math special functions are defective in your version")
 endif()
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
