@@ -29,6 +29,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 find_package(Boost COMPONENTS
 	program_options REQUIRED
 	system REQUIRED)
+find_package(Doxygen REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
@@ -81,6 +82,8 @@ set_target_properties(weif PROPERTIES VERSION 1.0.0 SOVERSION 1)
 set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 generate_export_header(weif)
+
+doxygen_add_docs(docs ${SOURCES} include)
 
 if(BUILD_TEST)
 pkg_check_modules(CPPUNIT REQUIRED IMPORTED_TARGET cppunit)
