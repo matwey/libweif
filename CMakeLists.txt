@@ -83,6 +83,7 @@ set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 generate_export_header(weif)
 
+set(DOXYGEN_USE_MATHJAX YES)
 doxygen_add_docs(docs ${SOURCES} include)
 
 if(BUILD_TEST)

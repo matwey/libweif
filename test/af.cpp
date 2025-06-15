@@ -15,6 +15,7 @@
 
 #include <xtensor/xio.hpp>
 #include <xtensor/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/xtensor.hpp> // IWYU pragma: keep
 
 #include <weif/af/circular.h>
 #include <weif/af/point.h>
@@ -36,6 +37,7 @@ CPPUNIT_TEST(test_cross_annular_vec1);
 CPPUNIT_TEST(test_cross_annular_vec2);
 CPPUNIT_TEST(test_point1);
 CPPUNIT_TEST(test_point_vec1);
+CPPUNIT_TEST(test_point_vec2);
 CPPUNIT_TEST(test_square1);
 CPPUNIT_TEST(test_square2);
 CPPUNIT_TEST(test_square_vec1);
@@ -263,6 +265,22 @@ void test_point_vec1() {
 	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
 	const point<double> af{};
 	xt::xarray<double> actual = af(args);
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+void test_point_vec2() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const xt::xarray<double> expected = {
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0}};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const point<double> af{};
+	xt::xarray<double> actual = af(args, args);
 
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
