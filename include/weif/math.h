@@ -17,13 +17,46 @@
 
 
 namespace weif {
+
+/**
+ * @defgroup math_functions Special mathematical functions
+ * @brief Special mathematical functions
+ */
+
+/// @namespace math
+/// @brief Mathematical constants and functions namespace
 namespace math {
 
-
+/**
+ * @brief Kolmogorov turbulence structure constant scaling factor
+ *
+ * @tparam T Numeric type for the constant
+ *
+ * Represents the fundamental scaling factor in Kolmogorov turbulence theory:
+ * \f[
+ * C = \frac{\Gamma\left(\frac{8}{3}\right) \sin\left(\frac{\pi}{3}\right)}{(2\pi)^{8/3}} \approx 9.69 \cdot 10^{-3},
+ * \f]
+ * where:
+ * - \f$\Gamma\f$ is the Gamma function
+ * - The value is precomputed to maximum available precision
+ */
 template<class T>
-constexpr T Kolmogorov_Cn2_scale = T(0.0096931507043123421456817216188956817L); // $\frac{\Gamma(8/3) \sin \frac{\pi}{3}}{(2\pi)^{8/3}}$
+constexpr T Kolmogorov_Cn2_scale = T(0.0096931507043123421456817216188956817L);
 
 
+/**
+ * @brief Computes the jinc function
+ * @ingroup math_functions
+ *
+ * @tparam T Numeric type
+ * @param x Input value
+ * @return Value of the jinc function at x
+ *
+ * The function provides accurate computation across the full numeric range:
+ * \f$ \mathrm{jinc}(x) = \frac{2 \cdot J_1(x)}{x}. \f$
+ *
+ * @note Uses Boost.Math for Bessel function evaluation
+ */
 template<class T, xt::disable_xexpression<T, bool> = true>
 T jinc_pi(const T x) noexcept {
 	using namespace std;
