@@ -64,8 +64,8 @@ struct WEIF_EXPORT square {
 	 * A(u_x, u_y) = \mathrm{sinc}^2(\pi u_x) \cdot \mathrm{sinc}^2(\pi u_y).
 	 * \f]
 	 *
-	 * @param e1 Tensor of x-component frequencies
-	 * @param e2 Tensor of y-component frequencies
+	 * @param ex Tensor of x-component frequencies
+	 * @param ey Tensor of y-component frequencies
 	 * @return (Nx, Ny) shaped tensor of filter values
 	 */
 	template<class EX, class EY, xt::enable_xexpression<EX, bool> = true, xt::enable_xexpression<EY, bool> = true>
