@@ -9,9 +9,9 @@
 
 #include <cmath>
 
-#include <xtensor/xmath.hpp>
-#include <xtensor/xutils.hpp>
-#include <xtensor/xvectorize.hpp>
+#include <xtensor/core/xmath.hpp>
+#include <xtensor/utils/xutils.hpp>
+#include <xtensor/core/xvectorize.hpp>
 
 #include <weif/math.h>
 #include <weif_export.h>

@@ -14,8 +14,8 @@
 
 #include <boost/math/quadrature/exp_sinh.hpp>
 
-#include <xtensor/xexpression.hpp> // IWYU pragma: keep
-#include <xtensor/xmath.hpp>
+#include <xtensor/core/xexpression.hpp> // IWYU pragma: keep
+#include <xtensor/core/xmath.hpp>
 
 #include <weif/detail/weight_function_base.h>
 #include <weif_export.h>

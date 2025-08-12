@@ -15,8 +15,8 @@
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/special_functions/cos_pi.hpp>
 
-#include <xtensor/xexpression.hpp>
-#include <xtensor/xmath.hpp>
+#include <xtensor/core/xexpression.hpp>
+#include <xtensor/core/xmath.hpp>
 
 #include <weif/detail/cubic_spline.h>
 #include <weif/math.h>

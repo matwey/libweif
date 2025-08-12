@@ -12,7 +12,7 @@
 #include <weif/detail/uniform_grid.h>
 #include <weif_export.h>
 
-#include <xtensor/xgenerator.hpp>
+#include <xtensor/generators/xgenerator.hpp>
 
 namespace weif {
 

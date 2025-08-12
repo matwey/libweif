@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.10)
 project(libweif LANGUAGES C CXX VERSION 0.1.0)
 
 OPTION(BUILD_EXAMPLE "libweif example" ON)
@@ -11,16 +11,9 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFileCXX)
 include(GNUInstallDirs)
 include(GenerateExportHeader)
+include(CheckIPOSupported)
 
-# CheckIPOSupported module is available since 3.9
-# VERSION_GREATER_EQUAL is available since 3.7
-if(NOT (CMAKE_VERSION VERSION_LESS "3.9.0"))
-	# check_ipo_supported() returns an error when CMP0069 is OLD
-	cmake_policy(SET CMP0069 NEW)
-
-	include(CheckIPOSupported)
-	check_ipo_supported(RESULT HAS_LTO_SUPPORT)
-endif()
+check_ipo_supported(RESULT HAS_LTO_SUPPORT)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ffast-math -fno-finite-math-only")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
@@ -30,7 +23,7 @@ find_package(Boost COMPONENTS
 	program_options REQUIRED
 	system REQUIRED)
 find_package(Doxygen REQUIRED)
-find_package(xtensor REQUIRED)
+find_package(xtensor REQUIRED VERSION 0.26)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)

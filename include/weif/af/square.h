@@ -10,8 +10,8 @@
 #include <cmath>
 #include <type_traits>
 
-#include <xtensor/xmath.hpp>
-#include <xtensor/xvectorize.hpp>
+#include <xtensor/core/xmath.hpp>
+#include <xtensor/core/xvectorize.hpp>
 
 #include <weif/math.h>
 #include <weif_export.h>

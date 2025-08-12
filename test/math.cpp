@@ -13,8 +13,8 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <xtensor/xio.hpp>
-#include <xtensor/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/io/xio.hpp>
+#include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
 
 #include <weif/math.h>
 

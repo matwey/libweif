@@ -12,10 +12,10 @@
 
 #include <boost/program_options.hpp>
 
-#include <xtensor/xarray.hpp>
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xcsv.hpp>
-#include <xtensor/xmanipulation.hpp>
+#include <xtensor/containers/xarray.hpp>
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/io/xcsv.hpp>
+#include <xtensor/misc/xmanipulation.hpp>
 
 #include <weif/af/angle_averaged.h>
 #include <weif/af/circular.h>

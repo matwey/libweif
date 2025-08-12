@@ -13,9 +13,9 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <xtensor/xio.hpp>
-#include <xtensor/xarray.hpp> // IWYU pragma: keep
-#include <xtensor/xtensor.hpp> // IWYU pragma: keep
+#include <xtensor/io/xio.hpp>
+#include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/containers/xtensor.hpp>
 
 #include <weif/af/circular.h>
 #include <weif/af/point.h>

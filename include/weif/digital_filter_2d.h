@@ -13,9 +13,9 @@
 #include <memory>
 #include <utility>
 
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xmath.hpp>
-#include <xtensor/xtensor.hpp> // IWYU pragma: keep
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/core/xmath.hpp>
+#include <xtensor/containers/xtensor.hpp> // IWYU pragma: keep
 
 #include <weif/detail/fftw3_wrap.h>
 #include <weif_export.h>

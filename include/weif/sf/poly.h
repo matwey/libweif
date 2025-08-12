@@ -14,12 +14,12 @@
 #include <boost/math/quadrature/exp_sinh.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 
-#include <xtensor/xadapt.hpp>
-#include <xtensor/xcomplex.hpp>
-#include <xtensor/xmath.hpp>
-#include <xtensor/xpad.hpp>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xview.hpp>
+#include <xtensor/containers/xadapt.hpp>
+#include <xtensor/misc/xcomplex.hpp>
+#include <xtensor/core/xmath.hpp>
+#include <xtensor/misc/xpad.hpp>
+#include <xtensor/containers/xtensor.hpp>
+#include <xtensor/views/xview.hpp>
 
 #include <weif/detail/cubic_spline.h>
 #include <weif/detail/fftw3_wrap.h> // IWYU pragma: keep

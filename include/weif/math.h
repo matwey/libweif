@@ -13,7 +13,7 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
-#include <xtensor/xmath.hpp>
+#include <xtensor/core/xmath.hpp>
 
 
 namespace weif {
