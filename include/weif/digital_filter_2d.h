@@ -27,14 +27,22 @@
 
 namespace weif {
 
+/**
+ * @brief Digital filter function
+ *
+ * @tparam T Numeric type used for calculations
+ * @tparam Allocator Memory allocator type (default: std::allocator<T>)
+ *
+ * Implements a dimensional digital filter.
+ */
 template<class T, class Allocator = std::allocator<T>>
 class WEIF_EXPORT digital_filter_2d:
 	private Allocator {
 public:
-	using value_type = T;
-	using allocator_type = Allocator;
-	using shape_type = std::array<std::size_t, 2>;
-	using impulse_type = xt::xtensor<value_type, 2, XTENSOR_DEFAULT_LAYOUT, allocator_type>;
+	using value_type = T; ///< Numeric type used for calculations
+	using allocator_type = Allocator; ///< Memory allocator type
+	using shape_type = std::array<std::size_t, 2>; ///< Filter shape type (Nx, Ny)
+	using impulse_type = xt::xtensor<value_type, 2, XTENSOR_DEFAULT_LAYOUT, allocator_type>; ///< Impulse response tensor type
 
 private:
 	using function_type = std::function<value_type(value_type, value_type)>;
@@ -49,25 +57,60 @@ private:
 		digital_filter_2d(make_impulse(std::forward<function_type>(fun), shape, get_allocator()), alloc) {}
 
 public:
+	/**
+	 * @brief Construct from impulse response expression
+	 * @tparam E Expression type
+	 * @param impulse Input impulse response expression
+	 * @param alloc Allocator instance
+	 */
 	template<class E>
 	digital_filter_2d(const xt::xexpression<E>& impulse, const allocator_type& alloc = allocator_type()):
 		allocator_type(alloc),
 		impulse_{impulse.derived_cast()} {}
 
+	/**
+	 * @brief Construct from rvalue impulse response expression
+	 * @tparam E Expression type
+	 * @param impulse Input impulse response expression (moved)
+	 * @param alloc Allocator instance
+	 */
 	template<class E>
 	digital_filter_2d(xt::xexpression<E>&& impulse, const allocator_type& alloc = allocator_type()):
 		allocator_type(alloc),
 		impulse_{impulse.derived_cast()} {}
 
+	/**
+	 * @brief Construct from filter function
+	 * @tparam DF Callable filter function type
+	 * @param digital_filter_fun Digital filter function
+	 * @param shape Filter dimensions (Nx, Ny)
+	 * @param alloc Allocator instance
+	 *
+	 * The digital filter function \f$\Omega(u_x, u_y)\f$ is evaluated on
+	 * an appropriate frequency grid and the filter impulse response is
+	 * calculated using Fast Fourier Transform. The frequency grid spans
+	 * \f$[0, 0.5] \times [0, 0.5]\f$ in dimensionless frequency space.
+	 */
 	template<class DF>
 	digital_filter_2d(DF&& digital_filter_fun, shape_type shape, const allocator_type& alloc = allocator_type()):
 		digital_filter_2d(function_type(std::forward<DF>(digital_filter_fun)), shape, alloc) {}
 
+	/// @return Associated allocator
 	const allocator_type& get_allocator() const noexcept { return *this; }
 
+	/// @return Reference to impulse response tensor
 	const auto& impulse() const noexcept { return impulse_; }
+
+	/// @return Filter dimensions (Nx, Ny)
 	const auto& shape()   const noexcept { return impulse_.shape(); }
 
+	/**
+	 * @brief Performs in-place amplitude mixing
+	 * @return Reference to modified filter
+	 *
+	 * Modifies the impulse response by subtracting a checkerboard sign
+	 * alternation pattern to set the center (0,0) to zero.
+	 */
 	digital_filter_2d<T, Allocator>& mix() noexcept {
 		const auto& nx = std::get<0>(shape());
 		const auto& ny = std::get<1>(shape());
@@ -86,6 +129,12 @@ public:
 		return *this;
 	};
 
+	/**
+	 * @brief Creates mixed version of filter
+	 * @return New mixed filter instance
+	 *
+	 * @see mix()
+	 */
 	digital_filter_2d<T, Allocator> mixed() const {
 		digital_filter_2d<T, Allocator> ret{*this};
 
@@ -94,6 +143,12 @@ public:
 		return ret;
 	}
 
+	/**
+	 * @brief Evaluate digital filter at specific frequency coordinates
+	 * @param ux Dimensionless frequency x-component
+	 * @param uy Dimensionless frequency y-component
+	 * @return Filter response value
+	 */
 	value_type operator() (value_type ux, value_type uy) const noexcept {
 		using std::cos;
 		using std::sin;
@@ -133,8 +188,14 @@ public:
 		return ret;
 	}
 
-	template<class E1, class E2>
-	auto operator() (const xt::xexpression<E1>& e1, const xt::xexpression<E2>& e2) const noexcept {
+	/**
+	 * @brief Evaluate digital filter for tensor input
+	 * @param ex Tensor of dimensionless x-component frequencies
+	 * @param ey Tensor of dimensionless y-component frequencies
+	 * @return (Nx, Ny) shaped tensor of filter values
+	 */
+	template<class EX, class EY>
+	auto operator() (const xt::xexpression<EX>& ex, const xt::xexpression<EY>& ey) const noexcept {
 		return xt::make_lambda_xfunction([this] (const value_type& ux, const value_type& uy) {
 			return this->operator()(ux, uy);
 		}, xt::expand_dims(e1.derived_cast(), 1), e2.derived_cast());
