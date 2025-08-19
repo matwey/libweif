@@ -28,8 +28,7 @@ namespace weif {
  *
  * @tparam T Numeric type used for calculations
  *
- * Computes the scintillation weight function used in atmospheric turbulence
- * analysis for axially symmetric power spectra:
+ * Computes the scintillation weight function for axially symmetric power spectra:
  * \f[
  * W(z) = 9.69 \cdot 10^{-3} \cdot 32 \pi^3 z^{5/6} \lambda^{-7/6} \int_0^{\infty} du u^{-8/3} S(u) A\left(\frac{D}{\sqrt{\lambda z}} u\right),
  * \f]

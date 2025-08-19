@@ -27,10 +27,9 @@ namespace weif {
  *
  * @tparam T Numeric type used for calculations
  *
- * Computes the scintillation weight function used in atmospheric turbulence
- * analysis for non axially symmetric power spectra:
+ * Computes the scintillation weight function for non axially symmetric power spectra:
  * \f[
- * W(z) = 9.69 \cdot 10^{-3} \cdot 16 \pi^2 z^{5/6} \lambda^{-7/6} \int \mathbf{du} u^{-8/3} S(u) A\left(\frac{D}{\sqrt{\lambda z}} \mathbf{u}\right),
+ * W(z) = 9.69 \cdot 10^{-3} \cdot 16 \pi^2 z^{5/6} \lambda^{-7/6} \int \mathbf{du} u^{-11/3} S(u) A\left(\frac{D}{\sqrt{\lambda z}} \mathbf{u}\right),
  * \f]
  * where \f$ S(u) \f$ is a spectral filter, \f$ \lambda \f$ is its equivalent wavelength, and \f$ A(\mathbf{u}) \f$ is an aperture filter.
  *

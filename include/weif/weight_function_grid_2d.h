@@ -71,15 +71,32 @@ public:
 
 } // detail
 
+/**
+ * @brief Weight function for uniform grid of identical apertures
+ *
+ * @tparam T Numeric type for calculations
+ * @tparam Allocator Memory allocator type (default: std::allocator<T>)
+ *
+ * Computes the scintillation weight function for non axially symmetric power spectra:
+ * \f[
+ * W_{jk}(z) = 9.69 \cdot 10^{-3} \cdot 16 \pi^2 z^{5/6} \lambda^{-7/6} \int \mathbf{du} u^{-8/3} S(u) A\left(\frac{D}{\sqrt{\lambda z}} \mathbf{u}\right) \cos\left(2\pi \frac{\Delta}{\sqrt{\lambda z}} (j \cdot u_x + k \cdot u_y) \right),
+ * \f]
+ * where \f$ S(u) \f$ is a spectral filter, \f$ \lambda \f$ is its equivalent wavelength, and \f$ A(\mathbf{u}) \f$ is an aperture filter.
+ *
+ * @par The library uses consistent units:
+ * - Altitudes: kilometers (km)
+ * - Wavelengths: nanometers (nm)
+ * - Geometric scales and grid steps: millimeters (mm)
+ */
 template<class T, class Allocator = std::allocator<T>>
 class WEIF_EXPORT weight_function_grid_2d:
 	public detail::weight_function_grid_2d_base<T>,
 	private Allocator {
 public:
-	using typename detail::weight_function_grid_2d_base<T>::value_type;
+	using typename detail::weight_function_grid_2d_base<T>::value_type; ///< Numeric type for calculations
 	using typename detail::weight_function_grid_2d_base<T>::shape_type;
-	using allocator_type = Allocator;
-	using result_type = xt::xtensor<value_type, 2, XTENSOR_DEFAULT_LAYOUT, allocator_type>;
+	using allocator_type = Allocator; ///< Memory allocator type
+	using result_type = xt::xtensor<value_type, 2, XTENSOR_DEFAULT_LAYOUT, allocator_type>; ///< Result tensor type
 	using typename detail::weight_function_grid_2d_base<T>::function_type;
 
 private:
@@ -88,6 +105,23 @@ private:
 		allocator_type(alloc) {}
 
 public:
+	/**
+	 * @brief Construct weight function
+	 * @param spectral_filter Spectral filter function
+	 * @param lambda Wavelength in nanometers
+	 * @param aperture_filter Aperture filter function
+	 * @param aperture_scale Aperture scale in millimeters
+	 * @param grid_step Grid spacing in millimeters
+	 * @param shape Grid dimensions (Nx, Ny)
+	 * @param alloc Allocator instance
+	 *
+	 * The function performs numerical computation each time
+	 * weight_function_grid_2d::operator()() is called, returning a tensor
+	 * of the specified shape containing the weight function values for the
+	 * uniform grid of apertures.
+	 *
+	 * @see operator()()
+	 */
 	template<class SF, class AF>
 	weight_function_grid_2d(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, value_type grid_step, shape_type shape, const allocator_type& alloc = allocator_type()):
 		weight_function_grid_2d(lambda, aperture_scale, grid_step, shape,
@@ -111,8 +145,14 @@ public:
 	weight_function_grid_2d(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, shape_type shape, const allocator_type& alloc = allocator_type()):
 		weight_function_grid_2d(std::forward<SF>(spectral_filter), lambda, std::forward<AF>(aperture_filter), aperture_scale, aperture_scale, shape, alloc) {}
 
+	/// @return Associated allocator
 	const allocator_type& get_allocator() const noexcept { return *this; }
 
+	/**
+	 * @brief Evaluate weight function for uniform aperture grid at specific altitude
+	 * @param altitude Atmospheric altitude in kilometers
+	 * @return 2D tensor of weight function values on spatial grid of shape (Nx, Ny)
+	 */
 	inline result_type operator() (value_type altitude) const {
 		using namespace std;
 		using namespace std::placeholders;
