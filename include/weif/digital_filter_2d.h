@@ -198,7 +198,7 @@ public:
 	auto operator() (const xt::xexpression<EX>& ex, const xt::xexpression<EY>& ey) const noexcept {
 		return xt::make_lambda_xfunction([this] (const value_type& ux, const value_type& uy) {
 			return this->operator()(ux, uy);
-		}, xt::expand_dims(e1.derived_cast(), 1), e2.derived_cast());
+		}, xt::expand_dims(ex.derived_cast(), 1), ey.derived_cast());
 	}
 };
 
