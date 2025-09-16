@@ -9,9 +9,9 @@
 #include <sstream>
 #include <type_traits>
 
-#include <xtensor/xarray.hpp>
-#include <xtensor/xexpression.hpp>
-#include <xtensor/xio.hpp>
+#include <xtensor/containers/xarray.hpp>
+#include <xtensor/core/xexpression.hpp>
+#include <xtensor/io/xio.hpp>
 
 template<class T1, class T2>
 void checkXArrayClose(const xt::xarray<T1>& a1, const xt::xarray<T2>& a2, CppUnit::SourceLine sourceLine,

@@ -13,12 +13,14 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <xtensor/xio.hpp>
-#include <xtensor/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/io/xio.hpp>
+#include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/containers/xtensor.hpp>
 
 #include <weif/af/circular.h>
 #include <weif/af/point.h>
 #include <weif/af/square.h>
+#include <weif/af/gauss.h>
 
 #include "xexpression.h"
 
@@ -35,9 +37,12 @@ CPPUNIT_TEST(test_cross_annular_vec1);
 CPPUNIT_TEST(test_cross_annular_vec2);
 CPPUNIT_TEST(test_point1);
 CPPUNIT_TEST(test_point_vec1);
+CPPUNIT_TEST(test_point_vec2);
 CPPUNIT_TEST(test_square1);
 CPPUNIT_TEST(test_square2);
 CPPUNIT_TEST(test_square_vec1);
+CPPUNIT_TEST(test_gauss1);
+CPPUNIT_TEST(test_gauss_vec1);
 CPPUNIT_TEST_SUITE_END();
 
 void test_circular1() {
@@ -264,6 +269,22 @@ void test_point_vec1() {
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
+void test_point_vec2() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const xt::xarray<double> expected = {
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0}};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const point<double> af{};
+	xt::xarray<double> actual = af(args, args);
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
 void test_square1() {
 	using namespace weif::af;
 
@@ -313,6 +334,52 @@ void test_square_vec1() {
 	xt::xarray<double> actual = af(args, args);
 
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+void test_gauss1() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const gauss<double> af{};
+
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, af(0.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.99004983374916805165034776550942575968, af(0.1), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.96078943915232320197237679117804541059, af(0.2), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.91393118527122816442466976065582081843, af(0.3), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.85214378896621131196639664702353209789, af(0.4), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.7788007830714048682451702669783206473, af(0.5), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.69767632607103098904641302112282260219, af(0.6), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.61262639418441600641460256288947477873, af(0.7), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.52729242404304849167752934166987246197, af(0.8), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.44485806622294111077464538418106828997, af(0.9), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.36787944117144232159552377016146086745, af(1.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.018315638888734180293718021273241242212, af(2.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00000011253517471925911451377517906012719164, af(4.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(2.3195228302435693883122636097380800411e-16, af(6.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.603810890548637852976087034142335381e-28, af(8.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(3.7200759760208359629596958038631183374e-44, af(10.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(2.8946403116483002802938374650110306514e-63, af(12.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(7.5558190197119603550515145467590847601e-86, af(14.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(6.6162610567094852610295308073620645218e-112, af(16.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.9435148500492927332935100661481034392e-141, af(18.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.9151695967140056950198397786542643507e-174, af(20.0), delta);
+}
+
+void test_gauss_vec1() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const xt::xarray<double> expected = {
+		1.0,
+		0.99004983374916805165034776550942575968,
+		0.36787944117144232159552377016146086745,
+		3.7200759760208359629596958038631183374e-44
+	};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const gauss<double> af{};
+	xt::xarray<double> actual = af(args);
+
+	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
 }
 
 };

@@ -10,9 +10,9 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <xtensor/xarray.hpp> // IWYU pragma: keep
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xio.hpp> // IWYU pragma: keep
+#include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/io/xio.hpp> // IWYU pragma: keep
 
 #include <weif/detail/cubic_spline.h>
 

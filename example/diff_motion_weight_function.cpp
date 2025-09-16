@@ -14,17 +14,17 @@
 #include <boost/program_options.hpp>
 #include <boost/math/quadrature/exp_sinh.hpp>
 
-#include <xtensor/xarray.hpp>
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xcsv.hpp>
-#include <xtensor/xmanipulation.hpp>
+#include <xtensor/containers/xarray.hpp>
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/io/xcsv.hpp>
+#include <xtensor/misc/xmanipulation.hpp>
 
-#include <xtensor/xadapt.hpp>
-#include <xtensor/xcomplex.hpp>
-#include <xtensor/xmath.hpp>
-#include <xtensor/xpad.hpp>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xview.hpp>
+#include <xtensor/containers/xadapt.hpp>
+#include <xtensor/misc/xcomplex.hpp>
+#include <xtensor/core/xmath.hpp>
+#include <xtensor/misc/xpad.hpp>
+#include <xtensor/containers/xtensor.hpp>
+#include <xtensor/views/xview.hpp>
 
 #include <weif/af/circular.h>
 #include <weif/detail/weight_function_base.h>

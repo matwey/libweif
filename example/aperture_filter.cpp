@@ -10,10 +10,10 @@
 
 #include <boost/program_options.hpp> // IWYU pragma: keep
 
-#include <xtensor/xarray.hpp> // IWYU pragma: keep
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xcsv.hpp>
-#include <xtensor/xmanipulation.hpp>
+#include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/io/xcsv.hpp>
+#include <xtensor/misc/xmanipulation.hpp>
 
 #include <weif/af/circular.h>
 

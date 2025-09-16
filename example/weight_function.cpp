@@ -12,10 +12,10 @@
 
 #include <boost/program_options.hpp>
 
-#include <xtensor/xarray.hpp>
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xcsv.hpp>
-#include <xtensor/xmanipulation.hpp>
+#include <xtensor/containers/xarray.hpp>
+#include <xtensor/generators/xbuilder.hpp>
+#include <xtensor/io/xcsv.hpp>
+#include <xtensor/misc/xmanipulation.hpp>
 
 #include <weif/af/angle_averaged.h>
 #include <weif/af/circular.h>
@@ -47,8 +47,13 @@ public:
 		using boost::math::cyl_bessel_j;
 
 		constexpr auto TWO_PI = xt::numeric_constants<value_type>::PI * 2;
+		const auto af = aperture_function_(u);
 
-		return aperture_function_(u) * cyl_bessel_j(0, TWO_PI * u * base_ratio_);
+		if (af == static_cast<value_type>(0)) {
+			return static_cast<value_type>(0);
+		}
+
+		return af * cyl_bessel_j(0, TWO_PI * u * base_ratio_);
 	}
 };
 
