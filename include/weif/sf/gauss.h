@@ -71,9 +71,14 @@ public:
 		using namespace std;
 
 		constexpr auto PI = xt::numeric_constants<value_type>::PI;
-		constexpr auto C = PI * PI / xt::numeric_constants<value_type>::LN2 / 8;
+		constexpr auto C = static_cast<value_type>(1) / xt::numeric_constants<value_type>::LN2 / 8;
+		const auto pix = PI * x;
 
-		return pow(sin(PI * x), 2) * exp(-C * pow(fwhm() * x, 2));
+		value_type e = exp(-C * pow(fwhm() * pix, 2));
+		if (e == static_cast<value_type>(0))
+			return 0;
+
+		return e * pow(sin(pix), 2);
 	}
 
 	/**
@@ -89,9 +94,10 @@ public:
 		using boost::math::sinc_pi;
 
 		constexpr auto PI = xt::numeric_constants<value_type>::PI;
-		constexpr auto C = PI * PI / xt::numeric_constants<value_type>::LN2 / 8;
+		constexpr auto C = static_cast<value_type>(1) / xt::numeric_constants<value_type>::LN2 / 8;
+		const auto pix = PI * x;
 
-		return pow(PI * sinc_pi(PI * x), 2) * exp(-C * pow(fwhm() * x, 2));
+		return pow(PI * sinc_pi(pix), 2) * exp(-C * pow(fwhm() * pix, 2));
 	}
 
         /**

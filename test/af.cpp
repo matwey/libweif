@@ -30,7 +30,9 @@ CPPUNIT_TEST_SUITE(test_af_suite);
 CPPUNIT_TEST(test_circular1);
 CPPUNIT_TEST(test_circular_vec1);
 CPPUNIT_TEST(test_annular1);
+CPPUNIT_TEST(test_annular2);
 CPPUNIT_TEST(test_annular_vec1);
+CPPUNIT_TEST(test_annular_vec2);
 CPPUNIT_TEST(test_cross_annular1);
 CPPUNIT_TEST(test_cross_annular2);
 CPPUNIT_TEST(test_cross_annular_vec1);
@@ -72,6 +74,7 @@ void test_circular1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000098772835964288263669519569071382502047, af(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000006948584101381736894948005247208674993, af(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000050722104418580991006410526916452587537, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_circular_vec1() {
@@ -82,9 +85,10 @@ void test_circular_vec1() {
 		1.0,
 		0.97557820345282925544738037599840241249,
 		0.032830452075419517493214219116742182043,
-		0.000040099342229572102544189269460965266392
+		0.000040099342229572102544189269460965266392,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const circular<double> af{};
 	xt::xarray<double> actual = af(args);
 
@@ -118,6 +122,37 @@ void test_annular1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000015604633257339527793568913708146413216, af(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000035803988981825795149495789673411768507, af(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00000079579675050707413378637344336522559154, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
+}
+
+void test_annular2() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const annular<double> af{0.0};
+
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, af(0.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.97557820345282925544738037599840241249, af(0.1), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.90527056926709826543687436589706043937, af(0.2), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.79745112049841285396087207337350145069, af(0.3), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.66451326578645121632531346910734726067, af(0.4), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.52085499634171633388451850905545890177, af(0.5), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.38064186165252341564739554410558523018, af(0.6), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.25577177637369743025174833977161815215, af(0.7), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15440278390591541872848388641857869804, af(0.8), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.080268510286597479867705768154527185659, af(0.9), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.032830452075419517493214219116742182043, af(1.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0045702276655243839509360474652512460908, af(2.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00060488171548396292171591681162427788157, af(4.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00018274993357362021237148215658828211404, af(6.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000077857738116575996557193284367527741371, af(8.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000040099342229572102544189269460965266392, af(10.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000023297399065979598913157367604140222006, af(12.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000014712721201644252120925506551088489092, af(14.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000098772835964288263669519569071382502047, af(16.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000006948584101381736894948005247208674993, af(18.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000050722104418580991006410526916452587537, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_annular_vec1() {
@@ -128,10 +163,29 @@ void test_annular_vec1() {
 		1.0,
 		0.96952615608590915008004059224757042018,
 		0.0000010432409682104119040509197686587990612,
-		0.00020573925983508204488321432110992697012
+		0.00020573925983508204488321432110992697012,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const annular<double> af{0.5};
+	xt::xarray<double> actual = af(args);
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+void test_annular_vec2() {
+	using namespace weif::af;
+
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const xt::xarray<double> expected = {
+		1.0,
+		0.97557820345282925544738037599840241249,
+		0.032830452075419517493214219116742182043,
+		0.000040099342229572102544189269460965266392,
+		0.0
+	};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
+	const annular<double> af{0.0};
 	xt::xarray<double> actual = af(args);
 
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
@@ -164,6 +218,7 @@ void test_cross_annular1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00000075125306385007565082814600131253535235, af(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000089227201326543507767780302952019977783, af(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00000038333475874090278379072664144132273568, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_cross_annular2() {
@@ -193,6 +248,7 @@ void test_cross_annular2() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000098772835964288263669519569071382502047, af(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000006948584101381736894948005247208674993, af(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000050722104418580991006410526916452587537, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_cross_annular_vec1() {
@@ -203,9 +259,10 @@ void test_cross_annular_vec1() {
 		1.0,
 		0.93386338494461007056370109893540622419,
 		-0.00012279567023698388639258514589261872756,
-		0.000051384308679875252787619942323952809653
+		0.000051384308679875252787619942323952809653,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const cross_annular<double> af{2.0, 0.5, 0.25};
 	xt::xarray<double> actual = af(args);
 
@@ -220,9 +277,10 @@ void test_cross_annular_vec2() {
 		1.0,
 		0.97557820345282925544738037599840241249,
 		0.032830452075419517493214219116742182043,
-		0.000040099342229572102544189269460965266392
+		0.000040099342229572102544189269460965266392,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const cross_annular<double> af{1.0, 0.0, 0.0};
 	xt::xarray<double> actual = af(args);
 
@@ -255,14 +313,15 @@ void test_point1() {
 	CPPUNIT_ASSERT_EQUAL(1.0, af(16.0));
 	CPPUNIT_ASSERT_EQUAL(1.0, af(18.0));
 	CPPUNIT_ASSERT_EQUAL(1.0, af(20.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(std::numeric_limits<double>::infinity()));
 }
 
 void test_point_vec1() {
 	using namespace weif::af;
 
 	constexpr auto delta = std::numeric_limits<double>::epsilon();
-	const xt::xarray<double> expected = {1.0, 1.0, 1.0, 1.0};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> expected = {1.0, 1.0, 1.0, 1.0, 1.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const point<double> af{};
 	xt::xarray<double> actual = af(args);
 
@@ -274,11 +333,12 @@ void test_point_vec2() {
 
 	constexpr auto delta = std::numeric_limits<double>::epsilon();
 	const xt::xarray<double> expected = {
-		{1.0, 1.0, 1.0, 1.0},
-		{1.0, 1.0, 1.0, 1.0},
-		{1.0, 1.0, 1.0, 1.0},
-		{1.0, 1.0, 1.0, 1.0}};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+		{1.0, 1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0, 1.0},
+		{1.0, 1.0, 1.0, 1.0, 1.0}};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const point<double> af{};
 	xt::xarray<double> actual = af(args, args);
 
@@ -301,6 +361,7 @@ void test_square1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.13533790946735205300724675797617704617, af(0.7, 0.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.05469626250521127398847633159820942949, af(0.8, 0.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.011944829744136771839732436791876860686, af(0.9, 0.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity(), 0.0), delta);
 }
 
 void test_square2() {
@@ -319,6 +380,7 @@ void test_square2() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.13533790946735205300724675797617704617, af(0.0, 0.7), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.05469626250521127398847633159820942949, af(0.0, 0.8), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.011944829744136771839732436791876860686, af(0.0, 0.9), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(0.0, std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_square_vec1() {
@@ -326,10 +388,11 @@ void test_square_vec1() {
 
 	constexpr auto delta = std::numeric_limits<double>::epsilon();
 	const xt::xarray<double> expected = {
-		{1.0, 0.96753120927507897864278592400778224587},
-		{0.96753120927507897864278592400778224587, 0.93611664092129667462914813285802163803}
+		{1.0, 0.96753120927507897864278592400778224587, 0.0},
+		{0.96753120927507897864278592400778224587, 0.93611664092129667462914813285802163803, 0.0},
+		{0.0, 0.0, 0.0}
 	};
-	const xt::xarray<double> args = {0.0, 0.1};
+	const xt::xarray<double> args = {0.0, 0.1, std::numeric_limits<double>::infinity()};
 	const square<double> af{};
 	xt::xarray<double> actual = af(args, args);
 
@@ -363,6 +426,7 @@ void test_gauss1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(6.6162610567094852610295308073620645218e-112, af(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.9435148500492927332935100661481034392e-141, af(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.9151695967140056950198397786542643507e-174, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_gauss_vec1() {
@@ -373,9 +437,10 @@ void test_gauss_vec1() {
 		1.0,
 		0.99004983374916805165034776550942575968,
 		0.36787944117144232159552377016146086745,
-		3.7200759760208359629596958038631183374e-44
+		3.7200759760208359629596958038631183374e-44,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const gauss<double> af{};
 	xt::xarray<double> actual = af(args);
 

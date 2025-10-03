@@ -54,6 +54,7 @@ void test_jinc_pi1() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.01129964695766302327983541280725950305621, jinc_pi(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(-0.020888320609785510445180601101201575494834, jinc_pi(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0066833124175850045578992974193646719982977, jinc_pi(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, jinc_pi(std::numeric_limits<double>::infinity()), delta);
 };
 
 void test_jinc_pi_vec1() {
@@ -64,9 +65,10 @@ void test_jinc_pi_vec1() {
 		1.0,
 		0.99875052072483995088407208329032034367448,
 		0.88010117148986703191936440743782982625493,
-		0.0086945492337722873339497536051718576612593
+		0.0086945492337722873339497536051718576612593,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	xt::xarray<double> actual = jinc_pi(args);
 
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
@@ -80,9 +82,10 @@ void test_sinc_pi_vec1() {
 		1.0,
 		0.99833416646828152274465063467924745690004,
 		0.84147098480789650665250232163029899962245,
-		-0.054402111088936981340474766185137728168366
+		-0.054402111088936981340474766185137728168366,
+		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	xt::xarray<double> actual = sinc_pi(args);
 
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);

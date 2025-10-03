@@ -160,7 +160,12 @@ public:
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return std::pow(math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration() * piu), 2) / norm;
+		value_type value = math::jinc_pi(piu);
+		if (obscuration() != static_cast<value_type>(0)) {
+			value -= eps2 * math::jinc_pi(obscuration() * piu);
+		}
+
+		return std::pow(value, 2) / norm;
 	}
 
 	/**
@@ -196,7 +201,6 @@ public:
 
 		const auto eps2 = std::pow(obscuration(), 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
-
 		auto fnct = [=](auto u) -> decltype(u) {
 			constexpr auto PI = xt::numeric_constants<value_type>::PI;
 
@@ -259,7 +263,12 @@ private:
 		const auto norm = static_cast<value_type>(1) - eps2;
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return (math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration * piu)) / norm;
+		value_type value = math::jinc_pi(piu);
+		if (obscuration != static_cast<value_type>(0)) {
+			value -= eps2 * math::jinc_pi(obscuration * piu);
+		}
+
+		return value / norm;
 	}
 
 public:
