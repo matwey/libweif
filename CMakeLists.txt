@@ -20,8 +20,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 
 find_package(Boost COMPONENTS
-	program_options REQUIRED
-	system REQUIRED)
+	program_options REQUIRED)
 find_package(Doxygen REQUIRED)
 find_package(xtensor REQUIRED VERSION 0.26)
 find_package(PkgConfig REQUIRED)
@@ -104,7 +103,7 @@ foreach(example_source IN ITEMS ${EXAMPLES})
 	string(REPLACE / _ example_name ${example_name})
 	string(REPLACE .cpp "" example_name ${example_name})
 	add_executable(${example_name} ${example_source})
-	target_link_libraries(${example_name} weif Boost::boost Boost::program_options Boost::system)
+	target_link_libraries(${example_name} weif Boost::boost Boost::program_options)
 	if(HAS_LTO_SUPPORT)
 		set_property(TARGET ${example_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 	endif(HAS_LTO_SUPPORT)
