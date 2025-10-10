@@ -36,7 +36,7 @@ make_aperture_filter(value_type aperture_scale, value_type central_obscuration, 
 	}
 
 	if (square) {
-		return weif::af::angle_averaged<value_type>{weif::af::square<value_type>{}, 1024};
+		return weif::af::angle_averaged{weif::af::square<value_type>{}, 1024};
 	}
 
 	if (central_obscuration != 0) {

@@ -35,21 +35,25 @@ private:
 
 		auto integrator = std::make_unique<tanh_sinh<value_type>>();
 
-		constexpr auto PI = xt::numeric_constants<value_type>::PI;
-
-		return xt::make_lambda_xfunction([integrator = std::move(integrator), aperture_filter = std::forward<AF>(aperture_filter)] (value_type z) -> value_type {
-			if (z == static_cast<value_type>(0))
-				return static_cast<value_type>(0);
+		return xt::make_lambda_xfunction([
+			integrator = std::move(integrator),
+			aperture_filter = std::forward<AF>(aperture_filter)] (value_type z) -> value_type {
 
 			const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
 			const auto u = (static_cast<value_type>(1) - z) / z;
 
-			return integrator->integrate([u, &aperture_filter] (value_type t) noexcept {
+			return integrator->integrate([u, &aperture_filter] (value_type phi, value_type theta) noexcept {
 				using namespace std;
+				using namespace boost::math;
 
-				const auto f = PI * (t + static_cast<value_type>(1));
-				const auto ux = u * cos(f);
-				const auto uy = u * sin(f);
+				if (isinf(u)) {
+					return aperture_filter(u, static_cast<value_type>(0));
+				}
+
+				const auto c = abs(phi) < static_cast<value_type>(0.5) ? cos_pi(phi) : -cos_pi(theta);
+				const auto s = abs(phi) < static_cast<value_type>(0.5) ? sin_pi(phi) : sin_pi(theta);
+				const auto ux = u * c;
+				const auto uy = u * s;
 
 				return aperture_filter(ux, uy);
 			}, tol) / 2;
@@ -86,6 +90,9 @@ public:
 		return this->operator()(xt::sqrt(xt::square(e1.derived_cast()) + xt::expand_dims(xt::square(e2.derived_cast()),1)));
 	}
 };
+
+template<class AF>
+angle_averaged(AF&&, std::size_t) -> angle_averaged<typename std::decay_t<AF>::value_type>;
 
 } // af
 } // weif

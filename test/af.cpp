@@ -17,10 +17,11 @@
 #include <xtensor/containers/xarray.hpp> // IWYU pragma: keep
 #include <xtensor/containers/xtensor.hpp>
 
+#include <weif/af/angle_averaged.h>
 #include <weif/af/circular.h>
+#include <weif/af/gauss.h>
 #include <weif/af/point.h>
 #include <weif/af/square.h>
-#include <weif/af/gauss.h>
 
 #include "xexpression.h"
 
@@ -45,6 +46,10 @@ CPPUNIT_TEST(test_square2);
 CPPUNIT_TEST(test_square_vec1);
 CPPUNIT_TEST(test_gauss1);
 CPPUNIT_TEST(test_gauss_vec1);
+CPPUNIT_TEST(test_angle_averaged_point1);
+CPPUNIT_TEST(test_angle_averaged_point_vec1);
+CPPUNIT_TEST(test_angle_averaged_circular1);
+CPPUNIT_TEST(test_angle_averaged_circular_vec1);
 CPPUNIT_TEST_SUITE_END();
 
 void test_circular1() {
@@ -445,6 +450,97 @@ void test_gauss_vec1() {
 	xt::xarray<double> actual = af(args);
 
 	CPPUNIT_ASSERT(xt::allclose(expected, actual, delta));
+}
+
+void test_angle_averaged_point1() {
+	using namespace weif::af;
+
+	const angle_averaged af{point<double>{}, 1024};
+
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.1));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.2));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.3));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.4));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.5));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.6));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.7));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.8));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(0.9));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(1.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(2.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(4.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(6.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(8.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(10.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(12.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(14.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(16.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(18.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(20.0));
+	CPPUNIT_ASSERT_EQUAL(1.0, af(std::numeric_limits<double>::infinity()));
+}
+
+void test_angle_averaged_point_vec1() {
+	using namespace weif::af;
+
+	constexpr auto epsilon = std::numeric_limits<double>::epsilon();
+	constexpr auto delta = std::numeric_limits<double>::epsilon();
+	const xt::xarray<double> expected = {1.0, 1.0, 1.0, 1.0, 1.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
+	const angle_averaged af{point<double>{}, 1024};
+	xt::xarray<double> actual = af(args);
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, epsilon, delta);
+}
+
+void test_angle_averaged_circular1() {
+	using namespace weif::af;
+
+	const auto delta = std::pow(std::numeric_limits<double>::epsilon(), static_cast<double>(2.0/3.0));
+	const angle_averaged af{circular<double>{}, 8192};
+
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, af(0.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.97557820345282925544738037599840241249, af(0.1), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.90527056926709826543687436589706043937, af(0.2), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.79745112049841285396087207337350145069, af(0.3), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.66451326578645121632531346910734726067, af(0.4), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.52085499634171633388451850905545890177, af(0.5), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.38064186165252341564739554410558523018, af(0.6), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.25577177637369743025174833977161815215, af(0.7), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15440278390591541872848388641857869804, af(0.8), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.080268510286597479867705768154527185659, af(0.9), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.032830452075419517493214219116742182043, af(1.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0045702276655243839509360474652512460908, af(2.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00060488171548396292171591681162427788157, af(4.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00018274993357362021237148215658828211404, af(6.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000077857738116575996557193284367527741371, af(8.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000040099342229572102544189269460965266392, af(10.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000023297399065979598913157367604140222006, af(12.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000014712721201644252120925506551088489092, af(14.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000098772835964288263669519569071382502047, af(16.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.000006948584101381736894948005247208674993, af(18.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000050722104418580991006410526916452587537, af(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, af(std::numeric_limits<double>::infinity()), delta);
+}
+
+void test_angle_averaged_circular_vec1() {
+	using namespace weif::af;
+
+	const auto epsilon = std::numeric_limits<double>::epsilon();
+	const auto delta = std::pow(std::numeric_limits<double>::epsilon(), static_cast<double>(2.0/3.0));
+	const xt::xarray<double> expected = {
+		1.0,
+		0.97557820345282925544738037599840241249,
+		0.032830452075419517493214219116742182043,
+		0.000040099342229572102544189269460965266392,
+		0.0
+	};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
+	const angle_averaged af{circular<double>{}, 8192};
+	xt::xarray<double> actual = af(args);
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, epsilon, delta);
 }
 
 };
