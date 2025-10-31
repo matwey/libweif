@@ -22,7 +22,7 @@ find_package(Boost COMPONENTS
 	math REQUIRED
 	program_options REQUIRED)
 find_package(Doxygen REQUIRED)
-find_package(xtensor REQUIRED VERSION 0.26)
+find_package(xtensor 0.26...<0.27 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Rapidcsv REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
