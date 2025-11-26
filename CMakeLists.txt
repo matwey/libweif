@@ -8,7 +8,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 
 include(CheckCXXSourceRuns)
-include(CheckIncludeFileCXX)
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CheckIPOSupported)
@@ -24,13 +23,10 @@ find_package(Boost COMPONENTS
 find_package(Doxygen REQUIRED)
 find_package(xtensor REQUIRED VERSION 0.26)
 find_package(PkgConfig REQUIRED)
+find_package(Rapidcsv REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 pkg_check_modules(FFTW3L REQUIRED IMPORTED_TARGET fftw3l)
-CHECK_INCLUDE_FILE_CXX("rapidcsv.h" RAPIDCSV_FOUND)
-if(NOT RAPIDCSV_FOUND)
-	message(FATAL_ERROR "rapidcsv.h not found")
-endif()
 
 check_cxx_source_runs("
 #include <limits>
@@ -52,7 +48,7 @@ include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(weif SHARED ${SOURCES})
-target_link_libraries(weif Boost::boost PkgConfig::FFTW3F PkgConfig::FFTW3 PkgConfig::FFTW3L)
+target_link_libraries(weif Boost::boost PkgConfig::FFTW3F PkgConfig::FFTW3 PkgConfig::FFTW3L Rapidcsv::Rapidcsv)
 if(HAS_LTO_SUPPORT)
 	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif(HAS_LTO_SUPPORT)
