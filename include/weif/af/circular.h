@@ -199,12 +199,19 @@ public:
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
-		const auto eps2 = std::pow(obscuration(), 2);
+		const auto obscuration_ = obscuration();
+		const auto eps2 = std::pow(obscuration_, 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
-		auto fnct = [=](auto u) -> decltype(u) {
-			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+		auto fnct = [obscuration_, eps2](auto u) -> decltype(u) {
+			constexpr auto PI = xt::numeric_constants<xvalue_type>::PI;
+			const auto piu = PI * u;
 
-			return math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps2) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration()) * u);
+			auto value = math::jinc_pi(piu);
+			if (obscuration_ != static_cast<value_type>(0)) {
+				value -= static_cast<xvalue_type>(eps2) * math::jinc_pi(static_cast<xvalue_type>(obscuration_) * piu);
+			}
+
+			return value;
 		};
 
 		/* Use static_cast<> to capture by value */
@@ -351,15 +358,24 @@ public:
 		const auto obscuration2 = obscuration_second();
 		const auto eps22 = std::pow(obscuration2, 2);
 		const auto norm2 = static_cast<value_type>(1) - eps22;
-		const auto r = ratio();
+		const auto ratio_ = ratio();
 
-		auto fnct = [=](auto u) -> decltype(u * u) {
-			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+		auto fnct = [obscuration1, eps12, obscuration2, eps22, ratio_](auto u) -> decltype(u * u) {
+			constexpr auto PI = xt::numeric_constants<xvalue_type>::PI;
+			const auto piu1 = PI * u;
+			const auto piu2 = PI * u * ratio_;
 
-			const auto a1 = math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps12) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration1) * u);
-			const auto a2 = math::jinc_pi(static_cast<xvalue_type>(PI * r) * u) - static_cast<xvalue_type>(eps22) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration2 * r) * u);
+			auto v1 = math::jinc_pi(piu1);
+			if (obscuration1 != static_cast<value_type>(0)) {
+				v1 -= static_cast<xvalue_type>(eps12) * math::jinc_pi(static_cast<xvalue_type>(obscuration1) * piu1);
+			}
 
-			return a1 * a2;
+			auto v2 = math::jinc_pi(piu2);
+			if (obscuration2 != static_cast<value_type>(0)) {
+				v2 -= static_cast<xvalue_type>(eps22) * math::jinc_pi(static_cast<xvalue_type>(obscuration2) * piu2);
+			}
+
+			return v1 * v2;
 		};
 
 		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / static_cast<xvalue_type>(norm1 * norm2);
