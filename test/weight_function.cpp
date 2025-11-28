@@ -215,7 +215,7 @@ void test_gauss_point_vec1() {
 	using namespace weif;
 	using namespace weif::detail;
 
-	constexpr auto delta = std::pow(std::numeric_limits<double>::epsilon(), 2.0/3.0);
+	const auto delta = std::pow(std::numeric_limits<double>::epsilon(), 2.0/3.0);
 	constexpr double c = 1.9133847737114990689173989228583762413866;
 	const xt::xarray<double> expected = {c, c, c, c, c, c, c, c, c, c, c};
 	const xt::xarray<double> args = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
