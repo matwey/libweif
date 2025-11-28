@@ -7,11 +7,10 @@ OPTION(BUILD_TEST    "libweif test"    ON)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 
-include(CheckCXXSourceRuns)
-include(CheckIncludeFileCXX)
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CheckIPOSupported)
+include(CheckBoostMathSpecialFunctions)
 
 check_ipo_supported(RESULT HAS_LTO_SUPPORT)
 
@@ -20,29 +19,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 
 find_package(Boost COMPONENTS
+	math REQUIRED
 	program_options REQUIRED)
 find_package(Doxygen REQUIRED)
-find_package(xtensor REQUIRED VERSION 0.26)
+find_package(xtensor 0.26...<0.27 REQUIRED)
 find_package(PkgConfig REQUIRED)
+find_package(Rapidcsv REQUIRED)
 pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
 pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 pkg_check_modules(FFTW3L REQUIRED IMPORTED_TARGET fftw3l)
-CHECK_INCLUDE_FILE_CXX("rapidcsv.h" RAPIDCSV_FOUND)
-if(NOT RAPIDCSV_FOUND)
-	message(FATAL_ERROR "rapidcsv.h not found")
-endif()
 
-check_cxx_source_runs("
-#include <limits>
-#include <boost/math/special_functions/bessel.hpp>
-
-int main() {
-	using namespace boost::math;
-	constexpr auto inf = std::numeric_limits<double>::infinity();
-	return !(cyl_bessel_j(1, inf) == 0.0 && sinc_pi(inf) == 0.0);
-}
-" HAVE_CORRECT_SPECIAL_FUNCTIONS)
-
+check_boost_math_special_functions(HAVE_CORRECT_SPECIAL_FUNCTIONS TARGET Boost::math)
 if(NOT HAVE_CORRECT_SPECIAL_FUNCTIONS)
 	message(FATAL_ERROR "boost::math special functions are defective in your version")
 endif()
@@ -52,7 +39,7 @@ include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(weif SHARED ${SOURCES})
-target_link_libraries(weif Boost::boost PkgConfig::FFTW3F PkgConfig::FFTW3 PkgConfig::FFTW3L)
+target_link_libraries(weif Boost::math PkgConfig::FFTW3F PkgConfig::FFTW3 PkgConfig::FFTW3L Rapidcsv::Rapidcsv)
 if(HAS_LTO_SUPPORT)
 	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif(HAS_LTO_SUPPORT)
@@ -103,7 +90,7 @@ foreach(example_source IN ITEMS ${EXAMPLES})
 	string(REPLACE / _ example_name ${example_name})
 	string(REPLACE .cpp "" example_name ${example_name})
 	add_executable(${example_name} ${example_source})
-	target_link_libraries(${example_name} weif Boost::boost Boost::program_options)
+	target_link_libraries(${example_name} weif Boost::program_options)
 	if(HAS_LTO_SUPPORT)
 		set_property(TARGET ${example_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 	endif(HAS_LTO_SUPPORT)
