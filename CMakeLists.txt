@@ -5,7 +5,7 @@ OPTION(BUILD_EXAMPLE "libweif example" ON)
 OPTION(BUILD_TEST    "libweif test"    ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(GNUInstallDirs)
 include(GenerateExportHeader)

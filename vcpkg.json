@@ -4,16 +4,10 @@
     "boost-program-options",
     "cppunit",
     "fftw3",
+    "rapidcsv",
     {
       "name": "xtensor",
       "version>=": "0.26.0"
-    },
-    "rapidcsv"
-  ],
-  "overrides": [
-    {
-      "name": "xtensor",
-      "version": "0.26.0"
     }
   ]
 }
