@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 project(libweif LANGUAGES C CXX VERSION 0.1.0)
 
+option(BUILD_DOC     "libweif documentation" ON)
 OPTION(BUILD_EXAMPLE "libweif example" ON)
 OPTION(BUILD_TEST    "libweif test"    ON)
 
@@ -18,10 +19,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ffast-math -fno-finite-math-only"
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 
-find_package(Boost COMPONENTS
-	math REQUIRED
-	program_options REQUIRED)
-find_package(Doxygen REQUIRED)
+find_package(Boost COMPONENTS math REQUIRED)
 find_package(xtensor 0.26 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Rapidcsv REQUIRED)
@@ -62,13 +60,19 @@ set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 generate_export_header(weif)
 
+if(BUILD_DOC)
+find_package(Doxygen REQUIRED)
+
 set(DOXYGEN_USE_MATHJAX YES)
 set(DOXYGEN_EXCLUDE_SYMBOLS detail)
 doxygen_add_docs(docs ${SOURCES} include)
+endif()
 
 if(BUILD_TEST)
 pkg_check_modules(CPPUNIT REQUIRED IMPORTED_TARGET cppunit)
+
 enable_testing()
+
 file(GLOB_RECURSE TESTS test/*.cpp)
 foreach(test_source IN ITEMS ${TESTS})
 	string(REPLACE ${CMAKE_SOURCE_DIR}/ "" test_name ${test_source})
@@ -84,6 +88,8 @@ endforeach(test_source)
 endif()
 
 if(BUILD_EXAMPLE)
+find_package(Boost COMPONENTS program_options REQUIRED)
+
 file(GLOB_RECURSE EXAMPLES example/*.cpp)
 foreach(example_source IN ITEMS ${EXAMPLES})
 	string(REPLACE ${CMAKE_SOURCE_DIR}/ "" example_name ${example_source})
