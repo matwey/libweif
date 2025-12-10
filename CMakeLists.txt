@@ -36,7 +36,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
-add_library(weif SHARED ${SOURCES})
+add_library(weif ${SOURCES})
 target_link_libraries(weif Boost::math PkgConfig::FFTW3F PkgConfig::FFTW3 PkgConfig::FFTW3L Rapidcsv::Rapidcsv)
 if(HAS_LTO_SUPPORT)
 	set_property(TARGET weif PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
