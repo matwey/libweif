@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(libweif LANGUAGES C CXX VERSION 0.1.0)
+project(libweif LANGUAGES C CXX VERSION 0.2.0)
 
 option(BUILD_DOC     "libweif documentation" ON)
 OPTION(BUILD_EXAMPLE "libweif example" ON)
