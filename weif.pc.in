@@ -5,8 +5,6 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 Name: @CMAKE_PROJECT_NAME@
 Description: Optical turbulence weight functions library
 Version: @PROJECT_VERSION@
-Requires: fftw3f
-Requires: fftw3
-Requires: fftw3l
+Requires: fftw3f fftw3 fftw3l
 Libs: -L${libdir} -lweif
 Cflags: -I${includedir}
