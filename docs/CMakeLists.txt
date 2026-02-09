@@ -1,3 +1,6 @@
+OPTION(SPHINX_OUTPUT "documentation output path" "${CMAKE_BINARY_DIR}/docs/html")
+
+
 find_package(Doxygen REQUIRED)
 find_package(Sphinx REQUIRED)
 
@@ -11,4 +14,4 @@ doxygen_add_docs(doxygen ${SOURCES} include)
 sphinx_add_docs(docs ALL
 	DEFINE "breathe_projects.libweif=${DOXYGEN_OUTPUT_DIRECTORY}/xml"
 	DEPENDS doxygen
-	OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/docs/html")
+	OUTPUT_DIRECTORY "${SPHINX_OUTPUT}")
