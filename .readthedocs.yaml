@@ -12,9 +12,11 @@ build:
     - doxygen
   tools:
     python: "3.13"
-  commands:
-    - cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_DOCS:BOOL=ON -DBUILD_WEIF:BOOL=OFF -DBUILD_TESTS:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -B build 
-    - cmake --build build --target docs
+  jobs:
+    build:
+      html:
+        - cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_DOCS:BOOL=ON -DBUILD_WEIF:BOOL=OFF -DBUILD_TESTS:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -B build 
+        - cmake --build build --target docs
 
 # Optional but recommended, declare the Python requirements required
 # to build your documentation
