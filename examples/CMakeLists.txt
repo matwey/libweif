@@ -1,0 +1,10 @@
+find_package(Boost COMPONENTS program_options REQUIRED)
+
+file(GLOB_RECURSE EXAMPLES *.cpp)
+foreach(example_source IN ITEMS ${EXAMPLES})
+	string(REPLACE ${CMAKE_CURRENT_SOURCE_DIR}/ "" example_name ${example_source})
+	string(REPLACE / _ example_name ${example_name})
+	string(REPLACE .cpp "" example_name ${example_name})
+	add_executable(${example_name} ${example_source})
+	target_link_libraries(${example_name} weif Boost::program_options)
+endforeach(example_source)

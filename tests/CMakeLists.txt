@@ -1,0 +1,13 @@
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CPPUNIT REQUIRED IMPORTED_TARGET cppunit)
+
+file(GLOB_RECURSE TESTS *.cpp)
+foreach(test_source IN ITEMS ${TESTS})
+	string(REPLACE ${CMAKE_CURRENT_SOURCE_DIR}/ "" test_name ${test_source})
+	string(REPLACE / _ test_name ${test_name})
+	string(REPLACE .cpp "" test_name ${test_name})
+	string(PREPEND test_name "test_")
+	add_executable(${test_name} ${test_source})
+	target_link_libraries(${test_name} weif PkgConfig::CPPUNIT)
+	add_test(${test_name} ${test_name})
+endforeach(test_source)
