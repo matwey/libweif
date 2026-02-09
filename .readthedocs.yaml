@@ -13,9 +13,11 @@ build:
   tools:
     python: "3.13"
   jobs:
+    create_environment:
+      - python -m virtualenv $READTHEDOCS_VIRTUALENV_PATH
     install:
-      - pip install --upgrade pip
-      - pip install -r docs/requirements.txt
+      - python -m pip install --upgrade pip
+      - python -m pip install -r docs/requirements.txt
     build:
       html:
         - cmake . -DBUILD_DOCS:BOOL=ON -DBUILD_WEIF:BOOL=OFF -DBUILD_TESTS:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DSPHINX_OUTPUT:PATH=$READTHEDOCS_OUTPUT/html/ -B build 
