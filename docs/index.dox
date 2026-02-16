@@ -1,13 +1,13 @@
 /**
  * @mainpage libweif library manual
  *
- * Welcome to the documentation for `libweif` library — a C++ library for calculation weight functions for optical turbulence in atmosphere.
+ * Welcome to the documentation for `libweif` library — a C++ library for calculating weight functions for optical turbulence in the atmosphere.
  *
- * The present documentation is arranged in the following groups:
+ * The present documentation is arranged in the following sections:
  * - \ref tutorial — some practical examples demonstrating how to use the library
- * - \ref howto — building and insallation guides
+ * - \ref howto — building and installation guides
  * - \ref api_reference
- * - \ref internals — library internals and explanation
+ * - \ref internals — library internals and explanations
  */
 
 /**
@@ -20,6 +20,65 @@
  * @page howto How-to guides
  *
  * @tableofcontents
+ *
+ * @section installation Installation
+ *
+ * Currently, there is only one way to install `libweif` — build from source code.
+ *
+ * @subsection source_build Build from sources
+ *
+ * The source code is located at [GitHub](https://github.com/matwey/libweif).
+ * Use the [GitHub Releases page](https://github.com/matwey/libweif/releases) to obtain the latest stable release of the library.
+ * To get the development version, run:
+ * ```bash
+ * git clone https://github.com/matwey/libweif
+ * ```
+ *
+ * Only Linux is supported at the moment. To build the library, the following
+ * dependencies are required:
+ * - C++ compiler with C++20 support (gcc 10+ or clang 10+)
+ * - [CMake](https://cmake.org/) build system
+ * - [Boost.math](https://www.boost.org/) and [Boost.Program_options](https://www.boost.org/) libraries
+ * - [FFTW3](https://www.fftw.org/) library
+ * - [RapidCSV](https://github.com/d99kris/rapidcsv) library
+ * - [XTensor](https://github.com/xtensor-stack/xtensor) library 0.26+
+ * - [CPPUnit](https://freedesktop.org/wiki/Software/cppunit) unit testing framework
+ *
+ * Run the appropriate command for your Linux distribution to install the dependencies:
+ * - openSUSE:
+ *   ```bash
+ *   sudo zypper install cmake cppunit-devel fftw3-devel gcc-c++ libboost_math-devel libboost_program_options-devel rapidcsv-devel xtensor-devel
+ *   ```
+ * - Ubuntu:
+ *   ```bash
+ *   sudo apt install cmake libcppunit-dev libfftw3-dev g++ libboost-math-dev libboost-program-options-dev rapidcsv-dev xtensor-dev
+ *   ```
+ * - There is also a `vcpkg.json` file for [vcpkg](https://vcpkg.io) package manager
+ *   users. Before proceeding, make sure that the `CMAKE_TOOLCHAIN_FILE`
+ *   environment variable stores the appropriate path to `vcpkg.cmake` for your
+ *   vcpkg installation.
+ *
+ * Run the following commands to compile the library:
+ * ```bash
+ * cmake -DCMAKE_BUILD_TYPE=Release -B build .
+ * cmake --build build
+ * ```
+ *
+ * Run unit tests to validate that the compiled library is consistent:
+ * ```bash
+ * ctest --test-dir build
+ * ```
+ * If the test succeeds, you should see a number of `Passed` lines.
+ *
+ * The final optional step is to install the library system-wide:
+ * ```bash
+ * sudo cmake --install build
+ * ```
+ *
+ * @section contributing Contributing
+ *
+ * You are welcome to report the issues on [GitHub Issues page](https://github.com/matwey/libweif/issues).
+ * Pull requests are also accepted on GitHub.
  *
  */
 

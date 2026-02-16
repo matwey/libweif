@@ -6,10 +6,10 @@ libweif library manual
 
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
-   tutorial.rst
-   howto.rst
-   api_reference.rst
-   internals.rst
+   tutorial
+   howto
+   api_reference
+   internals
