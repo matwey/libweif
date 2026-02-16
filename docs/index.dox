@@ -1,0 +1,36 @@
+/**
+ * @mainpage libweif library manual
+ *
+ * Welcome to the documentation for `libweif` library — a C++ library for calculation weight functions for optical turbulence in atmosphere.
+ *
+ * The present documentation is arranged in the following groups:
+ * - \ref tutorial — some practical examples demonstrating how to use the library
+ * - \ref howto — building and insallation guides
+ * - \ref api_reference
+ * - \ref internals — library internals and explanation
+ */
+
+/**
+ * @page tutorial Tutorial
+ *
+ * @tableofcontents
+ */
+
+/**
+ * @page howto How-to guides
+ *
+ * @tableofcontents
+ *
+ */
+
+/**
+ * @page api_reference API Reference
+ *
+ * @tableofcontents
+ */
+
+/**
+ * @page internals Internals
+ *
+ * @tableofcontents
+ */
