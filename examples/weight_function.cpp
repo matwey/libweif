@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 		("response_filename", po::value<std::vector<std::string>>()->required(), "Spectral response input filename")
 		("square", "Use square aperture filter")
 		("carrier", po::value<value_type>(), "Carrier wavelength")
-		("mono", po::value<value_type>(), "Use monochromatic spectral filter with given labmda");
+		("mono", po::value<value_type>(), "Use monochromatic spectral filter with given lambda");
 
 	try {
 		auto parsed = po::command_line_parser(argc, argv).options(opts).positional(pos_opts).run();

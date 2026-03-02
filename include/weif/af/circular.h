@@ -35,7 +35,7 @@ namespace af {
  * A(u_x, u_y) = \mathrm{jinc}_1^2\left(\pi \sqrt{u_x^2 + u_y^2}\right).
  * \f]
  * where \f$\mathrm{jinc}_1(x) = \frac{2 J_1(x)}{x}\f$ is the jinc function (Fourier transform of
- * a unit circular aperture) and \f$J_1\f$ is the Bessel function of first kind.
+ * a unit circular aperture) and \f$J_1\f$ is the Bessel function of the first kind.
  */
 template<class T>
 struct WEIF_EXPORT circular {

@@ -14,3 +14,4 @@ API Reference
 
    api_af
    api_sf
+   api_math

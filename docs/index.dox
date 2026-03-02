@@ -1,11 +1,11 @@
 /**
  * @mainpage libweif library manual
  *
- * Welcome to the documentation for `libweif` library — a C++ library for calculating weight functions for optical turbulence in the atmosphere.
+ * Welcome to the documentation for the `libweif` library — a C++ library for calculating weight functions for optical turbulence in the atmosphere.
  *
  * The present documentation is arranged in the following sections:
- * - \ref tutorial — some practical examples demonstrating how to use the library
- * - \ref howto — building and installation guides
+ * - \ref tutorial — Practical examples demonstrating how to use the library
+ * - \ref howto — Building and installation guides
  * - \ref api_reference
  * - \ref internals — library internals and explanations
  */
@@ -94,12 +94,12 @@
  *
  * @tableofcontents
  *
- * API is divided into the following groups:
+ * The API is divided into the following groups:
  * - \ref api_af
  * - \ref api_sf
  *   - \ref api_spectral_response
  * - \ref api_weight_function
- * - \ref api_math_functions
+ * - \ref api_math
  *
  */
 
@@ -113,8 +113,22 @@
  * @defgroup api_af Aperture filters
  * @brief Predefined functors for common aperture filters
  *
- * TODO: Description
- * TODO: unitless argument
+ * Aperture filters are responsible for spatial averaging by an input aperture having finite size and specific shape.
+ * Each aperture geometry shape is handled by a separate class.
+ * Each class has a consistent interface. It provides four `operator()` overloads: two for polar coordinate system and two for Cartesian coordinate system.
+ * However, the Cartesian coordinate overloads simply calculate hypotenuse before calling polar overloads.
+ * An exception is \ref weif::af::square, since it lacks axial symmetry, there is no polar coordinate overload for it.
+ *
+ * For every coordinate system, there is a scalar version that returns the aperture filter value for a single frequency, and a vector version that accepts an xtensor expression for frequencies.
+ *
+ * @note Due to the general scaling property of aperture filters, the frequency argument is unitless. For instance, there is no `diameter` parameter in the \ref weif::af::circular constructor.
+ * You are supposed to provide the aperture scale as a multiplier. For instance:
+ * @code
+ * weif::af::circular<float> af{};
+ * af(u);                 // u is unitless frequency
+ * af(D * f);             // f is 1/mm assuming diameter D in millimeters
+ * af(D / r_fresnel * u); // where diameter D and Fresnel radius r_fresnel in millimeters
+ * @endcode
  */
 
 /**
