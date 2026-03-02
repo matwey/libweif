@@ -29,6 +29,7 @@ namespace weif {
  * @brief Spectral response
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_spectral_response
  *
  * Represents spectral response curve on a uniform wavelength grid,
  * providing operations for normalization, stacking, and analysis.

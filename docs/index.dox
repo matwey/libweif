@@ -74,6 +74,13 @@
  * ```bash
  * sudo cmake --install build
  * ```
+ * @section examples Running examples
+ *
+ * TBD
+ *
+ * @section usage Import the library into your project
+ *
+ * TBD
  *
  * @section contributing Contributing
  *
@@ -86,10 +93,60 @@
  * @page api_reference API Reference
  *
  * @tableofcontents
+ *
+ * API is divided into the following groups:
+ * - \ref api_af
+ * - \ref api_sf
+ *   - \ref api_spectral_response
+ * - \ref api_weight_function
+ * - \ref api_math_functions
+ *
  */
 
 /**
  * @page internals Internals
  *
  * @tableofcontents
+ */
+
+/**
+ * @defgroup api_af Aperture filters
+ * @brief Predefined functors for common aperture filters
+ *
+ * TODO: Description
+ * TODO: unitless argument
+ */
+
+/**
+ * @namespace weif::af
+ * @brief Aperture filters
+ */
+
+/**
+ * @defgroup api_sf Spectral filters
+ * @brief Predefined functors for common spectral filters
+ *
+ * TODO: Description
+ * TODO: unitless argument
+ */
+
+/**
+ * @namespace weif::sf
+ * @brief Spectral filters
+ */
+
+/**
+ * @defgroup api_spectral_response Spectral response
+ * @ingroup api_sf
+ * @brief Function to handle spectral response curves
+ *
+ * TODO: Description
+ * TODO: unitless argument
+ */
+
+/**
+ * @defgroup api_weight_function Weight functions
+ * @brief Classes to evaluate weight functions
+ *
+ * TODO: Description
  */

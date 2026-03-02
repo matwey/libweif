@@ -20,6 +20,7 @@ namespace weif {
  * @brief Uniformly spaced numerical grid
  *
  * @tparam T Numeric type for grid values
+ * @ingroup api_spectral_response
  *
  * Represents a 1D grid of uniformly spaced values, providing mathematical
  * operations and grid analysis capabilities. The grid is defined by:

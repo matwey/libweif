@@ -6,7 +6,7 @@ libweif library manual
 
 .. toctree::
    :hidden:
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Contents:
 
    tutorial

@@ -35,6 +35,7 @@ namespace sf {
  * @brief Polychromatic spectral filter
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_sf
  *
  * Evaluates a polychromatic spectral filter using numerically provided spectral response data.
  * During construction, the class computes and stores the Fourier transform of the spectral response

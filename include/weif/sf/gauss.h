@@ -24,6 +24,7 @@ namespace sf {
  * @brief Gaussian spectral filter
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_sf
  *
  * The filter combines monochromatic oscillations with Gaussian damping:
  * \f[

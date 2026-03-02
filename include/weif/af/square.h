@@ -24,6 +24,7 @@ namespace af {
  * @brief Aperture filter function for a square aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * The aperture filter is defined in Cartesian coordinates as:
  * \f[

@@ -17,6 +17,7 @@ namespace af {
  * @brief Aperture filter function for a point (infinitely small) aperture
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_af
  *
  * The aperture filter is defined in both radial and Cartesian plane coordinates:
  * \f[

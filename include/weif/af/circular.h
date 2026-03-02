@@ -25,6 +25,7 @@ namespace af {
  * @brief Aperture filter function for a circular aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * The aperture filter is defined in both radial and Cartesian plane coordinates:
  * \f[
@@ -108,6 +109,7 @@ struct WEIF_EXPORT circular {
  * @brief Aperture filter function for an annular (ring-shaped) aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * The aperture filter accounts for central obscuration and is defined as:
  * \f[
@@ -243,6 +245,7 @@ public:
  * @brief Aperture filter for covariance between two concentric annular apertures
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * Models the covariance of relative flux fluctuations between two annular apertures
  * as used in MASS (Multi-Aperture Scintillation Sensor) instruments:
@@ -403,5 +406,6 @@ public:
 
 } // af
 } // weif
+
 
 #endif // _WEIF_AF_CIRCULAR_H

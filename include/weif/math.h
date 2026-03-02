@@ -19,12 +19,14 @@
 namespace weif {
 
 /**
- * @defgroup math_functions Special mathematical functions
- * @brief Special mathematical functions
+ * @defgroup api_math_functions Special mathematical functions and numerical constants
+ * @brief Special mathematical functions and numerical constants
  */
 
-/// @namespace math
-/// @brief Mathematical constants and functions namespace
+/**
+ * @namespace math
+ * @brief Special mathematical functions and numerical constants
+ */
 namespace math {
 
 /**
@@ -46,7 +48,7 @@ constexpr T Kolmogorov_Cn2_scale = T(0.0096931507043123421456817216188956817L);
 
 /**
  * @brief Computes the jinc function
- * @ingroup math_functions
+ * @ingroup api_math_functions
  *
  * @tparam T Numeric type
  * @param x Input value
