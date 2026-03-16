@@ -76,11 +76,46 @@
  * ```
  * @section examples Running examples
  *
- * TBD
+ * The library includes several example programs that demonstrate typical usage.
+ * By default, examples are built together with the library. If you wish to disable
+ * building examples, pass `-DBUILD_EXAMPLES:BOOL=OFF` to the CMake configuration step.
+ *
+ * After a successful build, the example executables can be found in the
+ * `build/examples/` directory (or the corresponding build directory you specified).
+ * For instance, to run the weight function example:
+ *
+ * ```bash
+ * ./build/examples/weight_function
+ * ```
+ *
+ * Each example may accept command-line arguments; use `--help` to see available options.
+ * Some examples require input files (e.g., spectral response curves). Refer to the
+ * source code of each example for details on expected file formats.
  *
  * @section usage Import the library into your project
  *
- * TBD
+ * Once installed, `libweif` can be used in your own C++ projects. The library provides a
+ * pkg‑config file (`weif.pc`) that simplifies compiler and linker flag generation.
+ *
+ * @subsection cmake Using CMake
+ * If your project uses CMake, you can locate `libweif` via `pkg‑config`:
+ * ```cmake
+ * find_package(PkgConfig REQUIRED)
+ * pkg_check_modules(weif REQUIRED IMPORTED_TARGET weif)
+ * # ...
+ * target_link_libraries(your_target PkgConfig::weif)
+ * ```
+ *
+ * @subsection make Using Makefile
+ * With `pkg‑config` you can obtain the necessary flags:
+ * ```make
+ * CXXFLAGS += $(shell pkg-config --cflags weif)
+ * LDFLAGS  += $(shell pkg-config --libs weif)
+ * ```
+ * Then compile your source files with `$(CXXFLAGS)` and link with `$(LDFLAGS)`.
+ *
+ * @note The library depends on FFTW3, Boost.math, XTensor, and RapidCSV.
+ * Ensure these dependencies are available in your build environment.
  *
  * @section contributing Contributing
  *
