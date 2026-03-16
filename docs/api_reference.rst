@@ -14,4 +14,5 @@ API Reference
 
    api_af
    api_sf
+   api_weight_function
    api_math

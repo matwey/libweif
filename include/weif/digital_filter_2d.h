@@ -32,6 +32,7 @@ namespace weif {
  *
  * @tparam T Numeric type used for calculations
  * @tparam Allocator Memory allocator type (default: std::allocator<T>)
+ * @ingroup api_af
  *
  * Implements a dimensional digital filter.
  */

@@ -140,8 +140,22 @@
  * @defgroup api_sf Spectral filters
  * @brief Predefined functors for common spectral filters
  *
- * TODO: Description
- * TODO: unitless argument
+ * Spectral filters are responsible for polychromatic Fresnel wave propagation.
+ * They are functions of the normalized squared frequency \f$x = z f^2 = u^2 / \lambda\f$,
+ * where \f$u\f$ is the unitless spatial frequency, \f$\lambda\f$ is the wavelength, and \f$z\f$ is the propagation distance.
+ *
+ * Each class has a consistent interface. It provides two `operator()` overloads:
+ * a scalar version that returns the spectral filter value for a single frequency,
+ * and a vector version that accepts an xtensor expression for frequencies.
+ *
+ * @note The frequency argument is unitless. The filter can also be used with physical
+ * frequencies by scaling accordingly. For scaling polychromatic filters,
+ * you are advised to use the equivalent wavelength.
+ * @code
+ * weif::sf::mono<double> mono_filter{};
+ * double x = 0.5;
+ * double value = mono_filter(x); // evaluates sin^2(π x)
+ * @endcode
  */
 
 /**
@@ -154,13 +168,42 @@
  * @ingroup api_sf
  * @brief Function to handle spectral response curves
  *
- * TODO: Description
- * TODO: unitless argument
+ * The spectral response class represents a discretized spectral response curve
+ * (e.g., filter transmission, detector sensitivity, or source spectrum)
+ * on a uniform wavelength grid. It is used as input for the polychromatic spectral
+ * filter \ref weif::sf::poly.
+ *
+ * The class provides operations for normalization, stacking (multiplication of
+ * multiple responses), and computation of effective wavelength. Spectral responses
+ * can be loaded from plain text files (space‑separated wavelength–value pairs).
+ *
+ * @note The wavelength grid is expected to be in nanometers.
+ *
+ * Example of loading and stacking two responses:
+ * @code
+ * auto sr1 = weif::spectral_response<double>::make_from_file("filter1.txt");
+ * auto sr2 = weif::spectral_response<double>::make_from_file("filter2.txt");
+ * sr1.stack(sr2); // sr1 now contains the product over the overlapping range
+ * const auto lambda_eff = sr1.effective_lambda();
+ * const auto lambda_eq = sr1.equiv_lambda(); // store the wavelength value for later use
+ * sr1.normalize();
+ * @endcode
  */
 
 /**
  * @defgroup api_weight_function Weight functions
  * @brief Classes to evaluate weight functions
  *
- * TODO: Description
+ * Weight functions compute the contribution of atmospheric turbulence layers to flux scintillation.
+ * They integrate over spatial frequencies with aperture and spectral filters, following the Kolmogorov spectrum.
+ *
+ * Each class is constructed with a spectral filter, a wavelength, an aperture filter, and an aperture scale.
+ *
+ * @par Consistent units used by the library:
+ * - Altitudes: kilometers (km)
+ * - Wavelengths: nanometers (nm)
+ * - Geometric scales: millimeters (mm)
+ *
+ * @note The weight functions assume the Kolmogorov turbulence spectrum with \f$ C_n^2 \f$ profile.
+ * The resulting value is proportional to \f$ C_n^2 \f$ and can be integrated to obtain the total scintillation variance.
  */

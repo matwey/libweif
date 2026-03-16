@@ -27,6 +27,7 @@ namespace weif {
  * @brief Scintillation weight function for axially symmetric power spectra
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_weight_function
  *
  * Computes the scintillation weight function for axially symmetric power spectra:
  * \f[
@@ -44,7 +45,10 @@ namespace weif {
  */
 template<class T>
 class WEIF_EXPORT weight_function:
-	public detail::weight_function_base<T> {
+// @cond
+	public detail::weight_function_base<T>
+// @endcond
+{
 public:
 	using value_type = typename detail::weight_function_base<T>::value_type; ///< Numeric type for calculations
 

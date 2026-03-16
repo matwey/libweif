@@ -76,6 +76,7 @@ public:
  *
  * @tparam T Numeric type for calculations
  * @tparam Allocator Memory allocator type (default: std::allocator<T>)
+ * @ingroup api_weight_function
  *
  * Computes the scintillation weight function for non axially symmetric power spectra:
  * \f[
@@ -90,8 +91,11 @@ public:
  */
 template<class T, class Allocator = std::allocator<T>>
 class WEIF_EXPORT weight_function_grid_2d:
+// @cond
 	public detail::weight_function_grid_2d_base<T>,
-	private Allocator {
+	private Allocator
+// @endcond
+{
 public:
 	using typename detail::weight_function_grid_2d_base<T>::value_type; ///< Numeric type for calculations
 	using typename detail::weight_function_grid_2d_base<T>::shape_type;
