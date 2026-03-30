@@ -13,8 +13,9 @@ set(DOXYGEN_EXCLUDE_SYMBOLS detail)
 set(DOXYGEN_USE_MATHJAX YES)
 set(DOXYGEN_CLASS_GRAPH NO)
 set(DOXYGEN_COLLABORATION_GRAPH NO)
+set(DOXYGEN_EXAMPLE_PATH "${CMAKE_SOURCE_DIR}/examples")
 set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/docs/doxygen")
-doxygen_add_docs(doxygen src include ${DOX_SOURCES}
+doxygen_add_docs(doxygen src include examples ${DOX_SOURCES}
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 sphinx_add_docs(docs ALL

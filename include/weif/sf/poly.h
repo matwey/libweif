@@ -124,8 +124,15 @@ public:
 	/// @brief Returns carrier wavelength
 	/// @return Carrier wavelength
 	value_type carrier() const noexcept { return carrier_; }
-	/// @brief Returns equivalent wavelength
-	/// @return Equivalent wavelength
+
+	/**
+	 * @brief Returns equivalent wavelength
+	 * @return Equivalent wavelength
+	 *
+	 * Equivalent wavelength is the wavelength of the monochromatic radiation producing the same scintilattion as the polychromatic filter.
+	 *
+	 * Reference: Kornilov V., et al. (2021) "Useful relations for the analysis of stellar scintillation at the entrance pupil of a telescope", https://doi.org/10.1364/JOSAA.420572
+	 */
 	value_type equiv_lambda() const noexcept { return equiv_lambda_; }
 
 	/**

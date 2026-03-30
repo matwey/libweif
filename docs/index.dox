@@ -4,16 +4,19 @@
  * Welcome to the documentation for the `libweif` library — a C++ library for calculating weight functions for optical turbulence in the atmosphere.
  *
  * The present documentation is arranged in the following sections:
- * - \ref tutorial — Practical examples demonstrating how to use the library
- * - \ref howto — Building and installation guides
- * - \ref api_reference
- * - \ref internals — library internals and explanations
+ * - @subpage tutorial — Practical examples demonstrating how to use the library
+ * - @subpage howto — Building and installation guides
+ * - @subpage api_reference
+ * - @subpage internals — library internals and explanations
  */
 
 /**
  * @page tutorial Tutorial
  *
  * @tableofcontents
+ *
+ * @subpage tutorial_spectral_filter
+ *
  */
 
 /**

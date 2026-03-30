@@ -110,7 +110,15 @@ public:
 	 */
 	spectral_response<value_type> stacked(const spectral_response<value_type>& other) const;
 
-	/// @return Effective wavelength
+	/**
+	 * @brief Computes effective wavelength
+	 * @return Effective wavelength
+	 *
+	 * We use usual astronomical definition of the effective wavelength:
+	 *
+	 * \f$ \lambda_{\mathrm{eff}} = \frac{\int \lambda R(\lambda) d\lambda}{\int R(\lambda) d\lambda} \f$.
+	 *
+	 */
 	value_type effective_lambda() const noexcept {
 		return grid_.origin() + grid_.delta() * xt::average(xt::arange(data_.size()), data_ / grid_.values())();
 	}
