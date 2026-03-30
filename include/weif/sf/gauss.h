@@ -101,17 +101,17 @@ public:
 		return pow(PI * sinc_pi(pix), 2) * exp(-C * pow(fwhm() * pix, 2));
 	}
 
-        /**
-         * @brief Call operator for Gaussian spectral filter with tensor input
-         *
-         * Evaluates the filter function for an array of arguments:
+	/**
+	 * @brief Call operator for Gaussian spectral filter with tensor input
+	 *
+	 * Evaluates the filter function for an array of arguments:
 	 * \f[
 	 * E(x) = \sin^2(\pi x) \cdot \exp\left(-\frac{\pi^2}{8\ln 2} (x \Lambda)^2\right)
 	 * \f]
-         *
-         * @param e Input tensor of dimensionless spatial frequency magnitudes
-         * @return Tensor of spectral filter values with same shape as input
-         */
+	 *
+	 * @param e Input tensor of dimensionless spatial frequency magnitudes
+	 * @return Tensor of spectral filter values with same shape as input
+	 */
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;

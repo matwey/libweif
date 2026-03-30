@@ -203,14 +203,14 @@ public:
 		return pow(c * sinc_pi(cx) * real()(dx) - cos(cx) * im, 2);
 	}
 
-        /**
-         * @brief Call operator for polychromatic spectral filter with tensor input
-         *
-         * Evaluates the filter function for an array of arguments.
-         *
-         * @param e Input tensor of dimensionless spatial frequency magnitudes
-         * @return Tensor of spectral filter values with same shape as input
-         */
+	/**
+	 * @brief Call operator for polychromatic spectral filter with tensor input
+	 *
+	 * Evaluates the filter function for an array of arguments.
+	 *
+	 * @param e Input tensor of dimensionless spatial frequency magnitudes
+	 * @return Tensor of spectral filter values with same shape as input
+	 */
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {
