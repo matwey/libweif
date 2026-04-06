@@ -15,7 +15,8 @@
  *
  * @tableofcontents
  *
- * @subpage tutorial_spectral_filter
+ * - @subpage tutorial_spectral_filter
+ * - @subpage tutorial_aperture_filter
  *
  */
 
