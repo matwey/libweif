@@ -17,6 +17,7 @@
  *
  * - @subpage tutorial_spectral_filter
  * - @subpage tutorial_aperture_filter
+ * - @subpage tutorial_weight_function
  *
  */
 

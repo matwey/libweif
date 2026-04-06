@@ -46,8 +46,8 @@
  * We obtain the following command line interface:
  * \code{bash}
  * > aperture_filter --help
- * Allowed options:
- * --size arg (=1024)      Output grid size
+ * --help                Print help message
+ * --size arg (=1024)    Output grid size
  * \endcode
  *
  * @section parsing Parsing command‑line options
@@ -153,6 +153,7 @@ int main(int argc, char** argv) {
 	po::variables_map va;
 
 	opts.add_options()
+		("help", "Print help message")
 		("size", po::value<std::size_t>()->default_value(1024), "Output grid size");
 //! [Define command line options]
 
