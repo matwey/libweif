@@ -148,6 +148,48 @@
  * @page internals Internals
  *
  * @tableofcontents
+ *
+ * This page describes internal design decisions, conventions, and policies used
+ * in the `libweif` library.
+ *
+ * @section versioning Semantic Versioning
+ *
+ * `libweif` follows [Semantic Versioning](https://semver.org/) (SemVer) for its
+ * release numbering. The version number is expressed as **MAJOR.MINOR.PATCH**:
+ *
+ * - **MAJOR** version increments indicate incompatible API changes.
+ * - **MINOR** version increments add functionality in a backward‑compatible
+ *   manner.
+ * - **PATCH** version increments are for backward‑compatible bug fixes.
+ *
+ * While the major version is zero (0.y.z), the library is considered to be in
+ * initial development. During this phase the public API may still change in
+ * backward‑incompatible ways.
+ *
+ * The version number is defined in the top‑level `CMakeLists.txt`
+ * (`project(libweif ... VERSION ...)`) and is propagated to the pkg‑config file
+ * (`weif.pc`). Users can query the version at compile time via the
+ * `WEIF_VERSION_STRING` macro (defined in `weif_export.h`).
+ *
+ * @section units Measurement Unit Convention
+ *
+ * To ensure consistency across all calculations, `libweif` adopts a fixed set
+ * of measurement units. All input parameters must be supplied in these units;
+ * the library does not perform automatic unit conversion.
+ *
+ * | Quantity                 | Unit            | Notes                                                        |
+ * |--------------------------|-----------------|--------------------------------------------------------------|
+ * | Altitude \f$z\f$         | kilometers (km) | Used for turbulence layer heights and propagation distances. |
+ * | Wavelength \f$\lambda\f$ | nanometers (nm) | Optical wavelengths.                                         |
+ * | Geometric scales \f$D\f$ | millimeters (mm)| Aperture diameter, Fresnel radius, and other length scales.  |
+ *
+ * This choice is justified because the parameters are internally combined into
+ * the following dimensionless combination in most cases:
+ * \f[
+ * \frac{D}{\sqrt{\lambda z}}.
+ * \f]
+ * When quantities are substituted in the chosen units, the result is
+ * automatically correct.
  */
 
 /**
