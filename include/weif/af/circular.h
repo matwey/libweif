@@ -257,6 +257,8 @@ public:
  * - \f$\epsilon_1\f$ is the central obscuration ratio of the first aperture,
  * - \f$\epsilon_2\f$ is the central obscuration ratio of the second aperture,
  * - \f$\alpha = D_2/D_1\f$ is the diameter ratio between apertures.
+ *
+ * Reference: Tokovinin, et. al. (2003) "Restoration of turbulence profile from scintillation indices", https://doi.org/10.1046/j.1365-8711.2003.06731.x
  */
 template<class T>
 class WEIF_EXPORT cross_annular {

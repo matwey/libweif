@@ -234,6 +234,7 @@ int main(int argc, char** argv) {
 	po::variables_map va;
 
 	opts.add_options()
+		("help", "Print help message")
 		("size", po::value<std::size_t>()->default_value(1024), "Output grid size")
 		("aperture_scale", po::value<value_type>()->default_value(20.574), "Aperture scale, mm.")
 		("central_obscuration", po::value<value_type>()->default_value(0.0), "Central obscuration")
