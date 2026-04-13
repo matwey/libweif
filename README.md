@@ -7,10 +7,10 @@
 Complete documentation is available at **[https://libweif.readthedocs.io](https://libweif.readthedocs.io)**.
 
 The documentation includes:
-- **Tutorials** – step‑by‑step examples of common use cases.
-- **How‑to guides** – building, installing, and integrating the library.
-- **API reference** – detailed class and function descriptions.
-- **Internals** – design decisions, versioning policy, and unit conventions.
+- [Tutorials](https://libweif.readthedocs.io/en/latest/tutorial.html) – step‑by‑step examples of common use cases.
+- [How‑to guides](https://libweif.readthedocs.io/en/latest/howto.html) – building, installing, and integrating the library.
+- [API reference](https://libweif.readthedocs.io/en/latest/api_reference.html) – detailed class and function descriptions.
+- [Internals](https://libweif.readthedocs.io/en/latest/internals.html) – design decisions, versioning policy, and unit conventions.
 
 ## Quick Installation
 
