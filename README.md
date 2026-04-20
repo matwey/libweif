@@ -1,3 +1,5 @@
+[![Build project and run ctest](https://github.com/matwey/libweif/actions/workflows/ctest.yml/badge.svg)](https://github.com/matwey/libweif/actions/workflows/ctest.yml)
+
 # libweif
 
 **libweif** is a C++ library for calculating weight functions for optical turbulence in the atmosphere.
