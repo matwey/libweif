@@ -42,7 +42,7 @@
  *
  * Only Linux is supported at the moment. To build the library, the following
  * dependencies are required:
- * - C++ compiler with C++20 support (gcc 10+ or clang 10+)
+ * - A C++ compiler with C++20 support (GCC 10+ or Clang 10+)
  * - [CMake](https://cmake.org/) build system
  * - [Boost.math](https://www.boost.org/) and [Boost.Program_options](https://www.boost.org/) libraries
  * - [FFTW3](https://www.fftw.org/) library
@@ -59,9 +59,9 @@
  *   ```bash
  *   sudo apt install cmake libcppunit-dev libfftw3-dev g++ libboost-math-dev libboost-program-options-dev rapidcsv-dev xtensor-dev
  *   ```
- * - There is also a `vcpkg.json` file for [vcpkg](https://vcpkg.io) package manager
- *   users. Before proceeding, make sure that the `CMAKE_TOOLCHAIN_FILE`
- *   environment variable stores the appropriate path to `vcpkg.cmake` for your
+ * - A `vcpkg.json` file is also provided for vcpkg package manager
+ *   users. Before proceeding, ensure the `CMAKE_TOOLCHAIN_FILE`
+ *   environment variable is set to the path of `vcpkg.cmake` for your
  *   vcpkg installation.
  *
  * Run the following commands to compile the library:
@@ -70,11 +70,11 @@
  * cmake --build build
  * ```
  *
- * Run unit tests to validate that the compiled library is consistent:
+ * Run unit tests to verify the compiled library works correctly:
  * ```bash
  * ctest --test-dir build
  * ```
- * If the test succeeds, you should see a number of `Passed` lines.
+ * If the tests pass, you will see several `Passed` lines.
  *
  * The final optional step is to install the library system-wide:
  * ```bash
@@ -125,7 +125,7 @@
  *
  * @section contributing Contributing
  *
- * You are welcome to report the issues on [GitHub Issues page](https://github.com/matwey/libweif/issues).
+ * You are welcome to report issues on the [GitHub Issues page](https://github.com/matwey/libweif/issues).
  * Pull requests are also accepted on GitHub.
  *
  */
@@ -163,7 +163,7 @@
  * - **PATCH** version increments are for backward‑compatible bug fixes.
  *
  * While the major version is zero (0.y.z), the library is considered to be in
- * initial development. During this phase the public API may still change in
+ * initial development. During this phase, the public API may still change in
  * backward‑incompatible ways.
  *
  * The version number is defined in the top‑level `CMakeLists.txt`
@@ -196,16 +196,16 @@
  * @defgroup api_af Aperture filters
  * @brief Predefined functors for common aperture filters
  *
- * Aperture filters are responsible for spatial averaging by an input aperture having finite size and specific shape.
+ * Aperture filters are responsible for spatial averaging by an input aperture with finite size and a specific shape.
  * Each aperture geometry shape is handled by a separate class.
- * Each class has a consistent interface. It provides four `operator()` overloads: two for polar coordinate system and two for Cartesian coordinate system.
- * However, the Cartesian coordinate overloads simply calculate hypotenuse before calling polar overloads.
- * An exception is \ref weif::af::square, since it lacks axial symmetry, there is no polar coordinate overload for it.
+ * Each class has a consistent interface. It provides four `operator()` overloads: two for a polar coordinate system and two for a Cartesian coordinate system.
+ * However, the Cartesian coordinate overloads simply calculate the hypotenuse before calling polar overloads.
+ * An exception is \ref weif::af::square; since it lacks axial symmetry, there is no polar coordinate overload for it.
  *
  * For every coordinate system, there is a scalar version that returns the aperture filter value for a single frequency, and a vector version that accepts an xtensor expression for frequencies.
  *
  * @note Due to the general scaling property of aperture filters, the frequency argument is unitless. For instance, there is no `diameter` parameter in the \ref weif::af::circular constructor.
- * You are supposed to provide the aperture scale as a multiplier. For instance:
+ * You should provide the aperture scale as a multiplier. For instance:
  * @code
  * weif::af::circular<float> af{};
  * af(u);                 // u is unitless frequency
