@@ -64,21 +64,10 @@ public:
 	 * @param impulse Input impulse response expression
 	 * @param alloc Allocator instance
 	 */
-	template<class E>
-	digital_filter_2d(const xt::xexpression<E>& impulse, const allocator_type& alloc = allocator_type()):
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	digital_filter_2d(E&& impulse, const allocator_type& alloc = allocator_type()):
 		allocator_type(alloc),
-		impulse_{impulse.derived_cast()} {}
-
-	/**
-	 * @brief Construct from rvalue impulse response expression
-	 * @tparam E Expression type
-	 * @param impulse Input impulse response expression (moved)
-	 * @param alloc Allocator instance
-	 */
-	template<class E>
-	digital_filter_2d(xt::xexpression<E>&& impulse, const allocator_type& alloc = allocator_type()):
-		allocator_type(alloc),
-		impulse_{impulse.derived_cast()} {}
+		impulse_{std::forward<E>(impulse)} {}
 
 	/**
 	 * @brief Construct from filter function
@@ -195,11 +184,11 @@ public:
 	 * @param ey Tensor of dimensionless y-component frequencies
 	 * @return (Nx, Ny) shaped tensor of filter values
 	 */
-	template<class EX, class EY>
-	auto operator() (const xt::xexpression<EX>& ex, const xt::xexpression<EY>& ey) const noexcept {
-		return xt::make_lambda_xfunction([this] (const value_type& ux, const value_type& uy) {
+	template<class EX, class EY, xt::enable_xexpression<EX, bool> = true, xt::enable_xexpression<EY, bool> = true>
+	auto operator() (EX&& ex, EY&& ey) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto ux, auto uy) noexcept {
 			return this->operator()(ux, uy);
-		}, xt::expand_dims(ex.derived_cast(), 1), ey.derived_cast());
+		}, xt::expand_dims(std::forward<EX>(ex), 1), std::forward<EY>(ey));
 	}
 };
 

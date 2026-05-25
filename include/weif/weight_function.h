@@ -97,11 +97,11 @@ public:
 	 * @param e Altitude values expression in kilometers
 	 * @return Tensor of scintillation weight function values
 	 */
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) noexcept {
 			return this->operator()(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 };
 
