@@ -54,9 +54,10 @@ public:
 	 * @param grid Wavelength grid definition
 	 * @param data Spectral response curve values
 	 */
-	spectral_response(const uniform_grid<value_type>& grid, const xt::xtensor<value_type, 1>& data):
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	spectral_response(const uniform_grid<value_type>& grid, E&& data):
 		grid_{grid},
-		data_{data} {}
+		data_{std::forward<E>(data)} {}
 
 	/// @return Reference to the wavelength grid
 	const auto& grid() const { return grid_; }
