@@ -35,10 +35,18 @@ jobs:
         apt-get update
         apt-get install -y cmake curl doxygen git libtool unzip pkg-config tar zip
 
+    - name: Restore vcpkg cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/.cache/vcpkg
+        key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{matrix.container}}-${{runner.arch}}-
+
+    - name: Set VCPKG_BINARY_SOURCES for container
+      run: echo "VCPKG_BINARY_SOURCES=clear;files,$GITHUB_WORKSPACE/.cache/vcpkg,readwrite" >> $GITHUB_ENV
+
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
-      with:
-        doNotCache: false
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{env.VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake
@@ -48,3 +56,9 @@ jobs:
 
     - name: Test
       run: ctest --test-dir ${{github.workspace}}/build --build-config ${{env.BUILD_TYPE}} --verbose
+
+    - name: Save vcpkg cache
+      uses: actions/cache/save@v4
+      with:
+        path: ${{github.workspace}}/.cache/vcpkg
+        key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
