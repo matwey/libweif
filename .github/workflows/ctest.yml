@@ -41,7 +41,7 @@ jobs:
         VCPKG_BINARY_SOURCES: default,readwrite
 
     - name: Restore vcpkg cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
         key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
@@ -57,7 +57,7 @@ jobs:
       run: ctest --test-dir ${GITHUB_WORKSPACE}/build --build-config ${{env.BUILD_TYPE}} --verbose
 
     - name: Save vcpkg cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
         key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
