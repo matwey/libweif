@@ -23,6 +23,7 @@
 #include <weif/sf/gauss.h>
 #include <weif/detail/weight_function_base.h>
 #include <weif/weight_function.h>
+#include <weif/weight_function_2d.h>
 
 #include "xexpression.h"
 
@@ -407,9 +408,90 @@ void test_gauss_point_vec3() {
 	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
 }
 
-
 };
 CPPUNIT_TEST_SUITE_REGISTRATION(test_weight_function_suite);
+
+class test_weight_function_2d_suite: public CppUnit::TestCase {
+CPPUNIT_TEST_SUITE(test_weight_function_2d_suite);
+CPPUNIT_TEST(test_mono_point_vec1);
+CPPUNIT_TEST(test_mono_circular_vec1);
+CPPUNIT_TEST(test_mono_gauss_vec1);
+CPPUNIT_TEST_SUITE_END();
+
+void test_mono_point_vec1() {
+	using namespace weif;
+
+	constexpr double lambda = 550;
+	constexpr double aperture_scale = 10;
+	constexpr double delta = 0.0003;
+	const xt::xarray<double> args = {0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, std::numeric_limits<double>::infinity()};
+	const weight_function_2d<double> wf(sf::mono<double>{}, lambda, af::point<double>{}, aperture_scale, 1024);
+	const xt::xarray<double> actual = wf(args);
+	const xt::xarray<double> expected = {
+		0.0,
+		68541193203.074699841774822250721611368818,
+		122126522328.85717429491402679001511623388,
+		217604724387.4327644368299751377039892409,
+		387727540036.09136175337735358778328922997,
+		690851936811.72176262852279766865892823018,
+		1230958209860.6672123780939793934380752668,
+		2193318182498.3903949367943120230915638022,
+		std::numeric_limits<double>::infinity()
+	};
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+void test_mono_circular_vec1() {
+	using namespace weif;
+
+	constexpr double lambda = 550;
+	constexpr double aperture_scale = 10;
+	constexpr double delta = 0.0003;
+	const xt::xarray<double> args = {0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, std::numeric_limits<double>::infinity()};
+	const weight_function_2d<double> wf(sf::mono<double>{}, lambda, af::circular<double>{}, aperture_scale, 1024);
+	const xt::xarray<double> actual = wf(args);
+	const xt::xarray<double> expected = {
+		0.0,
+		46095950091.596612607102260600389647472116,
+		96324603994.200757824334431948993478379833,
+		188826153859.60382074969531148828372231882,
+		356304606621.6182453863281127220806838675,
+		657076804976.76374836331145577965938358833,
+		1195089206023.7645592517542497518071268875,
+		2155584522441.6070284117170416038147092549,
+		std::numeric_limits<double>::infinity()
+	};
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+void test_mono_gauss_vec1() {
+	using namespace weif;
+
+	constexpr double lambda = 550;
+	constexpr double aperture_scale = 10;
+	constexpr double delta = 0.0003;
+	const xt::xarray<double> args = {0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, std::numeric_limits<double>::infinity()};
+	const weight_function_2d<double> wf(sf::mono<double>{}, lambda, af::gauss<double>{}, aperture_scale, 1024);
+	const xt::xarray<double> actual = wf(args);
+	const xt::xarray<double> expected = {
+		0.0,
+		56249590280.866457678494046451327661849971,
+		108481158127.85498284498602986817102027147,
+		202756532197.33789636818245702232651548152,
+		371809348522.62117416810705090698809709724,
+		673981231127.59302811145653407195965757201,
+		1213239250923.8783447887393524181491460868,
+		2174843669172.5074791409300099826737177478,
+		std::numeric_limits<double>::infinity()
+	};
+
+	XT_ASSERT_XEXPRESSION_CLOSE(expected, actual, delta);
+}
+
+};
+CPPUNIT_TEST_SUITE_REGISTRATION(test_weight_function_2d_suite);
 
 int main(int argc, char **argv) {
 	CppUnit::TextUi::TestRunner runner;

@@ -86,10 +86,7 @@ public:
 	 * @return Weight value representing thin layer contribution to scintillation
 	 */
 	inline value_type operator() (value_type altitude) const noexcept {
-		constexpr const auto PI = xt::numeric_constants<value_type>::PI;
-		constexpr const value_type c = 2 * PI;
-
-		return c * detail::weight_function_base<T>::operator()(altitude);
+		return detail::weight_function_base<T>::operator()(altitude);
 	}
 
 	/**

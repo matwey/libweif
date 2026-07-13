@@ -44,7 +44,7 @@ protected:
 
 		constexpr const auto PI = xt::numeric_constants<value_type>::PI;
 		/* 1e13 = pow(1e3, 5.0/6.0) * pow(1e9, 7.0/6.0) */
-		constexpr const value_type c = weif::math::Kolmogorov_Cn2_scale<value_type> * (16 * 1e13) * PI * PI;
+		constexpr const value_type c = weif::math::Kolmogorov_Cn2_scale<value_type> * (32 * 1e13) * PI * PI * PI;
 
 		const value_type fresnel_radius = sqrt(lambda() * altitude);
 		const value_type z = (static_cast<value_type>(1) / (static_cast<value_type>(1) + aperture_scale() / fresnel_radius) - grid_.origin()) / grid_.delta();
