@@ -19,6 +19,7 @@
 
 #include <rapidcsv.h>
 
+#include <weif/error.h>
 #include <weif/uniform_grid.h>
 #include <weif_export.h>
 
@@ -53,11 +54,21 @@ public:
 	 * @brief Construct from grid and data
 	 * @param grid Wavelength grid definition
 	 * @param data Spectral response curve values
+	 *
+	 * @throws empty_grid_data If both the grid and the data array are empty
+	 * @throws mismatched_grid_data If the data array size does not match the grid size
 	 */
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	spectral_response(const uniform_grid<value_type>& grid, E&& data):
 		grid_{grid},
-		data_{std::forward<E>(data)} {}
+		data_{std::forward<E>(data)} {
+
+		if (data_.size() == 0 && grid_.size() == 0)
+			throw empty_grid_data{};
+
+		if (data_.size() != grid_.size())
+			throw mismatched_grid_data{grid_.size(), data_.size()};
+	}
 
 	/// @return Reference to the wavelength grid
 	const auto& grid() const { return grid_; }
