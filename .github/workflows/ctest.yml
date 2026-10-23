@@ -33,7 +33,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y cmake curl doxygen git libtool unzip pkg-config tar zip
+        apt-get install -y --no-install-recommends --no-install-suggests cmake curl git libtool unzip pkg-config tar zip
 
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
@@ -47,7 +47,17 @@ jobs:
         key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
         restore-keys: vcpkg-${{matrix.container}}-${{runner.arch}}-
 
+    - name: Detect clang
+      id: cc
+      shell: bash
+      run: |
+        if cc --version 2>/dev/null | grep -qi clang; then
+          echo "cxxflags=-stdlib=libc++" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Configure CMake
+      env:
+        CXXFLAGS: ${{ steps.cc.outputs.cxxflags }}
       run: cmake -B ${GITHUB_WORKSPACE}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{env.VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
