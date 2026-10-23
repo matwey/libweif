@@ -71,3 +71,46 @@ jobs:
       with:
         path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
         key: vcpkg-${{matrix.container}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
+
+  macos:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-15, macos-15-intel]
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install dependencies
+      run: brew install autoconf automake libtool
+
+    - name: Set Intel macOS deployment target
+      if: matrix.os == 'macos-15-intel'
+      run: echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> "$GITHUB_ENV"
+
+    - name: Restore vcpkg cache
+      uses: actions/cache/restore@v6
+      with:
+        path: ~/.cache/vcpkg/archives
+        key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{matrix.runner}}-${{runner.arch}}-
+
+    - name: Set vcpkg toolchain
+      run: echo "CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
+
+    - name: Configure CMake
+      run: cmake -B ${GITHUB_WORKSPACE}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${GITHUB_WORKSPACE}/build --config ${{env.BUILD_TYPE}} --parallel $(sysctl -n hw.ncpu) --verbose
+
+    - name: Test
+      run: ctest --test-dir ${GITHUB_WORKSPACE}/build --build-config ${{env.BUILD_TYPE}} --verbose
+
+    - name: Save vcpkg cache
+      uses: actions/cache/save@v6
+      with:
+        path: ~/.cache/vcpkg/archives
+        key: vcpkg-${{matrix.runner}}-${{runner.arch}}-${{ hashFiles('vcpkg.json') }}
