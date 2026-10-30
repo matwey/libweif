@@ -35,6 +35,7 @@ namespace sf {
  * @brief Polychromatic spectral filter
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_sf
  *
  * Evaluates a polychromatic spectral filter using numerically provided spectral response data.
  * During construction, the class computes and stores the Fourier transform of the spectral response
@@ -123,8 +124,15 @@ public:
 	/// @brief Returns carrier wavelength
 	/// @return Carrier wavelength
 	value_type carrier() const noexcept { return carrier_; }
-	/// @brief Returns equivalent wavelength
-	/// @return Equivalent wavelength
+
+	/**
+	 * @brief Returns equivalent wavelength
+	 * @return Equivalent wavelength
+	 *
+	 * Equivalent wavelength is the wavelength of the monochromatic radiation producing the same scintilattion as the polychromatic filter.
+	 *
+	 * Reference: Kornilov V., et al. (2021) "Useful relations for the analysis of stellar scintillation at the entrance pupil of a telescope", https://doi.org/10.1364/JOSAA.420572
+	 */
 	value_type equiv_lambda() const noexcept { return equiv_lambda_; }
 
 	/**
@@ -195,14 +203,14 @@ public:
 		return pow(c * sinc_pi(cx) * real()(dx) - cos(cx) * im, 2);
 	}
 
-        /**
-         * @brief Call operator for polychromatic spectral filter with tensor input
-         *
-         * Evaluates the filter function for an array of arguments.
-         *
-         * @param e Input tensor of dimensionless spatial frequency magnitudes
-         * @return Tensor of spectral filter values with same shape as input
-         */
+	/**
+	 * @brief Call operator for polychromatic spectral filter with tensor input
+	 *
+	 * Evaluates the filter function for an array of arguments.
+	 *
+	 * @param e Input tensor of dimensionless spatial frequency magnitudes
+	 * @return Tensor of spectral filter values with same shape as input
+	 */
 	template<class E, xt::enable_xexpression<E, bool> = true>
 	auto operator() (E&& e) const noexcept {
 		return xt::make_lambda_xfunction([this] (auto x) -> decltype(x) {

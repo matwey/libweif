@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "boost-math",
+    "boost-program-options",
+    "cppunit",
+    "fftw3",
+    "pkgconf",
+    "rapidcsv",
+    {
+      "name": "xtensor",
+      "version>=": "0.26.0"
+    }
+  ]
+}

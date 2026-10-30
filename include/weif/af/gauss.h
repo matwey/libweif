@@ -23,6 +23,7 @@ namespace af {
  * @brief Aperture filter for Gaussian aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * Represents a Gaussian aperture filter defined as:
  * \f[

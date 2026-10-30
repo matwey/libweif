@@ -19,6 +19,7 @@
 
 #include <rapidcsv.h>
 
+#include <weif/error.h>
 #include <weif/uniform_grid.h>
 #include <weif_export.h>
 
@@ -29,6 +30,7 @@ namespace weif {
  * @brief Spectral response
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_spectral_response
  *
  * Represents spectral response curve on a uniform wavelength grid,
  * providing operations for normalization, stacking, and analysis.
@@ -52,10 +54,21 @@ public:
 	 * @brief Construct from grid and data
 	 * @param grid Wavelength grid definition
 	 * @param data Spectral response curve values
+	 *
+	 * @throws empty_grid_data If both the grid and the data array are empty
+	 * @throws mismatched_grid_data If the data array size does not match the grid size
 	 */
-	spectral_response(const uniform_grid<value_type>& grid, const xt::xtensor<value_type, 1>& data):
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	spectral_response(const uniform_grid<value_type>& grid, E&& data):
 		grid_{grid},
-		data_{data} {}
+		data_{std::forward<E>(data)} {
+
+		if (data_.size() == 0 && grid_.size() == 0)
+			throw empty_grid_data{};
+
+		if (data_.size() != grid_.size())
+			throw mismatched_grid_data{grid_.size(), data_.size()};
+	}
 
 	/// @return Reference to the wavelength grid
 	const auto& grid() const { return grid_; }
@@ -109,7 +122,15 @@ public:
 	 */
 	spectral_response<value_type> stacked(const spectral_response<value_type>& other) const;
 
-	/// @return Effective wavelength
+	/**
+	 * @brief Computes effective wavelength
+	 * @return Effective wavelength
+	 *
+	 * We use usual astronomical definition of the effective wavelength:
+	 *
+	 * \f$ \lambda_{\mathrm{eff}} = \frac{\int \lambda R(\lambda) d\lambda}{\int R(\lambda) d\lambda} \f$.
+	 *
+	 */
 	value_type effective_lambda() const noexcept {
 		return grid_.origin() + grid_.delta() * xt::average(xt::arange(data_.size()), data_ / grid_.values())();
 	}

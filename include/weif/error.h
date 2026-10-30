@@ -90,6 +90,42 @@ struct WEIF_EXPORT mismatched_grids:
 	mismatched_grids() noexcept;
 };
 
+/**
+ * @brief Exception thrown when both grid and data are empty
+ *
+ * Indicates that the spectral response was constructed with an empty
+ * wavelength grid and an empty data array.
+ *
+ * @see spectral_response
+ */
+struct WEIF_EXPORT empty_grid_data:
+	public error {
+
+	/**
+	 * @brief Construct with default message
+	 */
+	empty_grid_data() noexcept;
+};
+
+/**
+ * @brief Exception thrown when grid and data sizes do not match
+ *
+ * Indicates that the spectral response data array size does not match
+ * the size of the wavelength grid.
+ *
+ * @see spectral_response
+ */
+struct WEIF_EXPORT mismatched_grid_data:
+	public error {
+
+	/**
+	 * @brief Construct with grid and data sizes
+	 * @param grid_size Number of points in the grid
+	 * @param data_size Number of elements in the data array
+	 */
+	mismatched_grid_data(std::size_t grid_size, std::size_t data_size);
+};
+
 } // weif
 
 #endif // _WEIF_ERROR_H

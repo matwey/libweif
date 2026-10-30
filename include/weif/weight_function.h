@@ -27,6 +27,7 @@ namespace weif {
  * @brief Scintillation weight function for axially symmetric power spectra
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_weight_function
  *
  * Computes the scintillation weight function for axially symmetric power spectra:
  * \f[
@@ -44,7 +45,10 @@ namespace weif {
  */
 template<class T>
 class WEIF_EXPORT weight_function:
-	public detail::weight_function_base<T> {
+// @cond
+	public detail::weight_function_base<T>
+// @endcond
+{
 public:
 	using value_type = typename detail::weight_function_base<T>::value_type; ///< Numeric type for calculations
 
@@ -82,10 +86,7 @@ public:
 	 * @return Weight value representing thin layer contribution to scintillation
 	 */
 	inline value_type operator() (value_type altitude) const noexcept {
-		constexpr const auto PI = xt::numeric_constants<value_type>::PI;
-		constexpr const value_type c = 2 * PI;
-
-		return c * detail::weight_function_base<T>::operator()(altitude);
+		return detail::weight_function_base<T>::operator()(altitude);
 	}
 
 	/**
@@ -93,11 +94,11 @@ public:
 	 * @param e Altitude values expression in kilometers
 	 * @return Tensor of scintillation weight function values
 	 */
-	template<class E>
-	auto operator() (const xt::xexpression<E>& e) const noexcept {
-		return xt::make_lambda_xfunction([this] (const auto& x) {
+	template<class E, xt::enable_xexpression<E, bool> = true>
+	auto operator() (E&& e) const noexcept {
+		return xt::make_lambda_xfunction([this] (auto x) noexcept {
 			return this->operator()(x);
-		}, e.derived_cast());
+		}, std::forward<E>(e));
 	}
 };
 

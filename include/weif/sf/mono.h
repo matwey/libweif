@@ -23,6 +23,7 @@ namespace sf {
  * @brief Monocrhomatic spectral filter
  *
  * @tparam T Numeric type used for calculations
+ * @ingroup api_sf
  *
  * The monochromatic spectral filter is defined as:
  * \f[

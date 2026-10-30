@@ -214,6 +214,7 @@ void test_gauss3() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_gauss4() {
@@ -243,6 +244,7 @@ void test_gauss4() {
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf.regular(16.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf.regular(18.0), delta);
 	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf.regular(20.0), delta);
+	CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sf.regular(std::numeric_limits<double>::infinity()), delta);
 }
 
 void test_gauss_vec1() {
@@ -287,9 +289,10 @@ void test_gauss_vec3() {
 		0.0,
 		0.095474508234832555785906908949474601604,
 		0.0,
+		0.0,
 		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const gauss<double> sf{0.1};
 	xt::xarray<double> actual = sf(args);
 
@@ -304,9 +307,10 @@ void test_gauss_vec4() {
 		9.8696044010893586188344909998761511353,
 		9.5474508234832545186107178241953935714,
 		0.0,
+		0.0,
 		0.0
 	};
-	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0};
+	const xt::xarray<double> args = {0.0, 0.1, 1.0, 10.0, std::numeric_limits<double>::infinity()};
 	const gauss<double> sf{0.1};
 	xt::xarray<double> actual = sf.regular(args);
 

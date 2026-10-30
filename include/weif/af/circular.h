@@ -25,6 +25,7 @@ namespace af {
  * @brief Aperture filter function for a circular aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * The aperture filter is defined in both radial and Cartesian plane coordinates:
  * \f[
@@ -34,7 +35,7 @@ namespace af {
  * A(u_x, u_y) = \mathrm{jinc}_1^2\left(\pi \sqrt{u_x^2 + u_y^2}\right).
  * \f]
  * where \f$\mathrm{jinc}_1(x) = \frac{2 J_1(x)}{x}\f$ is the jinc function (Fourier transform of
- * a unit circular aperture) and \f$J_1\f$ is the Bessel function of first kind.
+ * a unit circular aperture) and \f$J_1\f$ is the Bessel function of the first kind.
  */
 template<class T>
 struct WEIF_EXPORT circular {
@@ -108,6 +109,7 @@ struct WEIF_EXPORT circular {
  * @brief Aperture filter function for an annular (ring-shaped) aperture
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * The aperture filter accounts for central obscuration and is defined as:
  * \f[
@@ -160,7 +162,12 @@ public:
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return std::pow(math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration() * piu), 2) / norm;
+		value_type value = math::jinc_pi(piu);
+		if (obscuration() != static_cast<value_type>(0)) {
+			value -= eps2 * math::jinc_pi(obscuration() * piu);
+		}
+
+		return std::pow(value, 2) / norm;
 	}
 
 	/**
@@ -194,13 +201,19 @@ public:
 	auto operator() (E&& e) const noexcept {
 		using xvalue_type = xt::get_value_type_t<std::decay_t<E>>;
 
-		const auto eps2 = std::pow(obscuration(), 2);
+		const auto obscuration_ = obscuration();
+		const auto eps2 = std::pow(obscuration_, 2);
 		const auto norm = std::pow(static_cast<value_type>(1) - eps2, 2);
+		auto fnct = [obscuration_, eps2](auto u) -> decltype(u) {
+			constexpr auto PI = xt::numeric_constants<xvalue_type>::PI;
+			const auto piu = PI * u;
 
-		auto fnct = [=](auto u) -> decltype(u) {
-			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+			auto value = math::jinc_pi(piu);
+			if (obscuration_ != static_cast<value_type>(0)) {
+				value -= static_cast<xvalue_type>(eps2) * math::jinc_pi(static_cast<xvalue_type>(obscuration_) * piu);
+			}
 
-			return math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps2) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration()) * u);
+			return value;
 		};
 
 		/* Use static_cast<> to capture by value */
@@ -232,6 +245,7 @@ public:
  * @brief Aperture filter for covariance between two concentric annular apertures
  *
  * @tparam T Numeric type used for calculations.
+ * @ingroup api_af
  *
  * Models the covariance of relative flux fluctuations between two annular apertures
  * as used in MASS (Multi-Aperture Scintillation Sensor) instruments:
@@ -243,6 +257,8 @@ public:
  * - \f$\epsilon_1\f$ is the central obscuration ratio of the first aperture,
  * - \f$\epsilon_2\f$ is the central obscuration ratio of the second aperture,
  * - \f$\alpha = D_2/D_1\f$ is the diameter ratio between apertures.
+ *
+ * Reference: Tokovinin, et. al. (2003) "Restoration of turbulence profile from scintillation indices", https://doi.org/10.1046/j.1365-8711.2003.06731.x
  */
 template<class T>
 class WEIF_EXPORT cross_annular {
@@ -259,7 +275,12 @@ private:
 		const auto norm = static_cast<value_type>(1) - eps2;
 		const auto piu = xt::numeric_constants<value_type>::PI * u;
 
-		return (math::jinc_pi(piu) - eps2 * math::jinc_pi(obscuration * piu)) / norm;
+		value_type value = math::jinc_pi(piu);
+		if (obscuration != static_cast<value_type>(0)) {
+			value -= eps2 * math::jinc_pi(obscuration * piu);
+		}
+
+		return value / norm;
 	}
 
 public:
@@ -342,15 +363,24 @@ public:
 		const auto obscuration2 = obscuration_second();
 		const auto eps22 = std::pow(obscuration2, 2);
 		const auto norm2 = static_cast<value_type>(1) - eps22;
-		const auto r = ratio();
+		const auto ratio_ = ratio();
 
-		auto fnct = [=](auto u) -> decltype(u * u) {
-			constexpr auto PI = xt::numeric_constants<value_type>::PI;
+		auto fnct = [obscuration1, eps12, obscuration2, eps22, ratio_](auto u) -> decltype(u * u) {
+			constexpr auto PI = xt::numeric_constants<xvalue_type>::PI;
+			const auto piu1 = PI * u;
+			const auto piu2 = PI * u * ratio_;
 
-			const auto a1 = math::jinc_pi(static_cast<xvalue_type>(PI) * u) - static_cast<xvalue_type>(eps12) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration1) * u);
-			const auto a2 = math::jinc_pi(static_cast<xvalue_type>(PI * r) * u) - static_cast<xvalue_type>(eps22) * math::jinc_pi(static_cast<xvalue_type>(PI * obscuration2 * r) * u);
+			auto v1 = math::jinc_pi(piu1);
+			if (obscuration1 != static_cast<value_type>(0)) {
+				v1 -= static_cast<xvalue_type>(eps12) * math::jinc_pi(static_cast<xvalue_type>(obscuration1) * piu1);
+			}
 
-			return a1 * a2;
+			auto v2 = math::jinc_pi(piu2);
+			if (obscuration2 != static_cast<value_type>(0)) {
+				v2 -= static_cast<xvalue_type>(eps22) * math::jinc_pi(static_cast<xvalue_type>(obscuration2) * piu2);
+			}
+
+			return v1 * v2;
 		};
 
 		return xt::make_lambda_xfunction(std::move(fnct), std::forward<E>(e)) / static_cast<xvalue_type>(norm1 * norm2);
@@ -378,5 +408,6 @@ public:
 
 } // af
 } // weif
+
 
 #endif // _WEIF_AF_CIRCULAR_H
