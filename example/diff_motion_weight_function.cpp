@@ -274,6 +274,66 @@ struct ztilt {
 	}
 };
 
+template<class SF, class AF, class CF, class E>
+auto dimensionless_weight_function(SF&& spectral_filter, AF&& aperture_filter, CF&& component_filter, value_type base_scale, E&& e) noexcept {
+	using namespace std::placeholders;
+	using boost::math::quadrature::exp_sinh;
+	using value_type = xt::get_value_type_t<std::decay_t<E>>;
+
+	auto spectrum_fcnt = [
+		spectral_filter = std::forward<SF>(spectral_filter),
+		aperture_filter = std::forward<AF>(aperture_filter),
+		component_filter = std::forward<CF>(component_filter),
+		&base_scale
+	] (value_type u, value_type x_far, value_type x_near) noexcept -> value_type {
+		using namespace std;
+
+		if (u == static_cast<value_type>(0) || u == std::numeric_limits<value_type>::infinity())
+			return static_cast<value_type>(0);
+
+		const auto q = x_far * u;
+		const auto bq = base_scale * q;
+
+		const auto t = pow(u, -static_cast<value_type>(2.0/3.0));
+		if (t == static_cast<value_type>(0))
+			return static_cast<value_type>(0);
+
+		const auto sf = spectral_filter(u * u / (x_near * x_near));
+
+		const auto cf = component_filter(bq);
+		if (cf == static_cast<value_type>(0))
+			return static_cast<value_type>(0);
+
+		const auto af = aperture_filter(q);
+		if (af == static_cast<value_type>(0))
+			return static_cast<value_type>(0);
+
+		return std::cbrt(x_far) * t * sf * af * cf;
+	};
+
+	/* exp-sinh quadrature works poorly for higher altutudes due to
+	 * $\sin^2(\pi u^2)$ term. Tanaka, et al. (doi: 10.1007/s00211-008-0195-1)
+	 * reveal the reason through the complex plane where $\sin^2(\pi z^2)$
+	 * is unbounded in $D_{DE,3}$. However, it seems that there are
+	 * alternative DE and SE quadratures which could work better.
+	 */
+	auto integrator = std::make_unique<exp_sinh<value_type>>();
+
+	auto fcnt = [
+		integrator = std::move(integrator),
+		spectrum_fcnt = std::move(spectrum_fcnt)
+	] (value_type z) -> value_type {
+		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
+		const auto x = (static_cast<value_type>(1) - z) / z;
+		constexpr value_type one = 1;
+		const auto [x_far, x_near] = std::minmax(x, one);
+
+		return integrator->integrate(std::bind(std::cref(spectrum_fcnt), _1, x_far, x_near), tol);
+	};
+
+	return xt::make_lambda_xfunction(std::move(fcnt), std::forward<E>(e));
+}
+
 template<class T>
 class weight_function:
 	public weif::detail::weight_function_base<T> {
@@ -283,54 +343,26 @@ public:
 private:
 	using function_type = std::function<value_type(value_type, value_type, value_type)>;
 
-private:
-	static auto integrate_weight_function(function_type&& fun, std::size_t size);
-
-	weight_function(value_type lambda, value_type aperture_scale, function_type&& fun, std::size_t size):
-		weif::detail::weight_function_base<T>(lambda, aperture_scale, integrate_weight_function(std::forward<function_type>(fun), size)) {}
-
 public:
 	template<class SF, class AF, class CF>
+	weight_function(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, CF&& component_filter, value_type base_length, const weif::uniform_grid<value_type>& grid):
+		weif::detail::weight_function_base<T>(lambda, aperture_scale, grid,
+			dimensionless_weight_function(std::forward<SF>(spectral_filter), std::forward<AF>(aperture_filter), std::forward<CF>(component_filter), base_length / aperture_scale, grid.values())) {}
+
+	template<class SF, class AF, class CF>
 	weight_function(SF&& spectral_filter, value_type lambda, AF&& aperture_filter, value_type aperture_scale, CF&& component_filter, value_type base_length, std::size_t size):
-		weight_function(lambda, aperture_scale,
-			[spectral_filter = std::forward<SF>(spectral_filter),
-			aperture_filter = std::forward<AF>(aperture_filter),
-			component_filter = std::forward<CF>(component_filter),
-			b = base_length / aperture_scale] (value_type u, value_type x_far, value_type x_near) noexcept -> value_type {
-			using namespace std;
-
-			if (u == static_cast<value_type>(0) || u == std::numeric_limits<value_type>::infinity())
-				return static_cast<value_type>(0);
-
-			const auto q = x_far * u;
-			const auto bq = b * q;
-
-			const auto t = pow(u, -static_cast<value_type>(2.0/3.0));
-			if (t == static_cast<value_type>(0))
-				return static_cast<value_type>(0);
-
-			const auto sf = spectral_filter(u * u / (x_near * x_near));
-
-			const auto cf = component_filter(bq);
-			if (cf == static_cast<value_type>(0))
-				return static_cast<value_type>(0);
-
-			const auto af = aperture_filter(q);
-			if (af == static_cast<value_type>(0))
-				return static_cast<value_type>(0);
-
-			return std::cbrt(x_far) * t * sf * af * cf;
-		}, size) {}
+		weight_function(std::forward<SF>(spectral_filter), lambda, std::forward<AF>(aperture_filter), aperture_scale,
+			std::forward<CF>(component_filter), base_length,
+			weif::uniform_grid{static_cast<value_type>(0), static_cast<value_type>(1) / (size-1), size}) {}
 
 	inline value_type operator() (value_type altitude) const noexcept {
 		using namespace std;
-
 		constexpr const auto PI = xt::numeric_constants<value_type>::PI;
 		/* 10 = pow(1e3, -1.0/6.0) * pow(1e9, 1.0/6.0) */
-		constexpr const value_type c = 9.69e-3 * 8 * PI * PI * PI * 10;
+		constexpr const value_type c = weif::math::Kolmogorov_Cn2_scale<value_type> * 8 * PI * PI * PI * 10;
 
 		const value_type fresnel_radius = sqrt(this->lambda() * altitude);
-		const value_type z = (fresnel_radius / (fresnel_radius + this->aperture_scale()) - this->grid().origin()) / this->grid().delta();
+		const value_type z = (static_cast<value_type>(1) / (static_cast<value_type>(1) + this->aperture_scale() / fresnel_radius) - this->grid().origin()) / this->grid().delta();
 
 		return c / std::cbrt(this->aperture_scale()) * this->wf()(z);
 	}
@@ -342,24 +374,6 @@ public:
 		}, e.derived_cast());
 	}
 };
-
-template<class T>
-auto weight_function<T>::integrate_weight_function(function_type&& fun, std::size_t size) {
-	using boost::math::quadrature::exp_sinh;
-
-	auto integrator = std::make_unique<exp_sinh<value_type>>();
-
-	return xt::make_lambda_xfunction([integrator = std::move(integrator), fun = std::forward<function_type>(fun)] (value_type z) -> value_type {
-		using namespace std::placeholders;
-
-		const auto tol = std::pow(std::numeric_limits<value_type>::epsilon(), static_cast<value_type>(2.0/3.0));
-		const auto x = (static_cast<value_type>(1) - z) / z;
-		constexpr value_type one = 1;
-		const auto [x_far, x_near] = std::minmax(x, one);
-
-		return integrator->integrate(std::bind(std::cref(fun), _1, x_far, x_near), tol);
-	}, xt::linspace(static_cast<value_type>(0), static_cast<value_type>(1), size));
-}
 
 std::pair<value_type, std::variant<sf::mono<value_type>, sf::gauss<value_type>, sf::poly<value_type>>>
 make_spectral_filter(const std::vector<std::string>& response_filename, std::optional<value_type> mono) {
@@ -425,7 +439,8 @@ int main(int argc, char** argv) {
 
 		constexpr auto wf_grid_size = 1024 + 1;
 		const auto af = ztilt<value_type>{};
-		const auto cf = longitudinal<value_type>{};
+//		const auto cf = longitudinal<value_type>{};
+		const auto cf = transversal<value_type>{};
 		const auto wf = std::visit([&] (const auto& sf) {
 			return weight_function<value_type>{sf, lambda, af, aperture_scale, cf, base_length, wf_grid_size};
 		}, spectral_filter);
