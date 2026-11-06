@@ -13,10 +13,14 @@ endif()
 
 file(GLOB_RECURSE SOURCES *.cpp)
 add_library(weif ${SOURCES})
+if(MSVC)
+target_compile_options(weif PUBLIC "/Wall;/fp:precise")
+else()
 target_compile_options(weif
 	PUBLIC "-Wall;-ffast-math;-fno-finite-math-only"
 	PUBLIC "$<$<CONFIG:Release>:-O3>"
 	PUBLIC "$<$<CONFIG:RelWithDebInfo>:-O3>")
+endif()
 target_compile_definitions(weif
 	PUBLIC "$<$<CONFIG:Release>:NDEBUG>"
 	PUBLIC "$<$<CONFIG:RelWithDebInfo>:NDEBUG>")
