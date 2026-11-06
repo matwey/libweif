@@ -119,7 +119,8 @@ auto dimensionless_weight_function_2d(SF&& spectral_filter, AF&& aperture_filter
 		aperture_filter = std::forward<AF>(aperture_filter)
 	] (value_type u, value_type x, value_type phi, value_type theta) noexcept -> value_type {
 		using namespace std;
-		using namespace boost::math;
+		using boost::math::cos_pi;
+		using boost::math::sin_pi;
 
 		const auto xu = x * u;
 

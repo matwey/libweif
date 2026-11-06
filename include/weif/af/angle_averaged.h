@@ -44,7 +44,8 @@ private:
 
 			return integrator->integrate([u, &aperture_filter] (value_type phi, value_type theta) noexcept {
 				using namespace std;
-				using namespace boost::math;
+				using boost::math::cos_pi;
+				using boost::math::sin_pi;
 
 				if (isinf(u)) {
 					return aperture_filter(u, static_cast<value_type>(0));
