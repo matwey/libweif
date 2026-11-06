@@ -114,3 +114,44 @@ jobs:
       with:
         path: ~/.cache/vcpkg/archives
         key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('vcpkg.json') }}
+
+  windows:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Set vcpkg binary cache path
+      run: |
+        New-Item -ItemType Directory -Force "$env:APPDATA\vcpkg\archives" | Out-Null
+        echo "VCPKG_DEFAULT_BINARY_CACHE=$env:APPDATA\vcpkg\archives" >> "$env:GITHUB_ENV"
+
+    - name: Restore vcpkg cache
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+        key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{ runner.os }}-${{ runner.arch }}-
+
+    - name: Set vcpkg toolchain
+      run: echo "CMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" >> "$env:GITHUB_ENV"
+
+    - name: Configure CMake
+      run: cmake -S $env:GITHUB_WORKSPACE -B $env:GITHUB_WORKSPACE\build -DCMAKE_BUILD_TYPE=$env:BUILD_TYPE
+
+    - name: Build
+      run: cmake --build $env:GITHUB_WORKSPACE\build --config $env:BUILD_TYPE --parallel $env:NUMBER_OF_PROCESSORS --verbose
+
+    - name: Test
+      run: ctest --test-dir $env:GITHUB_WORKSPACE\build -C $env:BUILD_TYPE --verbose
+
+    - name: Save vcpkg cache
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+        key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('vcpkg.json') }}
