@@ -18,7 +18,7 @@
 #include <xtensor/containers/xtensor.hpp> // IWYU pragma: keep
 
 #include <weif/detail/fftw3_wrap.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 #if __cpp_lib_memory_resource >= 201603
 #include <memory_resource>
@@ -37,7 +37,7 @@ namespace weif {
  * Implements a dimensional digital filter.
  */
 template<class T, class Allocator = std::allocator<T>>
-class digital_filter_2d:
+class WEIF_TEMPLATE_EXPORT digital_filter_2d:
 	private Allocator {
 public:
 	using value_type = T; ///< Numeric type used for calculations

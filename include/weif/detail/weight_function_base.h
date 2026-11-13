@@ -21,14 +21,14 @@
 #include <weif/detail/cubic_spline.h>
 #include <weif/math.h>
 #include <weif/uniform_grid.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
 namespace detail {
 
 template<class T>
-class weight_function_base {
+class WEIF_TEMPLATE_EXPORT weight_function_base {
 public:
 	using value_type = T;
 

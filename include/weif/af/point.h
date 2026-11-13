@@ -7,7 +7,7 @@
 #ifndef _WEIF_AF_POINT_H
 #define _WEIF_AF_POINT_H
 
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
@@ -26,7 +26,7 @@ namespace af {
  * This represents an ideal point aperture.
  */
 template<class T>
-struct point {
+struct WEIF_TEMPLATE_EXPORT point {
 	using value_type = T; ///< Numeric type used for calculations
 
         /**

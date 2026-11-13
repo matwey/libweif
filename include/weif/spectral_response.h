@@ -21,7 +21,7 @@
 
 #include <weif/error.h>
 #include <weif/uniform_grid.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
@@ -40,7 +40,7 @@ namespace weif {
  * @see sf::poly
  */
 template<class T>
-class spectral_response {
+class WEIF_TEMPLATE_EXPORT spectral_response {
 public:
 	using value_type = T; ///< Numeric type for spectral calculations
 

@@ -14,14 +14,14 @@
 
 #include <weif/detail/cubic_spline.h>
 #include <weif/uniform_grid.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
 namespace af {
 
 template<class T>
-class angle_averaged {
+class WEIF_TEMPLATE_EXPORT angle_averaged {
 public:
 	using value_type = T;
 

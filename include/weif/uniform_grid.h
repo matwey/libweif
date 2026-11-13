@@ -10,7 +10,7 @@
 #include <cstdlib>
 
 #include <weif/detail/uniform_grid.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 #include <xtensor/generators/xgenerator.hpp>
 
@@ -30,7 +30,7 @@ namespace weif {
  * where x_0 is the grid origin, \f$\Delta x\f$ is the grid spacing, and \f$N\f$ is the grid size.
  */
 template<class T>
-class uniform_grid {
+class WEIF_TEMPLATE_EXPORT uniform_grid {
 public:
 	using value_type = T; ///< Numeric type for grid values
 

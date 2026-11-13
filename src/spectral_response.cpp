@@ -9,8 +9,8 @@
 
 namespace weif {
 
-template class WEIF_EXPORT spectral_response<float>;
-template class WEIF_EXPORT spectral_response<double>;
-template class WEIF_EXPORT spectral_response<long double>;
+template class WEIF_INSTANTIATION_EXPORT spectral_response<float>;
+template class WEIF_INSTANTIATION_EXPORT spectral_response<double>;
+template class WEIF_INSTANTIATION_EXPORT spectral_response<long double>;
 
 } // weif

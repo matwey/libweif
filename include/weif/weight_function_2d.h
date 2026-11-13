@@ -17,7 +17,7 @@
 #include <xtensor/core/xmath.hpp>
 
 #include <weif/detail/weight_function_base.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
@@ -43,7 +43,7 @@ namespace weif {
  * @see weif::math::Kolmogorov_Cn2_scale
  */
 template<class T>
-class weight_function_2d:
+class WEIF_TEMPLATE_EXPORT weight_function_2d:
 // @cond
 	public detail::weight_function_base<T>
 // @endcond

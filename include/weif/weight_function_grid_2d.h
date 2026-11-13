@@ -18,7 +18,7 @@
 #include <xtensor/containers/xtensor.hpp> // IWYU pragma: keep
 
 #include <weif/detail/fftw3_wrap.h> // IWYU pragma: keep
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 #if __cpp_lib_memory_resource >= 201603
 #include <memory_resource>
@@ -29,7 +29,7 @@ namespace weif {
 namespace detail {
 
 template<class T>
-class weight_function_grid_2d_base {
+class WEIF_TEMPLATE_EXPORT weight_function_grid_2d_base {
 public:
 	using value_type = T;
 	using shape_type = std::array<std::size_t, 2>;
@@ -90,7 +90,7 @@ public:
  * - Geometric scales and grid steps: millimeters (mm)
  */
 template<class T, class Allocator = std::allocator<T>>
-class weight_function_grid_2d:
+class WEIF_TEMPLATE_EXPORT weight_function_grid_2d:
 // @cond
 	public detail::weight_function_grid_2d_base<T>,
 	private Allocator
