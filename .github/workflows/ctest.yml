@@ -58,7 +58,7 @@ jobs:
     - name: Configure CMake
       env:
         CXXFLAGS: ${{ steps.cc.outputs.cxxflags }}
-      run: cmake -B ${GITHUB_WORKSPACE}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{env.VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake
+      run: cmake -B ${GITHUB_WORKSPACE}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=${{env.VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       run: cmake --build ${GITHUB_WORKSPACE}/build --config ${{env.BUILD_TYPE}} --parallel $(nproc) --verbose
