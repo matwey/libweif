@@ -37,7 +37,7 @@ namespace weif {
  * Implements a dimensional digital filter.
  */
 template<class T, class Allocator = std::allocator<T>>
-class WEIF_EXPORT digital_filter_2d:
+class digital_filter_2d:
 	private Allocator {
 public:
 	using value_type = T; ///< Numeric type used for calculations

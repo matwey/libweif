@@ -26,7 +26,7 @@ namespace af {
  * This represents an ideal point aperture.
  */
 template<class T>
-struct WEIF_EXPORT point {
+struct point {
 	using value_type = T; ///< Numeric type used for calculations
 
         /**

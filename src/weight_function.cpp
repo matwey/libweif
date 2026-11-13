@@ -9,8 +9,8 @@
 
 namespace weif {
 
-template class weight_function<float>;
-template class weight_function<double>;
-template class weight_function<long double>;
+template class WEIF_EXPORT weight_function<float>;
+template class WEIF_EXPORT weight_function<double>;
+template class WEIF_EXPORT weight_function<long double>;
 
 } // weif

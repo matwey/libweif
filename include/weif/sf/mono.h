@@ -32,7 +32,7 @@ namespace sf {
  * where \f$x \equiv z f^2 = \frac{u^2}{\lambda}\f$.
  */
 template<class T>
-class WEIF_EXPORT mono {
+class mono {
 public:
 	using value_type = T; ///< Numeric type used for calculations
 

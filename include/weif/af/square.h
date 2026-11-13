@@ -33,7 +33,7 @@ namespace af {
  * representing the Fourier transform of a square pupil function.
  */
 template<class T>
-struct WEIF_EXPORT square {
+struct square {
 	using value_type = T; ///< Numeric type used for calculations
 
 	/**

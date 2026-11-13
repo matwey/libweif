@@ -21,7 +21,7 @@ namespace weif {
 namespace af {
 
 template<class T>
-class WEIF_EXPORT angle_averaged {
+class angle_averaged {
 public:
 	using value_type = T;
 
