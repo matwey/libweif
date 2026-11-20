@@ -13,7 +13,7 @@
 #include <xtensor/core/xmath.hpp>
 
 #include <weif/math.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
@@ -32,7 +32,7 @@ namespace sf {
  * where \f$x \equiv z f^2 = \frac{u^2}{\lambda}\f$.
  */
 template<class T>
-class WEIF_EXPORT mono {
+class WEIF_TEMPLATE_EXPORT mono {
 public:
 	using value_type = T; ///< Numeric type used for calculations
 

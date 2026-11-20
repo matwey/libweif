@@ -14,7 +14,7 @@
 #include <xtensor/core/xvectorize.hpp>
 
 #include <weif/math.h>
-#include <weif_export.h>
+#include <weif/detail/export.h>
 
 
 namespace weif {
@@ -33,7 +33,7 @@ namespace af {
  * representing the Fourier transform of a square pupil function.
  */
 template<class T>
-struct WEIF_EXPORT square {
+struct WEIF_TEMPLATE_EXPORT square {
 	using value_type = T; ///< Numeric type used for calculations
 
 	/**
