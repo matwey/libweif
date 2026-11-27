@@ -7,7 +7,7 @@
 #ifndef _WEIF_ERROR_H
 #define _WEIF_ERROR_H
 
-#include <sstream>
+#include <format>
 #include <stdexcept>
 #include <string>
 
@@ -62,10 +62,7 @@ struct WEIF_EXPORT non_uniform_grid:
 	 */
 	template<class T>
 	non_uniform_grid(std::size_t position, T actual, T expected):
-		error(reinterpret_cast<std::ostringstream&>(std::ostringstream() << "Non uniform input grid at position "
-			<< position << ", actual value "
-			<< actual << ", expected "
-			<< expected).str()) {}
+		error(std::format("Non uniform input grid at position {}, actual value {}, expected {}", position, actual, expected)) {}
 };
 
 /**
