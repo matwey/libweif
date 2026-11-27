@@ -9,6 +9,12 @@ OPTION(BUILD_TESTS    "libweif test"          ON)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 20)
 
+if(WIN32)
+	# Multi-config generators append the configuration name automatically,
+	# so all executables and DLLs end up in bin/<config> together.
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endif()
+
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CheckIPOSupported)
