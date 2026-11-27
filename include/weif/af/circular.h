@@ -38,7 +38,7 @@ namespace af {
  * a unit circular aperture) and \f$J_1\f$ is the Bessel function of the first kind.
  */
 template<class T>
-struct WEIF_EXPORT circular {
+struct WEIF_TEMPLATE_EXPORT circular {
 	using value_type = T; ///< Numeric type used for calculations
 
 	/**
@@ -123,7 +123,7 @@ struct WEIF_EXPORT circular {
  * - \f$\mathrm{jinc}_1(x) = \frac{2 J_1(x)}{x}\f$ is the jinc function.
  */
 template<class T>
-class WEIF_EXPORT annular {
+class WEIF_TEMPLATE_EXPORT annular {
 public:
 	using value_type = T; ///< Numeric type used for calculations
 
@@ -261,7 +261,7 @@ public:
  * Reference: Tokovinin, et. al. (2003) "Restoration of turbulence profile from scintillation indices", https://doi.org/10.1046/j.1365-8711.2003.06731.x
  */
 template<class T>
-class WEIF_EXPORT cross_annular {
+class WEIF_TEMPLATE_EXPORT cross_annular {
 public:
 	using value_type = T; ///< Numeric type used for covariance calculations
 

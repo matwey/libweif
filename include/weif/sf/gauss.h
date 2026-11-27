@@ -37,7 +37,7 @@ namespace sf {
  * Reference: Tokovinin (2003) "Polychromatic scintillation", https://doi.org/10.1364/JOSAA.20.000686
  */
 template<class T>
-class WEIF_EXPORT gauss {
+class WEIF_TEMPLATE_EXPORT gauss {
 public:
 	using value_type = T; ///< Numeric type used for calculations
 

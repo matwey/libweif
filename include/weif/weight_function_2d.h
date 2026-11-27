@@ -43,7 +43,7 @@ namespace weif {
  * @see weif::math::Kolmogorov_Cn2_scale
  */
 template<class T>
-class WEIF_EXPORT weight_function_2d:
+class WEIF_TEMPLATE_EXPORT weight_function_2d:
 // @cond
 	public detail::weight_function_base<T>
 // @endcond

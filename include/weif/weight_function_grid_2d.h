@@ -29,7 +29,7 @@ namespace weif {
 namespace detail {
 
 template<class T>
-class WEIF_EXPORT weight_function_grid_2d_base {
+class WEIF_TEMPLATE_EXPORT weight_function_grid_2d_base {
 public:
 	using value_type = T;
 	using shape_type = std::array<std::size_t, 2>;
@@ -90,7 +90,7 @@ public:
  * - Geometric scales and grid steps: millimeters (mm)
  */
 template<class T, class Allocator = std::allocator<T>>
-class WEIF_EXPORT weight_function_grid_2d:
+class WEIF_TEMPLATE_EXPORT weight_function_grid_2d:
 // @cond
 	public detail::weight_function_grid_2d_base<T>,
 	private Allocator

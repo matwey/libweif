@@ -37,7 +37,7 @@ namespace af {
  * pupil function, commonly used to model apodized optical systems.
  */
 template<class T>
-struct WEIF_EXPORT gauss {
+struct WEIF_TEMPLATE_EXPORT gauss {
 	using value_type = T; ///< Numeric type used for calculations
 
 	/**

@@ -10,9 +10,9 @@
 namespace weif {
 namespace sf {
 
-template class poly<float>;
-template class poly<double>;
-template class poly<long double>;
+template class WEIF_INSTANTIATION_EXPORT poly<float>;
+template class WEIF_INSTANTIATION_EXPORT poly<double>;
+template class WEIF_INSTANTIATION_EXPORT poly<long double>;
 
 } // sf
 } // weif

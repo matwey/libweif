@@ -14,7 +14,7 @@ endif()
 file(GLOB_RECURSE SOURCES *.cpp)
 add_library(weif ${SOURCES})
 if(MSVC)
-target_compile_options(weif PUBLIC "/Wall;/fp:precise")
+target_compile_options(weif PUBLIC "/W4;/fp:precise")
 else()
 target_compile_options(weif
 	PUBLIC "-Wall;-ffast-math;-fno-finite-math-only"
@@ -45,7 +45,16 @@ target_link_libraries(weif Boost::boost PkgConfig::FFTW3F PkgConfig::FFTW3 PkgCo
 set_target_properties(weif PROPERTIES VERSION 1.0.0 SOVERSION 1)
 set_target_properties(weif PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
-generate_export_header(weif)
+set(_TEMPLATE_EXPORT "#if defined(_WIN32) || defined(__CYGWIN__)
+#  define WEIF_TEMPLATE_EXPORT
+#  define WEIF_INSTANTIATION_EXPORT WEIF_EXPORT
+#else
+#  define WEIF_TEMPLATE_EXPORT WEIF_EXPORT
+#  define WEIF_INSTANTIATION_EXPORT
+#endif")
+
+generate_export_header(weif
+	CUSTOM_CONTENT_FROM_VARIABLE _TEMPLATE_EXPORT)
 
 install(TARGETS weif
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

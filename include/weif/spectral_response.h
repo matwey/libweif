@@ -40,7 +40,7 @@ namespace weif {
  * @see sf::poly
  */
 template<class T>
-class WEIF_EXPORT spectral_response {
+class WEIF_TEMPLATE_EXPORT spectral_response {
 public:
 	using value_type = T; ///< Numeric type for spectral calculations
 

@@ -28,7 +28,7 @@ namespace weif {
 namespace detail {
 
 template<class T>
-class WEIF_EXPORT weight_function_base {
+class WEIF_TEMPLATE_EXPORT weight_function_base {
 public:
 	using value_type = T;
 
